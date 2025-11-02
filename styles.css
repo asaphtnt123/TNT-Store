@@ -171,7 +171,7 @@ p { margin-bottom: var(--space-md); }
 }
 
 .header-main .container {
-  display: grid;
+  display: contents;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: var(--space-xl);
