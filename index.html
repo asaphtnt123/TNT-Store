@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Atacadão dos Revendedores - Melhores preços em roupas, joias e acessórios com entrega rápida">
-    <meta property="og:title" content="Atacadão dos Revendedores - Sua Loja de Atacado Online">
+    <meta name="description" content="Atacadão dos Revendedores - Joias e Acessórios com Preços Imbatíveis">
+    <meta property="og:title" content="Atacadão dos Revendedores - Sua Loja de Joias Online">
     <meta property="og:image" content="https://exemplo.com/logo-social.jpg">
     
-    <title>Atacadão dos Revendedores - Loja Virtual</title>
+    <title>Atacadão dos Revendedores - Joias & Acessórios</title>
     
     <!-- Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- Ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -22,306 +22,295 @@
 </head>
 
 <body>
-    <!-- Barra de Navegação Superior -->
-    <nav class="menu-nav">
-        
-    </nav>
+    <!-- Header Principal -->
+    <header class="main-header">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="container">
+                <div class="promo-banner">
+                    <span class="promo-tag">✨ PROMOÇÃO</span>
+                    <span class="promo-text">Frete grátis acima de R$ 100 • 10% off no PIX</span>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="admin-btn" onclick="goToAdminPage()">
+                        <i class="fas fa-cog"></i> Painel ADM
+                    </button>
+                </div>
+            </div>
+        </div>
 
-<!-- Caixa de diálogo de finalização da compra -->
-<div id="checkoutModal" class="modal">
+        <!-- Logo e Navegação -->
+        <div class="header-main">
+            <div class="container">
+                <div class="logo-section">
+                    <div class="logo">
+                        <img id="profileImage" src="caminho/para/logo.png" alt="Atacadão dos Revendedores">
+                        <h1 id="profileName">Atacadão dos Revendedores</h1>
+                    </div>
+                </div>
 
-  <div class="modal-content">
-    <span class="close" onclick="closeCheckoutModal()">&times;</span>
-<!-- Element to display the delivery fee -->
-<p id="cartDeliveryFee" style="display: none;"></p>
-
-    <h3>Finalizar Compra</h3>
-<!-- Element to display the delivery fee -->
-<p id="cartDeliveryFee" style="display: none;"></p>
-<!-- Element to display the total amount -->
-
-	<div>
-	<label  for="name">Nome:</label>
-	<input class="input-field"type="text" id="name" placeholder="Nome completo">
-	</div>
-	<div>
-	<label for="address">Endereço:</label>
-    <input class="input-field"type="text" id="address" placeholder="Rua, Numero, Bairro">
-	</div>
-	
-	<div>
-    <label for="paymentMethod">Método de Pagamento:</label>
-<select id="paymentMethod" onchange="showTrocoField()"class="select-field">
-  <option value="Cartao">Cartão</option>
-  <option value="Dinheiro">Dinheiro</option>
-  <option value="Pix">Pix</option>
-</select>
-</div>
-<select id="deliveryOption" onchange="handleDeliveryOptionChange()"class="select-field">
-  <option value="none" selected>Entrega ou Retirada?</option>
-  <option value="delivery">Entrega</option>
-  <option value="pickup">Retirada no estabelecimento</option>
-</select>
-
-
-
-
- <div id="trocoContainer" style="display: none;">
-  <label for="troco">Troco para quanto?</label>
-  <input class="input-field" type="number" id="troco" placeholder="R$00,00">
-</div>
-<div>
-<button class="btnConfirm" onclick="confirmPurchase()">Confirmar Compra</button>
-  <p id="totalWithDelivery">Total com taxa de entrega: R$ 0.00</p>
-
-
-</div>
-</div>
-</div>
-<body>
-
-<header>
-  <div class="header-top">
-  <!-- Coluna Esquerda - Informações de Contato -->
-  
-
-  <div class="header-top">
-  <!-- Coluna Esquerda - Carrinho -->
-  <div class="header-column left-column">
-    <div class="cart-action">
-      <div class="cart-wrapper" onclick="toggleCart()">
-        <i class="fas fa-shopping-cart cart-icon"></i>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- Coluna Central - Promoções -->
-  <div class="header-column promo-column">
-    <div class="promo-marquee">
-      <div class="promo-text-container">
-        <p class="promo-text">
-          <span class="promo-tag">🔥 PROMO!</span>
-          Promoções incríveis em andamento! Aproveite agora! Não perca tempo!
-        </p>
-      </div>
-    </div>
-  </div>
-
-  
-</div>
-
-  <!-- Coluna Direita - Ações do Usuário -->
-  
-</div>
-
-  <div class="main-header">
-   <!-- Botão para a página administrativa -->
-  <button class="admin-button" onclick="goToAdminPage()">Painel-ADM</button>
-
-    <div class="logo-profile">
-      <img id="profileImage" src="caminho/para/logo.png" alt="Logo da Loja">
-      <h1 id="profileName">Atacadão dos Revendedores</h1>
-    </div>
-
-    <div class="header-actions">
-      <div class="search-input-container">
+                <div class="search-section">
+    <div class="search-container">
         <i class="fas fa-search search-icon"></i>
-  <input class="search-input" type="text" id="searchInput" placeholder="Pesquisar produtos..." oninput="searchProducts()">
-      </div>
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar joias, acessórios..." oninput="searchProducts()">
+        <button class="search-btn" onclick="searchProducts()">
+            <i class="fas fa-arrow-right"></i>
+        </button>
     </div>
-  </div>
-
-  <nav class="category-nav">
-    <div class="category-buttons">
-      <button class="category-button" onclick="loadCategory('ProdutosCat1')">
-        <i class="fas fa-tshirt"></i> Camisetas
-      </button>
-      <button class="category-button" onclick="loadCategory('ProdutosCat2')">
-        <i class="fas fa-swimming-pool"></i> Bermudas
-      </button>
-      <button class="category-button" onclick="loadCategory('ProdutosCat3')">
-        <i class="fas fa-snowflake"></i> Inverno
-      </button>
-      <button class="category-button" onclick="loadCategory('ProdutosCat4')">
-        <i class="fas fa-female"></i> Roupas Íntimas
-      </button>
-      <button class="category-button" onclick="loadCategory('ProdutosCat5')">
-        <i class="fas fa-gem"></i> Joias
-      </button>
+    
+    <!-- Container para resultados da pesquisa -->
+    <div id="searchResults" class="search-results" style="display: none;">
+        <div class="search-results-header">
+            <h4>Resultados da Pesquisa</h4>
+            <button class="close-search-results" onclick="closeSearchResults()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="searchResultsContent" class="search-results-content">
+            <!-- Resultados serão carregados aqui -->
+        </div>
     </div>
-  </nav>
-<div id="fullscreenImageOverlay" class="fullscreen-image-overlay">
-  <img id="fullscreenImage" src="" alt="Imagem em Tamanho Real">
-  <button id="closeFullscreenButton" class="close-fullscreen-button">Fechar</button>
 </div>
 
-<!-- ... -->
-<div id="productDetailsDialog" class="product-details-dialog">
-  <div id="productDetailsContent" class="product-details-content">
-    <!-- Aqui é onde as informações do produto serão exibidas dinamicamente -->
-  </div>
-  <button id="closeDetailsButton" class="close-details-button">Fechar</button>
-</div>
-<div id="messageBox" class="message-box"></div>
+                <div class="cart-section">
+                    <button class="cart-btn" onclick="toggleCart()">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-<!-- Carrinho de Compras -->
-<div class="cart" id="cart">
-  <h2>Carrinho de Compras</h2>
-  <p id="cartDeliveryFee" style="display: none;"></p>
-  
-  <ul id="cartItems">
-    <!-- Itens do carrinho -->
-  </ul>
-  
-  <span id="cartTotal">Total: R$ 0.00</span>
-  <h5>Taxa de Entrega: R$ 2.00</h5>
-  
-  <!-- Botão "Finalizar Compra" -->
-  <div class="cart-buttons">
-    <button class="btn" onclick="openCheckoutModal()" id="finalizarButton" disabled>Finalizar Compra</button>
-    <button class="btn" onclick="toggleCart()" id="fecharButton">Fechar Carrinho</button> <!-- Botão de fechar/abrir -->
-  </div>
-</div>
-
-
-  </header>
- 
-
-
-  </section>
-<div class="menu0" id="menu0">
-    <!-- Aqui serão exibidos os itens do primeiro menu -->
-  </div>
-
-
-
-  <!-- Seu HTML -->
-<div>
-  <div class="menu0" id="menu0">
-    <!-- Aqui serão exibidos os itens do primeiro menu -->
-	<!-- Div para exibir a categoria selecionada -->
-<div id="selectedCategory">
-
-  <h2 id="categoryTitle"></h2>
-  
-  <div id="selectedCategoryProducts" class="horizontal-flex-container"></div>
-</div>
-  </div>
- <div>
-  <h2 class="centered">Novidades 2023 </h2>
-  <!-- Espaço de anúncios -->
- </div>
-
- 
-
-<div class="menu2" id="menu2">
-  <!-- Aqui serão exibidos os itens do segundo menu -->
-</div>
- <div class="menu" id="menu">
- 
-    <!-- Aqui serão exibidos os itens do primeiro menu -->
-  </div>
-
-</div>
- <div class="anuncio-image-container">
-  <img id="anuncioImage" src="" alt="Imagem de Anúncio">
-</div>
-  
-  
-  <footer>
-  
-  <div class="kit-container">
-  <!-- Imagens e textos dos kits de roupas -->
-  <div class="kit-item kit-premium">
-    <img src="https://th.bing.com/th/id/R.01bb8ce330fcf29c2021d0880f8b12bb?rik=rnqxmZlrtDeRIg&pid=ImgRaw&r=0" alt="Kit Premium">
-    <p>Melhores preços em Roupas</p>
-  </div>
-  <div class="kit-item kit-basico">
-    <img src="https://th.bing.com/th/id/OIP.-fO7_XnUHF47ZrZIOLDWoAHaFS?pid=ImgDet&rs=1" alt="Kit Básico">
-    <p>Melhores preços em Joias</p>
-  </div>
- <div class="kit-item kit-medio">
-  <img src="https://th.bing.com/th/id/R.6df3c582ccf7dbcb4f18c5b930e3f9a5?rik=P%2bSlrL8cLTHSPg&pid=ImgRaw&r=0&sres=1&sresct=1" alt="Kit Medio">
-  <p>Melhores preços em Acessórios</p>
-</div>
-
-  <!-- Adicione mais kits conforme necessário -->
-</div>
-
-    <div class="footer-content">
-	 <div class="policy-links">
-      <a href="#">Quem Somos</a>
-      <a href="#">Políticas</a>
-      <a href="#">Frete e Reembolso</a>
-	  <a href="#">Contato</a>
-
-      <!-- Adicione mais links conforme necessário -->
+        <!-- Navegação por Categorias -->
+        <nav class="category-nav">
+            <div class="container">
+                <div class="category-buttons">
+                   
+                </div>
+                <div class="subcategory-nav" id="subcategoryNav" style="display: none;">
+    <div class="container">
+        <div class="subcategory-buttons" id="subcategoryButtons">
+            <!-- Subcategorias serão carregadas aqui -->
+        </div>
     </div>
-      <p>Endereço: Rua Italo Avancini, N°123 - Itapira, SP</p>
-      <p>Telefone: (19) 9999-28467</p>
-      <p>>>>>>>>>>"DEUS É FIEL"<<<<<<<< </p>
-   
-  <p class="copyright">&copy; 2023 TNT'Design. Todos os direitos reservados.</p>
+</div>
+  <!-- Categoria Selecionada -->
+            <section class="category-products">
+                <div id="selectedCategory">
+                    <div class="section-header">
+                        <h2 id="categoryTitle">Todos os Produtos</h2>
+                    </div>
+                    <div id="selectedCategoryProducts" class="products-grid">
+                        <!-- Produtos da categoria selecionada -->
+                    </div>
+                    
+                </div>
+            </section>
+        </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Banner Hero -->
+           <section class="exclusive-products">
+    <div class="container">
+        <div class="section-header">
+            <h2>🎯 Produtos Exclusivos</h2>
+            <p>Itens especiais selecionados para você</p>
+        </div>
+        <div id="exclusiveProducts" class="products-grid">
+            <!-- Produtos exclusivos carregados via JavaScript -->
+        </div>
     </div>
-  </footer>
-  
-<!-- HTML -->
-<!-- HTML -->
-<!-- HTML -->
-<!-- HTML -->
-<div id="chat-container" class="chat-container">
-  <div class="chat-icon">
-    <img src="https://th.bing.com/th/id/OIP.omBJDhDA8rocKg_r8uzJ6gHaHi?pid=ImgDet&rs=1" alt="Chat via WhatsApp">
-  </div>
-</div>
+</section>
 
+            <!-- Produtos em Destaque -->
+            <section class="featured-products">
+    <div class="container">
+        <div class="section-header">
+            <h2>⭐ Em Destaque</h2>
+            <p>Nossos produtos mais populares</p>
+        </div>
+        <div id="featuredProducts" class="products-grid">
+            <!-- Produtos em destaque carregados via JavaScript -->
+        </div>
+    </div>
+</section>
 
+          
 
+    </main>
 
+    <!-- Carrinho de Compras -->
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Seu Carrinho</h3>
+            <button class="close-cart" onclick="toggleCart()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="cart-content">
+            <div id="cartItems" class="cart-items">
+                <!-- Itens do carrinho -->
+            </div>
+            
+            <div class="cart-summary">
+                <div class="cart-totals">
+                    <div class="total-line">
+                        <span>Subtotal:</span>
+                        <span id="cartSubtotal">R$ 0,00</span>
+                    </div>
+                    <div class="total-line">
+                        <span>Entrega:</span>
+                        <span id="cartDeliveryFee">R$ 2,00</span>
+                    </div>
+                    <div class="total-line final">
+                        <span>Total:</span>
+                        <span id="cartTotal">R$ 2,00</span>
+                    </div>
+                </div>
+                
+                <button class="checkout-btn" onclick="openCheckoutModal()" id="finalizarButton" disabled>
+                    Finalizar Compra <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
+    <!-- Modal de Finalização -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Finalizar Pedido</h3>
+                <button class="close-modal" onclick="closeCheckoutModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="checkoutForm">
+                    <div class="form-group">
+                        <label for="name">Nome Completo</label>
+                        <input type="text" id="name" class="form-input" placeholder="Seu nome completo" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deliveryOption">Tipo de Entrega</label>
+                        <select id="deliveryOption" class="form-select" onchange="handleDeliveryOptionChange()">
+                            <option value="none">Selecione...</option>
+                            <option value="delivery">Entrega</option>
+                            <option value="pickup">Retirada no Local</option>
+                        </select>
+                    </div>
+                    
+                    <div id="addressFields" class="form-group" style="display: none;">
+                        <label for="address">Endereço de Entrega</label>
+                        <input type="text" id="address" class="form-input" placeholder="Rua, número, bairro">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="paymentMethod">Forma de Pagamento</label>
+                        <select id="paymentMethod" class="form-select" onchange="showTrocoField()">
+                            <option value="Cartao">Cartão</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Pix">PIX</option>
+                        </select>
+                    </div>
+                    
+                    <div id="trocoContainer" class="form-group" style="display: none;">
+                        <label for="troco">Troco para quanto?</label>
+                        <input type="number" id="troco" class="form-input" placeholder="R$ 0,00" min="0">
+                    </div>
+                    
+                    <div class="order-summary">
+                        <h4>Resumo do Pedido</h4>
+                        <div id="orderSummary"></div>
+                        <div class="order-total">
+                            <strong id="totalWithDelivery">Total: R$ 0,00</strong>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeCheckoutModal()">Cancelar</button>
+                <button class="btn-primary" onclick="confirmPurchase()">
+                    <i class="fas fa-whatsapp"></i> Enviar para WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
 
-  
-  <div id="outOfStockDialog" class="modal">
-  <div class="modal-content">
-    <h3>Produto fora de estoque</h3>
-    <p>Desculpe, o produto selecionado está fora de estoque no momento.</p>
-    <button class="btnConfirm" onclick="closeOutOfStockDialog()">OK</button>
-  </div>
-</div>
+    <!-- Modais Auxiliares -->
+    <div id="productModal" class="modal">
+        <div class="modal-content product-modal">
+            <!-- Conteúdo do produto será injetado via JavaScript -->
+        </div>
+    </div>
 
-<div id="customPromptDialog">
-  <p id="promptText"></p>
-  <input type="text" id="promptInput" />
-  <button onclick="submitPrompt()">OK</button>
-</div>
+    <div id="outOfStockDialog" class="modal">
+        <div class="modal-content">
+            <h3>Produto Indisponível</h3>
+            <p>Este produto está fora de estoque no momento.</p>
+            <button class="btn-primary" onclick="closeOutOfStockDialog()">Entendi</button>
+        </div>
+    </div>
 
-<div id="productOptionsDialog" class="modal">
-  <div class="modal-content">
-    <h3>Opções do Produto</h3>
-    <button class="btnOption" onclick="showProductDetails()">Ver Detalhes do Produto</button>
-    <button class="btnOption" onclick="addToCartConfirm()">Adicionar ao Carrinho</button>
-    <button class="btnConfirm" onclick="closeProductOptionsDialog()">Cancelar</button>
-  </div>
-</div>
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Atacadão dos Revendedores</h4>
+                    <p>Melhores preços em joias, roupas e acessórios</p>
+                    <div class="contact-info">
+                        <p><i class="fas fa-map-marker-alt"></i> Rua Italo Avancini, 123 - Itapira, SP</p>
+                        <p><i class="fas fa-phone"></i> (19) 9999-28467</p>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Links Rápidos</h4>
+                    <div class="footer-links">
+                        <a href="#">Quem Somos</a>
+                        <a href="#">Políticas</a>
+                        <a href="#">Frete e Reembolso</a>
+                        <a href="#">Contato</a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Categorias</h4>
+                    <div class="footer-links">
+                        <a href="#" onclick="loadCategory('ProdutosCat5')">Joias</a>
+                        <a href="#" onclick="loadCategory('ProdutosCat1')">Roupas</a>
+                        <a href="#" onclick="loadCategory('ProdutosCat4')">Acessórios</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Atacadão dos Revendedores. Todos os direitos reservados.</p>
+                <p>>>>>>>>>> "DEUS É FIEL" <<<<<<<<< </p>
+            </div>
+        </div>
+    </footer>
 
+    <!-- WhatsApp Float -->
+    <div class="whatsapp-float">
+        <a href="https://wa.me/5519999999999" target="_blank" class="whatsapp-btn">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
 
-
-	  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
-</body>
-
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="scripts.js"></script>
-
-
-
-
-
-  
-  
-  
-  
-
-
+</body>
 </html>

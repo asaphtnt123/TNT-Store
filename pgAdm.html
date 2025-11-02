@@ -1,1357 +1,1463 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Adicionar Produto</title>
-</head>
-
-<style>
- #pageInfo {
-    background-color: #f5f5f5;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-
-  #logoImage {
-    max-width: 200px;
-    height: auto;
-    margin-bottom: 10px;
-  }
-
-  #changeLogoButton,
-  #updateNameAndWhatsAppButton {
-    background-color: #3f618b;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 10px;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-  }
-
-  #changeLogoButton:hover,
-  #updateNameAndWhatsAppButton:hover {
-    background-color: #2980b9;
-  }
-
-  #pageName,
-  #whatsapp {
-    font-weight: bold;
-    color: #333;
-  }
-  #logoImage {
-    max-width: 100px; /* Define a largura máxima da imagem para evitar esticamento */
-    height: auto; /* Mantém a proporção da imagem */
-    display: block; /* Garante que a imagem não cause espaços indesejados */
-    margin: 10px auto; /* Margem para espaçamento em torno da imagem */
-  }
-/* Estilo para a seção "Adicionar Produto" */
- body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9; /* Cor de fundo branco */
-    color: #333; /* Cor do texto padrão */
-  }
-
-  h1 {
-    font-size: 30px; /* Tamanho de fonte maior */
-    text-align: center; /* Alinhar o texto ao centro */
-    margin-top: 30px; /* Margem superior para espaçamento */
-    color: #3f618b; /* Cor rosa */
-    text-transform: uppercase; /* Transformar o texto em maiúsculas */
-  }
-
-  .form-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-    background-color: #fff; /* Cor de fundo do container */
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
-    width: 90%;
-    margin: 20px auto;
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 20px;
-  }
-
-  .form-group label {
-    font-size: 18px;
-    color: #3f618b; /* Cor rosa */
-    margin-bottom: 5px;
-  }
-
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f9f9f9; /* Cor de fundo branco */
-    color: #333;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: border-color 0.3s ease;
-  }
-
-  .form-group input:focus,
-  .form-group textarea:focus,
-  .form-group select:focus {
-    border-color: #3f618b; /* Cor de destaque rosa quando o input está em foco */
-    outline: none;
-  }
-
-.form-group select {
-  appearance: none; /* Remover a aparência padrão do select */
-  padding-right: 30px; /* Adicionar espaço para a seta do select */
-}
-
-
-  .center-button {
-    background-color: #3f618b; /* Cor de fundo rosa */
-    color: #fff; /* Cor do texto branco */
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 18px;
-  }
-
-  .center-button:hover {
-    background-color: #d81b60; /* Cor de fundo rosa mais escura ao passar o mouse */
-  }
-h3 {
-  color: #fff; /* Cor rosa */
-  font-size: 36px; /* Tamanho de fonte maior */
-  font-family: 'Arial', sans-serif; /* Escolha uma fonte feminina ou cursiva */
-  text-transform: uppercase; /* Transformar o texto em maiúsculas */
-  letter-spacing: 2px; /* Espaçamento entre letras */
-  text-align: center; /* Alinhar o texto ao centro */
-  margin-top: 40px; /* Margem superior para espaçamento */
-  border: 2px solid #3f618b; /* Borda arredondada de cor rosa claro */
-  border-radius: 20px; /* Raio da borda arredondada */
-  padding: 10px 20px; /* Espaçamento interno para o título */
-  background-color: #3f618b;
-
-}
-
-
- 
-  .product-table {
-    overflow-x: auto; /* Adiciona uma barra de rolagem horizontal caso a tabela seja maior que a tela */
-    margin: 10px 0; /* Margem nos lados para espaçamento horizontal e espaçamento superior e inferior */
-    width: 100%; /* Largura da tabela definida como 100% do contêiner .form-container */
-    max-height: 300px; /* Altura máxima do contêiner da tabela para evitar que ocupe muito espaço */
-    border-radius: 8px; /* Borda arredondada */
-    overflow-y: auto; /* Adiciona uma barra de rolagem vertical caso a tabela seja maior que a altura máxima definida */
-  }
-
-  .product-table table {
-    width: 100%; /* Largura total da tabela */
-    border-collapse: collapse; /* Colapso das bordas das células */
-    background-color: #efefef; /* Cor de fundo da tabela */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra */
-    border-radius: 8px; /* Borda arredondada */
-    white-space: nowrap; /* Evita que o conteúdo da tabela quebre em várias linhas */
-  }
-
-  .product-table th,
-  .product-table td {
-    font-size: 15px;
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    word-break: break-word; /* Permite que o conteúdo das células seja quebrado em várias linhas, se necessário */
-  }
-
-
-.center-button {
-  display: block;
-  margin: 20px auto 0;
-}
-.color-control {
-  background-color: #f8f9fa;
-  padding: 20px;
-      display: ruby;
-
-  border-radius: 10px;
-  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-  margin: 20px 0;
-  max-width: 500px;
-}
-
-.color-control label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #2d3436;
-  font-size: 14px;
-}
-
-.color-control input[type="color"] {
-  width: 100%;
-  height: 40px;
-  margin-bottom: 15px;
-  border: 2px solid #ddd;
-  border-radius: 6px;
-  padding: 3px;
-  cursor: pointer;
-}
-
-.color-control button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  margin-top: 10px;
-}
-
-.color-control button:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
-}
-
-.color-previews {
-  display: flex;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.color-preview {
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-  border: 2px solid #ddd;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-/* Layout responsivo */
-@media (max-width: 480px) {
-  .color-control {
-    padding: 15px;
-  }
-  
-  .color-control button {
-    width: 100%;
-    padding: 15px;
-  }
-}
-
-/* Melhoria na organização visual */
-.color-option {
-  margin-bottom: 20px;
-}
-
-.color-option:last-child {
-  margin-bottom: 0;
-}
-
-
-/* Estilos Gerais */
-#productFormContainer {
-  display: none;
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  background: #f5f5f5;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.form-container h1 {
-  text-align: center;
-  font-size: 1.5rem;
-  margin-bottom: 25px;
-  color: #333;
-}
-
-/* Layout do Formulário */
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #444;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  border-color: #4CAF50;
-  outline: none;
-}
-
-/* File Inputs */
-.file-input-group {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-}
-
-.file-input-group input[type="file"] {
-  font-size: 0.9rem;
-}
-
-/* Botões */
-.center-button {
-  display: block;
-  width: 100%;
-  max-width: 200px;
-  margin: 20px auto 0;
-  padding: 12px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.3s ease;
-}
-
-.center-button:hover {
-  background: #45a049;
-}
-
-/* Responsivo para Mobile */
-@media (max-width: 768px) {
-  .form-container {
-    padding: 15px;
-    margin: 10px;
-    width: 90%;
-  }
-
-  .form-container h1 {
-    font-size: 1.3rem;
-  }
-
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    padding: 10px;
-    font-size: 0.9rem;
-  }
-
-  .file-input-group {
-    grid-template-columns: 1fr;
-  }
-
-  .center-button {
-    max-width: 100%;
-    padding: 15px;
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  #AbaAddProduct {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-  }
-
-  .form-group {
-    margin-bottom: 1rem;
-  }
-}
-
-/* Melhorias para File Inputs */
-input[type="file"] {
-  background: white;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-}
-
-/* Ajustes para Dropdown */
-select {
-  appearance: none;
-  background: white url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat right 10px center;
-  background-size: 16px;
-}
-
-
-/* Estilos Gerais para ambas seções */
-.form-container,
-#editProductFormContainer {
-  display: none;
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  background: #f5f5f5;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.alterarPoduct {
-  margin: 10px 0;
-  padding: 8px 15px;
-  background-color: #2196F3;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.product-table {
-  overflow-x: auto;
-  margin-top: 20px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-}
-
-th, td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-/* Formulário de Edição */
-#editProductFormContainer {
-  margin-top: 20px;
-}
-
-/* Responsivo Mobile */
-@media (max-width: 768px) {
-  .form-container,
-  #editProductFormContainer {
-    padding: 15px;
-    margin: 10px;
-    width: 90%;
-  }
-
-  th, td {
-    padding: 8px;
-    font-size: 0.9rem;
-  }
-
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    padding: 10px;
-    font-size: 0.9rem;
-  }
-
-  button[type="submit"] {
-    width: 100%;
-    padding: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .alterarPoduct {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-  }
-
-  .product-table {
-    margin: 10px -15px;
-  }
-}
-
-/* Botões de Ação */
-.action-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.btn-edit {
-  background: #4CAF50;
-  color: white;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-delete {
-  background: #f44336;
-  color: white;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-/* Formulário de Edição */
-#editProductForm .form-group {
-  margin-bottom: 1rem;
-}
-
-#editProductForm button {
-  margin-top: 15px;
-}
-
-</style>
-
-<body>
-
-
-<!-- Botão para ir para a página main.html -->
-<div style="position: fixed; bottom: 20px; right: 20px;">
-  <a href="main.html" style="text-decoration: none;">
-    <button style="background-color: #3f618b; color: #fff; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 18px;">Ver Pagina</button>
-  </a>
-</div>
-<div id="pageInfo">
-
-
-  <h3>Atacadao dos Revendedores</h3>
-
-
-  <img id="logoImage" src="" alt="Logo da Página">
-   <button id="changeLogoButton">Alterar Imagem da Logo</button>
-  <button id="updateNameAndWhatsAppButton">Atualizar Nome e WhatsApp</button>
-  
-  <p><strong>Nome da Página:</strong> <span id="pageName"></span></p>
-  <p><strong>WhatsApp:</strong> <span id="whatsapp"></span></p>
-<div class="color-control">
-  <div class="color-option">
-    <label for="headerColor">Cor do Header:</label>
-    <input type="color" id="headerColor">
-  </div>
-  
-  <div class="color-option">
-    <label for="cartColor">Cor do Carrinho:</label>
-    <input type="color" id="cartColor">
-  </div>
-  
-  <div class="color-option">
-    <label for="promoColor">Cor do Texto Promocional:</label>
-    <input type="color" id="promoColor">
-  </div>
-  
-  <div class="color-option">
-    <label for="bodyColor">Cor/Gradiente do Body </label>
-    <input type="text" id="bodyColor" placeholder="Ex: linear-gradient(to right, #ff7e5f, #feb47b)">
-  </div>
-
-  <div class="color-option">
-    <label for="footerColor">Cor/Gradiente do Footer </label>
-    <input type="text" id="footerColor" placeholder="Ex: #333 ou radial-gradient(circle, #ff7e5f, #feb47b)">
-  </div>
-
-  <button onclick="saveStoreColors()">Salvar Configurações</button>
-  
-  <div class="color-previews">
-    <div class="color-preview" id="headerPreview" title="Preview Header"></div>
-    <div class="color-preview" id="cartPreview" title="Preview Carrinho"></div>
-    <div class="color-preview" id="promoPreview" title="Preview Promoção"></div>
-    <div class="color-preview" id="bodyPreview" title="Preview Body"></div>
-    <div class="color-preview" id="footerPreview" title="Preview Footer"></div>
-  </div>
-</div>
-
-
-
-</div>
-
-
-
-<div class="category-control">
-  <h3>Editar Categorias</h3>
-
-  <div class="category-option">
-    <label for="cat1">Categoria 1:</label>
-    <input type="text" id="cat1" placeholder="Ex: Camisetas">
-  </div>
-
-  <div class="category-option">
-    <label for="cat2">Categoria 2:</label>
-    <input type="text" id="cat2" placeholder="Ex: Bermudas">
-  </div>
-
-  <div class="category-option">
-    <label for="cat3">Categoria 3:</label>
-    <input type="text" id="cat3" placeholder="Ex: Inverno">
-  </div>
-
-  <div class="category-option">
-    <label for="cat4">Categoria 4:</label>
-    <input type="text" id="cat4" placeholder="Ex: Roupas Íntimas">
-  </div>
-
-  <div class="category-option">
-    <label for="cat5">Categoria 5:</label>
-    <input type="text" id="cat5" placeholder="Ex: Joias">
-  </div>
-
-
-
-  <button onclick="saveCategories()">Salvar Categorias</button>
-  
- <div class="category-control">
-  <h3>Editar Estilo dos Botões</h3>
-
-  <div class="color-option">
-    <label for="categoryButtonColor">Cor do Fundo dos Botões:</label>
-    <input type="color" id="categoryButtonColor" value="#ff0000">
-  </div>
-
-  <div class="color-option">
-    <label for="categoryTextColor">Cor do Texto dos Botões:</label>
-    <input type="color" id="categoryTextColor" value="#ffffff">
-  </div>
-
-  <button onclick="saveButtonStyles()">Salvar Estilo</button>
-</div>
-
-
-
-</div>
-
-
-
-
-
-  <!-- Seção  produtos -->
-    <h3>Gerenciador de Produtos</h3>
-	   <button id="AbaAddProduct">add produto</button>
-
-<!-- HTML Modificado para Melhor Semântica -->
-<div class="form-container" id="productFormContainer">
-  <h1>Adicionar Novo Produto</h1>
-  <form id="addProductForm">
-    <div class="form-group">
-      <label for="addNome">Nome do Produto:</label>
-      <input type="text" id="addNome" required>
-    </div>
-
-    <div class="form-group">
-      <label for="addMarca">Marca:</label>
-      <input type="text" id="addMarca" required>
-    </div>
-
-    <div class="form-group">
-      <label for="addInformacoes">Informações:</label>
-      <textarea id="addInformacoes" rows="3" required></textarea>
-    </div>
-
-    <div class="form-group">
-      <label for="addValor">Valor:</label>
-      <input type="text" id="addValor" inputmode="decimal" required>
-    </div>
-
-    <div class="form-group">
-      <label for="addQuantidade">Quantidade em Estoque:</label>
-      <input type="number" id="addQuantidade" inputmode="numeric" required>
-    </div>
-
-  <div class="form-group">
-  <label for="editColecao">Coleção:</label>
-  <select id="editColecao" required>
-    <option value="ProdutosCat1">Categoria 1</option>
-    <option value="ProdutosCat2">Categoria 2</option>
-    <option value="ProdutosCat3">Categoria 3</option>
-    <option value="ProdutosCat4">Categoria 4</option>
-    <option value="ProdutosCat5">Categoria 5</option>
-  </select>
-</div>
-
-<!-- Adicionar campo para marca -->
-<div class="form-group">
-  <label for="editMarca">Marca:</label>
-  <input type="text" id="editMarca" required>
-</div>
-
-
-
-    <div class="form-group">
-      <label>Imagens do Produto:</label>
-      <div class="file-input-group">
-        <input type="file" id="addImagemFile" accept="image/*" required>
-        <input type="file" id="addImagemFile2">
-        <input type="file" id="addImagemFile3">
-        <input type="file" id="addImagemFile4">
-        <input type="file" id="addImagemFile5">
-      </div>
-    </div>
-
-    <button type="submit" class="center-button">Salvar Produto</button>
-  </form>
-</div>
-<!-- Seção de Pesquisa -->
-<button class="alterarPoduct">Alterar Produto</button>
-
-<div class="form-container" id="searchSection">
-  <h1>Alterar ou Apagar Produtos</h1>
-  
-  <form id="searchProductForm">
-    <div class="form-group">
-      <label for="searchInput">Pesquisar Produto:</label>
-      <input type="text" id="searchInput" required 
-             placeholder="Digite o nome do produto...">
-    </div>
-    <button type="submit" class="center-button">Pesquisar</button>
-  </form>
-
-  <!-- Resultados -->
-  <div class="product-table">
-    <table>
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Valor</th>
-          <th>Estoque</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody id="searchResults"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Seção de Edição -->
-<div id="editProductFormContainer">
-  <h2>Editar Produto</h2>
-  <form id="editProductForm">
-    <div class="form-group">
-      <label for="editNome">Nome do Produto:</label>
-      <input type="text" id="editNome" required>
-    </div>
-
-    <div class="form-group">
-      <label for="editInformacoes">Informações:</label>
-      <textarea id="editInformacoes" rows="3" required></textarea>
-    </div>
-
-    <div class="form-group">
-      <label for="editValor">Valor:</label>
-      <input type="text" id="editValor" inputmode="decimal" required>
-    </div>
-
-    <div class="form-group">
-      <label for="editQuantidade">Quantidade:</label>
-      <input type="number" id="editQuantidade" inputmode="numeric" required>
-    </div>
-
-    <div class="form-group">
-      <label>Coleção:</label>
-      <p id="editColecao" class="collection-display"></p>
-    </div>
-
-    <div class="form-group">
-      <label for="editImagemFile">Alterar Imagem:</label>
-      <input type="file" id="editImagemFile" accept="image/*">
-    </div>
-
-    <input type="hidden" id="editProductId">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Atacadão dos Revendedores</title>
     
-    <div class="action-buttons">
-      <button type="submit" class="btn-edit">Salvar</button>
-      <button type="button" class="btn-delete" onclick="cancelEdit()">Cancelar</button>
-    </div>
-  </form>
-</div>
-
- 
-
-<footer class="footer">
- 
-  <p class="footer-copyright">&copy; 2023 Atacadao dos Revendedores. Todos os direitos reservados.</p>
-</footer>
-
-<div id="message" style="display: none;"></div>
-
-  
-
-  <!-- Configurações do seu projeto do Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-
-  <script>
-    let collectionName;
-    let currentProductId;
-
-   // Configurações do seu projeto do Firebase
-    const firebaseConfig = {
-  apiKey: "AIzaSyA-7HOp-Ycvyf3b_03ev__8aJEwAbWSQZY",
-  authDomain: "connectfamilia-312dc.firebaseapp.com",
-  projectId: "connectfamilia-312dc",
-  storageBucket: "connectfamilia-312dc.appspot.com",
-  messagingSenderId: "797817838649",
-  appId: "1:797817838649:web:1aa7c54abd97661f8d81e8",
-  measurementId: "G-QKN9NFXZZQ"
-};
-
-
-    // Inicialize o Firebase
-    firebase.initializeApp(firebaseConfig);
- // Obtenha uma referência para o Firestore
-    const firestore = firebase.firestore();
-   
-// Obter uma referência para a coleção 'dadosLandPage'
-const dadosLandPageRef = firestore.collection('dadosLandPage');
-
-
-// Função para preencher os dados da página
-function fillPageInfo(data) {
-  const pageNameElement = document.getElementById('pageName');
-  const whatsappElement = document.getElementById('whatsapp');
-  const logoImageElement = document.getElementById('logoImage');
-
-  // Preencher os elementos com os dados do documento
-  pageNameElement.textContent = data.nome;
-  whatsappElement.textContent = data.whatsapp;
-  logoImageElement.src = data.imageLogoUrl; // Carrega a imagem da URL fornecida no Firestore
-  logoImageElement.alt = 'Logo da ' + data.nome; // Define um texto alternativo para a imagem
-}
-
-// Obtendo os dados da coleção 'dadosLandPage' e preenchendo os elementos na página
-dadosLandPageRef.get().then((querySnapshot) => {
-  if (!querySnapshot.empty) {
-    const doc = querySnapshot.docs[0];
-    const data = doc.data();
-    fillPageInfo(data);
-  } else {
-    console.log('Nenhum documento encontrado na coleção dadosLandPage');
-  }
-}).catch((error) => {
-  console.error('Erro ao obter os dados:', error);
-});
-
-// No evento de clique do botão de alteração de imagem
-changeLogoButton.addEventListener('click', () => {
-  const newImageUrl = prompt('Digite a URL da nova imagem da logo:');
-  if (newImageUrl) {
-    // Consultar a coleção 'dadosLandPage' para obter o primeiro documento
-    dadosLandPageRef.limit(1).get().then((querySnapshot) => {
-      if (!querySnapshot.empty) {
-        const documentId = querySnapshot.docs[0].id; // Obter o ID do primeiro documento
-
-        // Atualizar a URL da imagem no Firestore
-        const documentToUpdate = firestore.collection('dadosLandPage').doc(documentId);
-        documentToUpdate.update({
-          imageLogoUrl: newImageUrl
-        })
-        .then(() => {
-          console.log('URL da imagem atualizada com sucesso!');
-          // Recarregue a página para atualizar a imagem exibida
-          window.location.reload();
-        })
-        .catch((error) => {
-          console.error('Erro ao atualizar a URL da imagem:', error);
-        });
-      } else {
-        console.log('Nenhum documento encontrado na coleção dadosLandPage');
-      }
-    }).catch((error) => {
-      console.error('Erro ao obter os dados:', error);
-    });
-  }
-});
- // Função para atualizar o nome e o WhatsApp
-function updateNameAndWhatsApp(newName, newWhatsApp) {
-  // Consultar a coleção 'dadosLandPage' para obter o primeiro documento
-  dadosLandPageRef.limit(1).get().then((querySnapshot) => {
-    if (!querySnapshot.empty) {
-      const documentId = querySnapshot.docs[0].id; // Obter o ID do primeiro documento
-
-      // Atualizar o nome e o WhatsApp no Firestore
-      const documentToUpdate = firestore.collection('dadosLandPage').doc(documentId);
-      documentToUpdate.update({
-        nome: newName,
-        whatsapp: newWhatsApp
-      })
-      .then(() => {
-        console.log('Nome e WhatsApp atualizados com sucesso!');
-        // Recarregue a página para exibir os dados atualizados
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error('Erro ao atualizar o nome e o WhatsApp:', error);
-      });
-    } else {
-      console.log('Nenhum documento encontrado na coleção dadosLandPage');
-    }
-  }).catch((error) => {
-    console.error('Erro ao obter os dados:', error);
-  });
-}
-
-// ...
-
-// No evento de clique do botão para atualizar nome e WhatsApp
-const updateNameAndWhatsAppButton = document.getElementById('updateNameAndWhatsAppButton');
-updateNameAndWhatsAppButton.addEventListener('click', () => {
-  const newName = prompt('Digite o novo nome da página:');
-  const newWhatsApp = prompt('Digite o novo número de WhatsApp:');
-  if (newName && newWhatsApp) {
-    updateNameAndWhatsApp(newName, newWhatsApp);
-  }
-});
-
-    function searchProducts() {
-  const searchInput = document.getElementById("searchInput").value;
-  const collections = ["ProdutosCat1", "ProdutosCat2", "ProdutosCat3","ProdutosCat4","ProdutosCat5"];
-
-  // Limpa os resultados da pesquisa anteriormente exibidos
-  document.getElementById("searchResults").innerHTML = "";
-
-  // Adicionar a legenda antes dos valores
-  const rowLegend = document.createElement("tr");
-  rowLegend.innerHTML = `
-    <th>Nome</th>
-    <th>Informações</th>
-    <th>Valor</th>
-    <th>Quantidade</th>
-    <th>Imagem</th>
-    <th>Ações</th>
-  `;
-  document.getElementById("searchResults").appendChild(rowLegend);
-
-  // Percorre as coleções para pesquisar o produto
-  collections.forEach((collection) => {
-    firestore.collection(collection)
-      .where("nome", "==", searchInput)
-      .get()
-      .then((querySnapshot) => {
-        if (!querySnapshot.empty) {
-          querySnapshot.forEach((doc) => {
-            const product = doc.data();
-            // Exibe os detalhes do produto encontrado
-            const row = document.createElement("tr");
-            row.innerHTML = `
-              <td>${product.nome}</td>
-              <td>${product.informacoes}</td>
-              <td>${product.valor}</td>
-              <td>${product.quantidade}</td>
-              <td><img src="${product.imagemUrl}" alt="Imagem do produto" width="100"></td>
-              <td>
-                <button onclick="editProduct('${collection}', '${doc.id}')">Editar</button>
-                <button onclick="deleteProduct('${collection}', '${doc.id}')">Excluir</button>
-              </td>
-            `;
-            document.getElementById("searchResults").appendChild(row);
-          });
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #d4af37;
+            --secondary: #2c2c2c;
+            --white: #ffffff;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-800: #343a40;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
         }
-      })
-      .catch((error) => {
-        console.error("Erro ao pesquisar produto:", error);
-      });
-  });
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        .admin-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 0;
+            position: fixed;
+            width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .logo h1 {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            font-size: 0.875rem;
+            color: var(--gray-300);
+            opacity: 0.8;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-links li {
+            margin-bottom: 5px;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 25px;
+            color: var(--gray-300);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-links a:hover {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .nav-links a.active {
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .nav-links i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 0;
+            overflow-y: auto;
+        }
+
+        .header {
+            background: var(--white);
+            padding: 25px 30px;
+            border-bottom: 1px solid var(--gray-200);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: var(--secondary);
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+        }
+
+        .header p {
+            color: var(--gray-600);
+            font-size: 1rem;
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        .section {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            border: 1px solid var(--gray-200);
+        }
+
+        .section h2 {
+            color: var(--secondary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: var(--white);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+
+        .btn-primary:hover {
+            background: #c19d2a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: var(--gray-100);
+            transition: all 0.3s;
+        }
+
+        .category-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .category-content {
+            flex: 1;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .subcategory-input {
+            padding: 10px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            margin-right: 10px;
+            width: 200px;
+        }
+
+        .subcategory-list {
+            margin-top: 15px;
+            padding-left: 20px;
+        }
+
+        .subcategory-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--white);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .subcategory-name {
+            color: var(--gray-700);
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            padding: 20px;
+            background: var(--white);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .product-price {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-weight: 600;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        /* Estilos simples para o preview do logo */
+.logo-preview {
+    margin-top: 15px;
+    text-align: center;
 }
 
-	
-	
-	  // Função para limpar a caixa de pesquisa e os resultados
-  function clearSearch() {
-    document.getElementById("searchInput").value = "";
-    document.getElementById("searchResults").innerHTML = "";
-  }
-  
-  
- // Função para excluir um produto do Firestore (com confirmação)
-  function deleteProduct(collection, id) {
-    const confirmed = window.confirm("Tem certeza que deseja excluir o produto?");
-    if (confirmed) {
-      firestore.collection(collection).doc(id).delete()
-        .then(() => {
-          // Exibe a mensagem de sucesso
-          const messageElement = document.getElementById("message");
-          messageElement.innerText = "Produto excluído com sucesso!";
-          messageElement.style.display = "block";
+.logo-preview img {
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    padding: 5px;
+    background: white;
+}
 
-          // Oculta a mensagem após alguns segundos (opcional)
-          setTimeout(() => {
-            messageElement.style.display = "none";
-          }, 3000); // Exibe a mensagem por 3 segundos
+.no-logo-placeholder {
+    padding: 30px 20px;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    color: #6c757d;
+}
 
-          // Limpa a caixa de pesquisa e recarrega os resultados
-          clearSearch();
-          searchProducts(); // Recarrega os resultados da pesquisa atualizados
-        })
-        .catch((error) => {
-          // Exibe a mensagem de erro
-          const messageElement = document.getElementById("message");
-          messageElement.innerText = "Erro ao excluir produto: " + error.message;
-          messageElement.style.display = "block";
+.no-logo-placeholder i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+    color: #adb5bd;
+}
 
-          // Oculta a mensagem após alguns segundos (opcional)
-          setTimeout(() => {
-            messageElement.style.display = "none";
-          }, 5000); // Exibe a mensagem de erro por 5 segundos
+
+        /* Estilos para o sistema de subcategorias */
+.subcategory-system {
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    padding: 15px;
+    background: var(--gray-50);
+    margin-bottom: 20px;
+}
+
+.subcategory-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.subcategory-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.manual-input-toggle {
+    background: none;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.manual-input-toggle:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.subcategory-hint {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h1>🏪 Painel Admin</h1>
+                <p>Atacadão dos Revendedores</p>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#dashboard" class="active" onclick="showSection('dashboard')">
+                    <i class="fas fa-chart-bar"></i> Dashboard
+                </a></li>
+                <li><a href="#config" onclick="showSection('config')">
+                    <i class="fas fa-cog"></i> Configurações
+                </a></li>
+                <li><a href="#categories" onclick="showSection('categories')">
+                    <i class="fas fa-folder"></i> Categorias
+                </a></li>
+                <li><a href="#products" onclick="showSection('products')">
+                    <i class="fas fa-box"></i> Produtos
+                </a></li>
+                <li><a href="index.html" target="_blank">
+                    <i class="fas fa-store"></i> Ver Loja
+                </a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1>Painel Administrativo</h1>
+                <p>Gerencie sua loja virtual em tempo real</p>
+            </div>
+
+            <div class="content-area">
+                <!-- Mensagens -->
+                <div id="message" class="message"></div>
+
+                <!-- Seção Dashboard -->
+                <section id="dashboard-section" class="section">
+                    <h2><i class="fas fa-chart-bar"></i> Dashboard</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalProducts">0</div>
+                            <div class="stat-label">Produtos Cadastrados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalCategories">0</div>
+                            <div class="stat-label">Categorias</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalOrders">-</div>
+                            <div class="stat-label">Pedidos Hoje</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="storeStatus">🟢</div>
+                            <div class="stat-label">Status da Loja</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <h3>Status do Sistema</h3>
+                        <p><strong>Firebase:</strong> <span id="firebaseStatus">Conectando...</span></p>
+                        <p><strong>Projeto:</strong> corretorcerto-76933</p>
+                        <p><strong>Última atualização:</strong> <span id="lastUpdate">-</span></p>
+                    </div>
+                </section>
+
+                <!-- Seção Configurações -->
+                <section id="config-section" class="section" style="display: none;">
+                    <h2><i class="fas fa-cog"></i> Configurações da Loja</h2>
+                    
+                    <!-- Seção Logotipo Simplificada -->
+<div class="form-group">
+    <label for="storeLogoUrl">URL do Logotipo</label>
+    <input type="text" id="storeLogoUrl" class="form-control" placeholder="https://exemplo.com/logo.png">
+    <small style="color: #666; font-size: 0.875rem;">
+        Cole a URL completa da imagem do logotipo (JPG, PNG, SVG)
+    </small>
+    
+    <!-- Preview do Logotipo -->
+    <div class="logo-preview" style="margin-top: 15px;">
+        <img id="logoPreview" src="" alt="Preview do logotipo" style="display: none; max-width: 150px; max-height: 150px; border-radius: 8px;">
+        <div id="noLogo" class="no-logo-placeholder" style="text-align: center; color: #666; padding: 20px; border: 2px dashed #ddd; border-radius: 8px;">
+            <i class="fas fa-store" style="font-size: 2rem; display: block; margin-bottom: 8px;"></i>
+            <span>Nenhum logotipo carregado</span>
+        </div>
+    </div>
+</div>
+                    <div class="form-group">
+                        <label for="storeName">Nome da Loja</label>
+                        <input type="text" id="storeName" class="form-control" placeholder="Ex: Atacadão dos Revendedores">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="storeDescription">Descrição da Loja (SEO)</label>
+                        <textarea id="storeDescription" class="form-control" rows="3" placeholder="Descrição para motores de busca"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="whatsappNumber">WhatsApp para Pedidos</label>
+                        <input type="text" id="whatsappNumber" class="form-control" placeholder="5511999999999 (com DDI e DDD)">
+                        <small style="color: #666; font-size: 0.875rem;">Formato: 55 + DDD + número (sem espaços ou caracteres especiais)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deliveryFee">Taxa de Entrega (R$)</label>
+                        <input type="number" id="deliveryFee" class="form-control" step="0.01" value="2.00" min="0">
+                    </div>
+
+                    <button class="btn btn-primary" onclick="saveStoreConfig()">
+                        <i class="fas fa-save"></i> Salvar Configurações
+                    </button>
+                </section>
+
+                <!-- Seção Categorias -->
+                <section id="categories-section" class="section" style="display: none;">
+                    <h2><i class="fas fa-folder"></i> Gerenciar Categorias</h2>
+                    
+                    <div class="form-group">
+                        <label for="newCategory">Nova Categoria</label>
+                        <input type="text" id="newCategory" class="form-control" placeholder="Ex: Joias, Roupas, Eletrônicos">
+                    </div>
+
+                    <button class="btn btn-primary" onclick="addCategory()">
+                        <i class="fas fa-plus"></i> Adicionar Categoria
+                    </button>
+
+                    <div id="categoriesList" class="categories-list" style="margin-top: 30px;">
+                        <div class="loading-categories">Carregando categorias...</div>
+                    </div>
+                </section>
+
+                <!-- Seção Produtos -->
+               <!-- Seção Produtos -->
+<section id="products-section" class="section" style="display: none;">
+    <h2><i class="fas fa-box"></i> Gerenciar Produtos</h2>
+    
+    <div class="form-group">
+        <label for="productCategory">Categoria</label>
+        <select id="productCategory" class="form-control">
+            <option value="">Selecione uma categoria</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="productName">Nome do Produto</label>
+        <input type="text" id="productName" class="form-control" placeholder="Ex: Colar de Prata 925">
+    </div>
+
+    <div class="form-group">
+        <label for="productPrice">Preço (R$)</label>
+        <input type="number" id="productPrice" class="form-control" step="0.01" placeholder="0.00" min="0">
+    </div>
+
+    <div class="form-group">
+        <label for="productStock">Estoque</label>
+        <input type="number" id="productStock" class="form-control" value="1" min="0">
+    </div>
+<div class="form-group">
+    <label for="productSubcategory">Subcategoria</label>
+    <div class="subcategory-system">
+        <select id="productSubcategory" class="form-control">
+            <option value="">Selecione uma subcategoria (Opcional)</option>
+        </select>
+        
+        <div class="subcategory-actions" style="margin-top: 10px;">
+            <input type="text" 
+                   id="newSubcategoryInput" 
+                   class="form-control" 
+                   placeholder="Ou digite uma nova subcategoria"
+                   style="flex: 1; margin-right: 10px;">
+            <button type="button" 
+                    class="btn btn-primary btn-sm" 
+                    onclick="addNewSubcategoryFromInput()">
+                <i class="fas fa-plus"></i> Adicionar
+            </button>
+        </div>
+        
+        <div class="subcategory-hint" id="subcategoryHint">
+            Selecione uma subcategoria existente ou crie uma nova
+        </div>
+    </div>
+</div>
+
+    <div class="form-group">
+        <label for="productDescription">Descrição</label>
+        <textarea id="productDescription" class="form-control" rows="3" placeholder="Descrição detalhada do produto"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="productImage">URL da Imagem</label>
+        <input type="text" id="productImage" class="form-control" placeholder="https://exemplo.com/imagem.jpg">
+        <small style="color: #666; font-size: 0.875rem;">Cole a URL de uma imagem da internet</small>
+    </div>
+
+    <!-- NOVOS CAMPOS ADICIONADOS -->
+    <div class="form-group">
+        <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="productFeatured" style="margin: 0;">
+                <span>⭐ Produto em Destaque</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="productExclusive" style="margin: 0;">
+                <span>🎯 Produto Exclusivo</span>
+            </label>
+        </div>
+        <small style="color: #666; margin-left: 0; display: block; margin-top: 8px;">
+            Produtos em destaque aparecem na seção inicial. Produtos exclusivos têm badge especial.
+        </small>
+    </div>
+
+    <button class="btn btn-success" onclick="addProduct()">
+        <i class="fas fa-plus"></i> Adicionar Produto
+    </button>
+
+    <div id="productsList" class="products-grid" style="margin-top: 30px;">
+        <div class="loading-products">Carregando produtos...</div>
+    </div>
+</section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNr5JoKsWJVeUYAaVDqmPznZo100v0uvg",
+            authDomain: "corretorcerto-76933.firebaseapp.com",
+            databaseURL: "https://corretorcerto-76933-default-rtdb.firebaseio.com",
+            projectId: "corretorcerto-76933",
+            storageBucket: "corretorcerto-76933.firebasestorage.app",
+            messagingSenderId: "357149829474",
+            appId: "1:357149829474:web:324b2005d82eabbce5e43b"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Estado global
+        let storeConfig = {};
+        let categories = [];
+        let products = [];
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAdmin();
+        });
+
+        async function initializeAdmin() {
+            try {
+                showMessage('Conectando ao Firebase...', 'warning');
+                await loadStoreConfig();
+                await loadCategories();
+                await loadProducts();
+                updateDashboard();
+                showMessage('Painel admin carregado com sucesso!', 'success');
+                document.getElementById('firebaseStatus').textContent = '🟢 Conectado';
+            } catch (error) {
+                console.error('Erro na inicialização:', error);
+                showMessage('Erro ao conectar com o Firebase. Verifique a conexão.', 'error');
+                document.getElementById('firebaseStatus').textContent = '🔴 Erro de conexão';
+            }
+        }
+
+        // Navegação entre seções
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.style.display = 'none';
+            });
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            document.getElementById(section + '-section').style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        // Mostrar mensagens
+        function showMessage(message, type = 'success') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // ===== DASHBOARD =====
+        function updateDashboard() {
+            document.getElementById('totalProducts').textContent = products.length;
+            document.getElementById('totalCategories').textContent = categories.length;
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString('pt-BR');
+        }
+
+        // ===== CONFIGURAÇÕES DA LOJA =====
+        async function loadStoreConfig() {
+            try {
+                const doc = await db.collection('config').doc('store').get();
+                if (doc.exists) {
+                    storeConfig = doc.data();
+                    document.getElementById('storeName').value = storeConfig.name || '';
+                    document.getElementById('storeDescription').value = storeConfig.description || '';
+                    document.getElementById('whatsappNumber').value = storeConfig.whatsapp || '';
+                    document.getElementById('deliveryFee').value = storeConfig.deliveryFee || 2.00;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar configurações:', error);
+                throw error;
+            }
+        }
+
+        async function saveStoreConfig() {
+            try {
+                const config = {
+                    name: document.getElementById('storeName').value,
+                    description: document.getElementById('storeDescription').value,
+                    whatsapp: document.getElementById('whatsappNumber').value,
+                    deliveryFee: parseFloat(document.getElementById('deliveryFee').value),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                if (!config.name.trim()) {
+                    showMessage('Digite o nome da loja', 'error');
+                    return;
+                }
+
+                await db.collection('config').doc('store').set(config, { merge: true });
+                storeConfig = config;
+                showMessage('Configurações salvas com sucesso!', 'success');
+            } catch (error) {
+                console.error('Erro ao salvar configurações:', error);
+                showMessage('Erro ao salvar configurações', 'error');
+            }
+        }
+
+        // ===== GERENCIAMENTO DE CATEGORIAS =====
+        async function loadCategories() {
+            try {
+                const snapshot = await db.collection('categories').orderBy('name').get();
+                categories = [];
+                snapshot.forEach(doc => {
+                    categories.push({ id: doc.id, ...doc.data() });
+                });
+                displayCategories();
+                updateCategorySelect();
+            } catch (error) {
+                console.error('Erro ao carregar categorias:', error);
+                throw error;
+            }
+        }
+
+        function displayCategories() {
+            const container = document.getElementById('categoriesList');
+            if (categories.length === 0) {
+                container.innerHTML = '<p>Nenhuma categoria cadastrada.</p>';
+                return;
+            }
+
+            container.innerHTML = categories.map(category => `
+                <div class="category-item">
+                    <div class="category-content">
+                        <div class="category-name">${category.name}</div>
+                        ${category.subcategories && category.subcategories.length > 0 ? `
+                            <div class="subcategory-list">
+                                ${category.subcategories.map(sub => `
+                                    <div class="subcategory-item">
+                                        <span class="subcategory-name">${sub}</span>
+                                        <button class="btn btn-danger btn-sm" onclick="removeSubcategory('${category.id}', '${sub}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<p style="color: #666; font-size: 0.875rem;">Nenhuma subcategoria</p>'}
+                    </div>
+                    <div class="category-actions">
+                        <input type="text" 
+                               class="subcategory-input" 
+                               id="subcategory-${category.id}" 
+                               placeholder="Nova subcategoria">
+                        <button class="btn btn-primary btn-sm" onclick="addSubcategory('${category.id}')">
+                            <i class="fas fa-plus"></i> Sub
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCategory('${category.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function addCategory() {
+            const name = document.getElementById('newCategory').value.trim();
+            if (!name) {
+                showMessage('Digite o nome da categoria', 'error');
+                return;
+            }
+
+            try {
+                await db.collection('categories').add({
+                    name: name,
+                    subcategories: [],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                document.getElementById('newCategory').value = '';
+                showMessage('Categoria adicionada com sucesso!', 'success');
+                await loadCategories();
+                updateDashboard();
+            } catch (error) {
+                console.error('Erro ao adicionar categoria:', error);
+                showMessage('Erro ao adicionar categoria', 'error');
+            }
+        }
+
+// Função para adicionar nova subcategoria a uma categoria existente
+async function addNewSubcategory(categoryId, newSubcategory) {
+    if (!newSubcategory.trim()) {
+        showMessage('Digite o nome da nova subcategoria', 'error');
+        return;
+    }
+
+    try {
+        const categoryRef = db.collection('categories').doc(categoryId);
+        await categoryRef.update({
+            subcategories: firebase.firestore.FieldValue.arrayUnion(newSubcategory.trim())
+        });
+        
+        showMessage('Subcategoria adicionada com sucesso!', 'success');
+        
+        // Recarregar categorias para atualizar a lista
+        await loadCategories();
+        
+        // Atualizar o select de subcategorias
+        updateSubcategorySelect(categoryId);
+        
+    } catch (error) {
+        console.error('Erro ao adicionar subcategoria:', error);
+        showMessage('Erro ao adicionar subcategoria', 'error');
+    }
+}
+        async function addSubcategory(categoryId) {
+            const input = document.getElementById(`subcategory-${categoryId}`);
+            const subcategoryName = input.value.trim();
+            
+            if (!subcategoryName) {
+                showMessage('Digite o nome da subcategoria', 'error');
+                return;
+            }
+
+            try {
+                const categoryRef = db.collection('categories').doc(categoryId);
+                await categoryRef.update({
+                    subcategories: firebase.firestore.FieldValue.arrayUnion(subcategoryName)
+                });
+                
+                input.value = '';
+                showMessage('Subcategoria adicionada com sucesso!', 'success');
+                await loadCategories();
+            } catch (error) {
+                console.error('Erro ao adicionar subcategoria:', error);
+                showMessage('Erro ao adicionar subcategoria', 'error');
+            }
+        }
+
+        async function removeSubcategory(categoryId, subcategoryName) {
+            try {
+                const categoryRef = db.collection('categories').doc(categoryId);
+                await categoryRef.update({
+                    subcategories: firebase.firestore.FieldValue.arrayRemove(subcategoryName)
+                });
+                
+                showMessage('Subcategoria removida com sucesso!', 'success');
+                await loadCategories();
+            } catch (error) {
+                console.error('Erro ao remover subcategoria:', error);
+                showMessage('Erro ao remover subcategoria', 'error');
+            }
+        }
+
+        async function deleteCategory(categoryId) {
+            if (!confirm('Tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita.')) return;
+
+            try {
+                // Verificar se existem produtos nesta categoria
+                const productsSnapshot = await db.collection('products')
+                    .where('categoryId', '==', categoryId)
+                    .get();
+                
+                if (!productsSnapshot.empty) {
+                    showMessage('Não é possível excluir categoria com produtos vinculados', 'error');
+                    return;
+                }
+
+                await db.collection('categories').doc(categoryId).delete();
+                showMessage('Categoria excluída com sucesso!', 'success');
+                await loadCategories();
+                updateDashboard();
+            } catch (error) {
+                console.error('Erro ao excluir categoria:', error);
+                showMessage('Erro ao excluir categoria', 'error');
+            }
+        }
+
+       
+// Atualize a função updateCategorySelect para incluir o listener de mudança
+function updateCategorySelect() {
+    const select = document.getElementById('productCategory');
+    select.innerHTML = '<option value="">Selecione uma categoria</option>' +
+        categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+
+    // Adicionar listener para atualizar subcategorias quando a categoria mudar
+    select.addEventListener('change', function() {
+        const categoryId = this.value;
+        updateSubcategorySelect(categoryId);
+    });
+}
+
+        async function loadProducts() {
+            try {
+                const snapshot = await db.collection('products')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                
+                products = [];
+                snapshot.forEach(doc => {
+                    products.push({ id: doc.id, ...doc.data() });
+                });
+                displayProducts();
+                updateDashboard();
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+                throw error;
+            }
+        }
+
+        function displayProducts() {
+    const container = document.getElementById('productsList');
+    if (!container) {
+        console.error('Container de produtos não encontrado');
+        return;
+    }
+
+    if (products.length === 0) {
+        container.innerHTML = '<p>Nenhum produto cadastrado.</p>';
+        return;
+    }
+
+    container.innerHTML = products.map(product => {
+        const category = categories.find(cat => cat.id === product.categoryId);
+        return `
+            <div class="product-card">
+                <img src="${product.imageURL || 'https://via.placeholder.com/300x200?text=Sem+Imagem'}" 
+                     alt="${product.name}" 
+                     class="product-image"
+                     onerror="this.src='https://via.placeholder.com/300x200?text=Erro+Imagem'">
+                
+                <div class="product-name">${product.name}</div>
+                <div class="product-price">R$ ${product.price?.toFixed(2) || '0.00'}</div>
+                
+                <div class="product-meta">
+                    <span>Categoria: ${category?.name || 'N/A'}</span>
+                    <span>Estoque: ${product.stock || 0}</span>
+                </div>
+
+                ${product.subcategory ? `
+                    <div style="color: #666; font-size: 0.875rem; margin: 5px 0;">
+                        Subcategoria: ${product.subcategory}
+                    </div>
+                ` : ''}
+
+                <!-- Badges para destaque e exclusivo -->
+                <div style="display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap;">
+                    ${product.featured ? '<span style="background: #ffc107; color: #000; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem;">⭐ Destaque</span>' : ''}
+                    ${product.exclusive ? '<span style="background: #17a2b8; color: #fff; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem;">🎯 Exclusivo</span>' : ''}
+                </div>
+                
+                ${product.description ? `
+                    <p style="color: #666; font-size: 0.875rem; margin-bottom: 15px;">
+                        ${product.description.substring(0, 100)}...
+                    </p>
+                ` : ''}
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary btn-sm" onclick="toggleProductFeature('${product.id}', 'featured', ${!product.featured})" style="flex: 1; min-width: 120px;">
+                        ${product.featured ? '❌ Remover Destaque' : '⭐ Destacar'}
+                    </button>
+                    <button class="btn btn-info btn-sm" onclick="toggleProductFeature('${product.id}', 'exclusive', ${!product.exclusive})" style="flex: 1; min-width: 120px;">
+                        ${product.exclusive ? '❌ Remover Exclusivo' : '🎯 Tornar Exclusivo'}
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteProduct('${product.id}')" style="min-width: 60px;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function toggleProductFeature(productId, field, value) {
+    try {
+        await db.collection('products').doc(productId).update({
+            [field]: value,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        const action = field === 'featured' ? 'destaque' : 'exclusivo';
+        const status = value ? 'adicionado aos' : 'removido dos';
+        showMessage(`Produto ${status} ${action}s!`, 'success');
+        await loadProducts();
+    } catch (error) {
+        console.error('Erro ao atualizar produto:', error);
+        showMessage('Erro ao atualizar produto', 'error');
+    }
+}
+
+// Atualize a função addProduct para lidar com a subcategoria selecionada
+async function addProduct() {
+    // Obter elementos de forma segura
+    const categorySelect = document.getElementById('productCategory');
+    const nameInput = document.getElementById('productName');
+    const priceInput = document.getElementById('productPrice');
+    const stockInput = document.getElementById('productStock');
+    const subcategorySelect = document.getElementById('productSubcategory');
+    const manualSubcategoryInput = document.getElementById('manualSubcategoryInput');
+    const descriptionInput = document.getElementById('productDescription');
+    const imageInput = document.getElementById('productImage');
+    const featuredCheckbox = document.getElementById('productFeatured');
+    const exclusiveCheckbox = document.getElementById('productExclusive');
+
+    // Verificar se os elementos existem
+    if (!categorySelect || !nameInput || !priceInput || !stockInput || !featuredCheckbox || !exclusiveCheckbox) {
+        showMessage('Erro: Elementos do formulário não encontrados.', 'error');
+        return;
+    }
+
+    const categoryId = categorySelect.value;
+    const name = nameInput.value.trim();
+    const price = parseFloat(priceInput.value);
+    const stock = parseInt(stockInput.value);
+    
+    // Obter subcategoria (do select ou do input manual)
+    let subcategory = '';
+    if (subcategorySelect && subcategorySelect.value) {
+        subcategory = subcategorySelect.value;
+    } else if (manualSubcategoryInput && manualSubcategoryInput.value.trim()) {
+        subcategory = manualSubcategoryInput.value.trim();
+    }
+    
+    const description = descriptionInput ? descriptionInput.value.trim() : '';
+    const imageURL = imageInput ? imageInput.value.trim() : '';
+    const featured = featuredCheckbox ? featuredCheckbox.checked : false;
+    const exclusive = exclusiveCheckbox ? exclusiveCheckbox.checked : false;
+
+    // Validações
+    if (!categoryId) {
+        showMessage('Selecione uma categoria', 'error');
+        return;
+    }
+
+    if (!name) {
+        showMessage('Digite o nome do produto', 'error');
+        return;
+    }
+
+    if (isNaN(price) || price < 0) {
+        showMessage('Digite um preço válido', 'error');
+        return;
+    }
+
+    if (isNaN(stock) || stock < 0) {
+        showMessage('Digite um estoque válido', 'error');
+        return;
+    }
+
+    try {
+        // Preparar dados do produto
+        const productData = {
+            categoryId: categoryId,
+            name: name,
+            price: price,
+            stock: stock || 0,
+            description: description,
+            imageURL: imageURL,
+            featured: featured,
+            exclusive: exclusive,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        // Adicionar subcategoria se fornecida
+        if (subcategory) {
+            productData.subcategory = subcategory;
+        }
+
+        await db.collection('products').add(productData);
+
+        // Limpar formulário
+        nameInput.value = '';
+        priceInput.value = '';
+        stockInput.value = '1';
+        if (subcategorySelect) subcategorySelect.value = '';
+        if (manualSubcategoryInput) {
+            manualSubcategoryInput.value = '';
+            manualSubcategoryInput.style.display = 'none';
+        }
+        if (descriptionInput) descriptionInput.value = '';
+        if (imageInput) imageInput.value = '';
+        if (featuredCheckbox) featuredCheckbox.checked = false;
+        if (exclusiveCheckbox) exclusiveCheckbox.checked = false;
+
+        showMessage('Produto adicionado com sucesso!', 'success');
+        await loadProducts();
+        
+    } catch (error) {
+        console.error('Erro ao adicionar produto:', error);
+        showMessage('Erro ao adicionar produto: ' + error.message, 'error');
+    }
+}
+
+        async function deleteProduct(productId) {
+            if (!confirm('Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita.')) return;
+
+            try {
+                await db.collection('products').doc(productId).delete();
+                showMessage('Produto excluído com sucesso!', 'success');
+                await loadProducts();
+            } catch (error) {
+                console.error('Erro ao excluir produto:', error);
+                showMessage('Erro ao excluir produto', 'error');
+            }
+        }
+
+
+
+function createManualSubcategoryInput() {
+    // Verificar se já existe o campo manual
+    if (document.getElementById('manualSubcategoryInput')) return;
+
+    const subcategoryGroup = document.getElementById('productSubcategory').parentNode;
+    
+    const manualInput = document.createElement('input');
+    manualInput.type = 'text';
+    manualInput.id = 'manualSubcategoryInput';
+    manualInput.className = 'form-control';
+    manualInput.placeholder = 'Digite o nome da subcategoria manualmente';
+    manualInput.style.marginTop = '8px';
+    manualInput.style.display = 'none';
+    
+    subcategoryGroup.appendChild(manualInput);
+
+    // Mostrar/ocultar campo manual baseado na seleção
+    document.getElementById('productSubcategory').addEventListener('change', function() {
+        if (this.value === "") {
+            manualInput.style.display = 'block';
+        } else {
+            manualInput.style.display = 'none';
+            manualInput.value = '';
+        }
+    });
+}
+
+// Função para adicionar nova subcategoria a partir do input
+async function addNewSubcategoryFromInput() {
+    const categorySelect = document.getElementById('productCategory');
+    const newSubcategoryInput = document.getElementById('newSubcategoryInput');
+    const categoryId = categorySelect.value;
+    const newSubcategory = newSubcategoryInput.value.trim();
+
+    if (!categoryId) {
+        showMessage('Selecione uma categoria primeiro', 'error');
+        return;
+    }
+
+    if (!newSubcategory) {
+        showMessage('Digite o nome da nova subcategoria', 'error');
+        return;
+    }
+
+    await addNewSubcategory(categoryId, newSubcategory);
+    newSubcategoryInput.value = ''; // Limpar input
+}
+
+// Atualize a função updateSubcategorySelect para mostrar dica
+function updateSubcategorySelect(categoryId) {
+    const subcategorySelect = document.getElementById('productSubcategory');
+    const subcategoryHint = document.getElementById('subcategoryHint');
+    
+    if (!subcategorySelect) return;
+
+    // Limpar opções atuais
+    subcategorySelect.innerHTML = '<option value="">Selecione uma subcategoria (Opcional)</option>';
+
+    // Encontrar a categoria selecionada
+    const category = categories.find(cat => cat.id === categoryId);
+    
+    if (category && category.subcategories && category.subcategories.length > 0) {
+        // Adicionar opções das subcategorias
+        category.subcategories.forEach(subcategory => {
+            const option = document.createElement('option');
+            option.value = subcategory;
+            option.textContent = subcategory;
+            subcategorySelect.appendChild(option);
+        });
+        
+        // Atualizar hint
+        if (subcategoryHint) {
+            subcategoryHint.textContent = `${category.subcategories.length} subcategorias disponíveis para ${category.name}`;
+        }
+        
+    } else {
+        // Atualizar hint se não houver subcategorias
+        if (subcategoryHint) {
+            subcategoryHint.textContent = `Nenhuma subcategoria disponível para ${category?.name || 'esta categoria'}. Crie uma nova abaixo.`;
+        }
+    }
+}
+
+// ===== SISTEMA SIMPLES DE LOGOTIPO COM URL =====
+
+// Atualizar a função loadStoreConfig
+async function loadStoreConfig() {
+    try {
+        const doc = await db.collection('config').doc('store').get();
+        if (doc.exists) {
+            storeConfig = { ...CONFIG.defaultStoreConfig, ...doc.data() };
+            
+            // Preencher formulário
+            document.getElementById('storeName').value = storeConfig.name || '';
+            document.getElementById('storeDescription').value = storeConfig.description || '';
+            document.getElementById('whatsappNumber').value = storeConfig.whatsapp || '';
+            document.getElementById('deliveryFee').value = storeConfig.deliveryFee || 2.00;
+            document.getElementById('storeLogoUrl').value = storeConfig.logoUrl || '';
+            
+            // Carregar preview do logo se existir
+            if (storeConfig.logoUrl) {
+                updateLogoPreview(storeConfig.logoUrl);
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar configurações:', error);
+    }
+}
+
+// Atualizar a função saveStoreConfig para salvar o logo também
+async function saveStoreConfig() {
+    try {
+        const logoUrl = document.getElementById('storeLogoUrl').value.trim();
+        
+        const config = {
+            name: document.getElementById('storeName').value,
+            description: document.getElementById('storeDescription').value,
+            whatsapp: document.getElementById('whatsappNumber').value,
+            deliveryFee: parseFloat(document.getElementById('deliveryFee').value),
+            logoUrl: logoUrl, // ✅ Salvar a URL do logo
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        if (!config.name.trim()) {
+            showMessage('Digite o nome da loja', 'error');
+            return;
+        }
+
+        await db.collection('config').doc('store').set(config, { merge: true });
+        storeConfig = config;
+        
+        // Atualizar preview
+        if (logoUrl) {
+            updateLogoPreview(logoUrl);
+        } else {
+            clearLogoPreview();
+        }
+        
+        showMessage('Configurações salvas com sucesso!', 'success');
+    } catch (error) {
+        console.error('Erro ao salvar configurações:', error);
+        showMessage('Erro ao salvar configurações', 'error');
+    }
+}
+
+// Função para atualizar o preview do logo
+function updateLogoPreview(logoUrl) {
+    const preview = document.getElementById('logoPreview');
+    const noLogo = document.getElementById('noLogo');
+    
+    if (preview && noLogo) {
+        // Verificar se a imagem carrega
+        const tempImage = new Image();
+        
+        tempImage.onload = function() {
+            preview.src = logoUrl;
+            preview.style.display = 'block';
+            noLogo.style.display = 'none';
+            console.log('✅ Preview do logotipo atualizado');
+        };
+        
+        tempImage.onerror = function() {
+            console.error('❌ Erro ao carregar imagem do logo');
+            preview.style.display = 'none';
+            noLogo.style.display = 'block';
+            showMessage('URL da imagem inválida. Verifique o link.', 'warning');
+        };
+        
+        tempImage.src = logoUrl;
+    }
+}
+
+// Função para limpar o preview
+function clearLogoPreview() {
+    const preview = document.getElementById('logoPreview');
+    const noLogo = document.getElementById('noLogo');
+    
+    if (preview && noLogo) {
+        preview.style.display = 'none';
+        preview.src = '';
+        noLogo.style.display = 'block';
+    }
+}
+
+// Adicionar evento para preview em tempo real (opcional)
+document.addEventListener('DOMContentLoaded', function() {
+    const logoUrlInput = document.getElementById('storeLogoUrl');
+    if (logoUrlInput) {
+        logoUrlInput.addEventListener('blur', function() {
+            const url = this.value.trim();
+            if (url) {
+                updateLogoPreview(url);
+            } else {
+                clearLogoPreview();
+            }
         });
     }
-  }
-
-  function editProduct(collection, id) {
-  collectionName = collection;
-  currentProductId = id;
-
-  firestore.collection(collectionName).doc(currentProductId).get()
-    .then((doc) => {
-      if (doc.exists) {
-        const product = doc.data();
-        // Preencher campos do formulário
-        document.getElementById("editNome").value = product.nome;
-        document.getElementById("editInformacoes").value = product.informacoes;
-        document.getElementById("editValor").value = product.valor;
-        document.getElementById("editQuantidade").value = product.quantidade;
-        document.getElementById("editMarca").value = product.marca;
-        document.getElementById("editColecao").value = collectionName;
-        
-        // Limpar campo de imagem
-        document.getElementById("editImagemFile").value = "";
-
-        // Exibir formulário
-        document.getElementById("editProductFormContainer").style.display = "block";
-      }
-    })
-    .catch((error) => {
-      console.error("Erro ao obter produto:", error);
-    });
-}
-
-    // Função para cancelar a edição do produto
-    function cancelEdit() {
-      // Oculte o formulário de edição
-      document.getElementById("editProductFormContainer").style.display = "none";
-    }
-
-    document.getElementById("editProductForm").addEventListener("submit", function (event) {
-  event.preventDefault();
-  
-  const nome = document.getElementById("editNome").value;
-  const informacoes = document.getElementById("editInformacoes").value;
-  const valor = document.getElementById("editValor").value;
-  const quantidade = document.getElementById("editQuantidade").value;
-  const marca = document.getElementById("editMarca").value;
-  const colecao = document.getElementById("editColecao").value;
-
-  // Atualizar documento
-  firestore.collection(colecao).doc(currentProductId).update({
-    nome: nome,
-    informacoes: informacoes,
-    valor: parseFloat(valor),
-    quantidade: parseInt(quantidade),
-    marca: marca
-  })
-  .then(() => {
-    console.log("Produto atualizado!");
-    cancelEdit();
-    searchProducts(); // Atualizar lista
-  })
-  .catch((error) => {
-    console.error("Erro ao atualizar:", error);
-  });
-});
-
-function addProduct() {
-  const nome = document.getElementById("addNome").value;
-  const informacoes = document.getElementById("addInformacoes").value;
-  const valor = document.getElementById("addValor").value;
-  const quantidade = parseInt(document.getElementById("addQuantidade").value);
-  const colecao = document.getElementById("addColecao").value;
-  const marca = document.getElementById("addMarca").value;
-
-  const imagemFiles = [
-    document.getElementById("addImagemFile").files[0],
-    document.getElementById("addImagemFile2").files[0],
-    document.getElementById("addImagemFile3").files[0],
-    document.getElementById("addImagemFile4").files[0],
-    document.getElementById("addImagemFile5").files[0]
-  ];
-
-  const storageRef = firebase.storage().ref();
-  const imagemUrls = [];
-
-  // Fazer o upload das imagens para o Firebase Storage
-  const uploadPromises = imagemFiles.map((imagemFile) => {
-    if (imagemFile) {
-      const imagemStorageRef = storageRef.child('imagens/' + imagemFile.name);
-      return imagemStorageRef.put(imagemFile).then((snapshot) => {
-        return snapshot.ref.getDownloadURL();
-      });
-    } else {
-      return Promise.resolve(null);
-    }
-  });
-
-  // Executar todas as promessas de upload
-  Promise.all(uploadPromises).then((downloadUrls) => {
-    for (let i = 0; i < downloadUrls.length; i++) {
-      imagemUrls.push(downloadUrls[i] || null);
-    }
-
-    // Adicionar o produto com as URLs das imagens
-    firestore.collection(colecao).add({
-      nome: nome,
-      informacoes: informacoes,
-      valor: parseFloat(valor),
-      quantidade: quantidade,
-      imagemUrl: imagemUrls[0],
-      imagemUrl2: imagemUrls[1],
-      imagemUrl3: imagemUrls[2],
-      imagemUrl4: imagemUrls[3],
-      imagemUrl5: imagemUrls[4],
-      marca: marca 
-    })
-    .then(() => {
-      console.log("Novo produto adicionado com sucesso!");
-      // Limpar o formulário após a adição do produto
-      document.getElementById("addProductForm").reset();
-    })
-    .catch((error) => {
-      console.error("Erro ao adicionar novo produto:", error);
-    });
-  });
-}
-
-    // Event listener para o formulário de adição de produtos
-    document.getElementById("addProductForm").addEventListener("submit", function (event) {
-      event.preventDefault();
-      addProduct();
-    });
-
-
-// Função para salvar a cor no Firestore
-async function saveHeaderColor() {
-  const color = document.getElementById('headerColor').value;
-  const docRef = firestore.collection('dadosLandPage').doc('config');
-
-  try {
-    await docRef.set({
-      headerColor: color
-    }, { merge: true });
-    showMessage('Cor do header salva com sucesso!');
-    updateColorPreview(color);
-  } catch (error) {
-    console.error('Erro ao salvar cor:', error);
-    showMessage('Erro ao salvar cor!');
-  }
-}
-// Salvar todas as cores
-async function saveStoreColors() {
-  const colors = {
-    header: document.getElementById('headerColor').value,
-    cart: document.getElementById('cartColor').value,
-    promo: document.getElementById('promoColor').value,
-    body: document.getElementById('bodyColor').value,
-    footer: document.getElementById('footerColor').value
-  };
-
-  try {
-    await firestore.collection('config').doc('colors').set(colors);
-    showMessage('Cores salvas com sucesso!');
-    updateColorPreviews(colors);
-  } catch (error) {
-    console.error('Erro ao salvar cores:', error);
-    showMessage('Erro ao salvar cores!');
-  }
-}
-
-// Carregar cores do Firestore
-async function loadStoreColors() {
-  const doc = await firestore.collection('config').doc('colors').get();
-  
-  if (doc.exists) {
-    const colors = doc.data();
-    document.getElementById('headerColor').value = colors.header || '#3f618b';
-    document.getElementById('cartColor').value = colors.cart || '#98f1ff';
-    document.getElementById('promoColor').value = colors.promo || '#ffffff';
-    document.getElementById('bodyColor').value = colors.body || '#ffffff';
-    document.getElementById('footerColor').value = colors.footer || '#333333';
-    
-    updateColorPreviews(colors);
-  }
-}
-
-function updateColorPreviews(colors) {
-  document.getElementById('headerPreview').style.backgroundColor = colors.header;
-  document.getElementById('cartPreview').style.backgroundColor = colors.cart;
-  document.getElementById('promoPreview').style.backgroundColor = colors.promo;
-  document.getElementById('bodyPreview').style.background = colors.body; 
-  document.getElementById('footerPreview').style.background = colors.footer;
-}
-
-
-// Carregar cores ao iniciar a página
-window.onload = loadStoreColors;
-
-
-
-
-
-
-document.querySelectorAll('input[type="color"]').forEach(input => {
-  input.addEventListener('input', (e) => {
-    const previewId = e.target.id.replace('Color', 'Preview');
-    document.getElementById(previewId).style.backgroundColor = e.target.value;
-  });
-});
-
-// Adicione este JavaScript
-document.getElementById('AbaAddProduct').addEventListener('click', function() {
-  const formContainer = document.getElementById('productFormContainer');
-  
-  // Alterna a visibilidade do formulário
-  if(formContainer.style.display === 'none' || formContainer.style.display === '') {
-    formContainer.style.display = 'block';
-    this.textContent = 'Fechar Formulário'; // Altera o texto do botão
-  } else {
-    formContainer.style.display = 'none';
-    this.textContent = 'Adicionar Produto'; // Volta ao texto original
-  }
 });
 
 
 
-// Controle de Visibilidade
-document.querySelector('.alterarPoduct').addEventListener('click', function() {
-  const searchSection = document.getElementById('searchSection');
-  const editSection = document.getElementById('editProductFormContainer');
-  
-  searchSection.style.display = searchSection.style.display === 'none' ? 'block' : 'none';
-  editSection.style.display = 'none';
-  
-  if(searchSection.style.display === 'block') {
-    searchSection.scrollIntoView({ behavior: 'smooth' });
-  }
-});
 
-function cancelEdit() {
-  document.getElementById('editProductFormContainer').style.display = 'none';
-  document.getElementById('searchSection').style.display = 'block';
-}
+        // Inicializar com dashboard
+        showSection('dashboard');
+    </script>
 
-
-function showMessage(message, type = 'success') {
-  const messageBox = document.createElement('div');
-  messageBox.textContent = message;
-  messageBox.style.position = 'fixed';
-  messageBox.style.bottom = '20px';
-  messageBox.style.right = '20px';
-  messageBox.style.padding = '10px';
-  messageBox.style.borderRadius = '5px';
-  messageBox.style.fontWeight = 'bold';
-  messageBox.style.zIndex = '1000';
-  messageBox.style.color = '#fff';
-
-  if (type === 'success') {
-    messageBox.style.backgroundColor = 'green';
-  } else {
-    messageBox.style.backgroundColor = 'red';
-  }
-
-  document.body.appendChild(messageBox);
-
-  setTimeout(() => {
-    messageBox.remove();
-  }, 3000);
-}
-
-
-
-// Salvar categorias no Firestore
-async function saveCategories() {
-  const categories = {
-    cat1: document.getElementById('cat1').value,
-    cat2: document.getElementById('cat2').value,
-    cat3: document.getElementById('cat3').value,
-    cat4: document.getElementById('cat4').value,
-    cat5: document.getElementById('cat5').value
-  };
-
-  try {
-    await firestore.collection('config').doc('categories').set(categories);
-    showMessage('Categorias salvas com sucesso!');
-  } catch (error) {
-    console.error('Erro ao salvar categorias:', error);
-    showMessage('Erro ao salvar categorias!', 'error');
-  }
-}
-
-// Carregar categorias do Firestore ao abrir a página administrativa
-async function loadCategories() {
-  const doc = await firestore.collection('config').doc('categories').get();
-
-  if (doc.exists) {
-    const categories = doc.data();
-    document.getElementById('cat1').value = categories.cat1 || 'Camisetas';
-    document.getElementById('cat2').value = categories.cat2 || 'Bermudas';
-    document.getElementById('cat3').value = categories.cat3 || 'Inverno';
-    document.getElementById('cat4').value = categories.cat4 || 'Roupas Íntimas';
-    document.getElementById('cat5').value = categories.cat5 || 'Joias';
-  }
-}
-
-// Chamar a função ao carregar a página
-window.onload = loadCategories;
-
-
-// Função para salvar as cores dos botões no Firestore
-async function saveButtonStyles() {
-  const buttonColor = document.getElementById('categoryButtonColor').value;
-  const textColor = document.getElementById('categoryTextColor').value;
-
-  try {
-    await firestore.collection('config').doc('categoryStyle').set({
-      buttonColor: buttonColor,
-      textColor: textColor
-    }, { merge: true });
-
-    showMessage('Estilo dos botões salvo com sucesso!');
-  } catch (error) {
-    console.error('Erro ao salvar estilo dos botões:', error);
-    showMessage('Erro ao salvar estilo dos botões!', 'error');
-  }
-}
-
-// Carregar estilos ao abrir a página
-async function loadButtonStyles() {
-  const doc = await firestore.collection('config').doc('categoryStyle').get();
-
-  if (doc.exists) {
-    const styles = doc.data();
-    document.getElementById('categoryButtonColor').value = styles.buttonColor || '#ff0000';
-    document.getElementById('categoryTextColor').value = styles.textColor || '#ffffff';
-  }
-}
-
-// Chamar a função ao carregar a página
-window.onload = loadButtonStyles;
-
-
-
-  </script>
+    <!-- Font Awesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 </body>
-
 </html>
+
