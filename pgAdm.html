@@ -621,6 +621,34 @@
                         <input type="number" id="deliveryFee" class="form-control" step="0.01" value="2.00" min="0">
                     </div>
 
+
+                    <div class="admin-section">
+  <h3>🎨 Personalização de Cores</h3>
+
+  <label>Cor 1 do Fundo Madreperola:</label>
+  <input type="color" id="bgColor1" value="#ffffff">
+
+  <label>Cor 2 do Fundo Madreperola:</label>
+  <input type="color" id="bgColor2" value="#f5f5f5">
+
+  <label>Cor 3 (Reflexo Radial Esquerda):</label>
+  <input type="color" id="bgRadial1" value="#fff0dc">
+
+  <label>Cor 4 (Reflexo Radial Direita):</label>
+  <input type="color" id="bgRadial2" value="#e6e6ff">
+
+  <hr>
+
+  <label>Gradiente Exclusivos – Cor Inicial:</label>
+  <input type="color" id="exclusiveStart" value="#f5f3ed">
+
+  <label>Gradiente Exclusivos – Cor Final:</label>
+  <input type="color" id="exclusiveEnd" value="#d9c089">
+
+  <button id="saveColors">Salvar Cores</button>
+</div>
+
+
                     <button class="btn btn-primary" onclick="saveStoreConfig()">
                         <i class="fas fa-save"></i> Salvar Configurações
                     </button>
@@ -1449,6 +1477,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+document.getElementById("saveColors").addEventListener("click", () => {
+  const bg1 = document.getElementById("bgColor1").value;
+  const bg2 = document.getElementById("bgColor2").value;
+  const radial1 = document.getElementById("bgRadial1").value;
+  const radial2 = document.getElementById("bgRadial2").value;
+  const exStart = document.getElementById("exclusiveStart").value;
+  const exEnd = document.getElementById("exclusiveEnd").value;
+
+  // Armazenar localmente (ou substituir por Firestore se quiser persistência total)
+  const themeColors = { bg1, bg2, radial1, radial2, exStart, exEnd };
+  localStorage.setItem("queroLuxoTheme", JSON.stringify(themeColors));
+
+  alert("Cores salvas com sucesso!");
+});
 
 
 

@@ -2008,3 +2008,27 @@ function getCategoryName(categoryId) {
     const category = STATE.categories.find(cat => cat.id === categoryId);
     return category ? category.name : 'Geral';
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const saved = localStorage.getItem("queroLuxoTheme");
+  if (!saved) return;
+
+  const { bg1, bg2, radial1, radial2, exStart, exEnd } = JSON.parse(saved);
+
+  // Aplica o fundo madrepérola
+  document.body.style.background = `
+    linear-gradient(135deg, ${bg1}, ${bg2}),
+    radial-gradient(circle at top left, ${radial1}, transparent 70%),
+    radial-gradient(circle at bottom right, ${radial2}, transparent 70%)
+  `;
+  document.body.style.backgroundBlendMode = "screen, overlay";
+  document.body.style.backgroundAttachment = "fixed";
+
+  // Aplica o gradiente dos produtos exclusivos
+  const exclusiveSection = document.querySelector(".exclusive-products");
+  if (exclusiveSection) {
+    exclusiveSection.style.background = `linear-gradient(135deg, ${exStart} 0%, ${exEnd} 100%)`;
+  }
+});
+

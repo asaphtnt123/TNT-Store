@@ -22,65 +22,70 @@
 </head>
 
 <body>
+    
     <!-- Header Principal -->
     <header class="main-header">
         <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="container">
-                <div class="promo-banner">
-                    <span class="promo-tag">✨ PROMOÇÃO</span>
-                    <span class="promo-text">Frete grátis acima de R$ 100 • 10% off no PIX</span>
-                </div>
-                
-                <div class="header-actions">
-                    <button class="admin-btn" onclick="goToAdminPage()">
-                        <i class="fas fa-cog"></i> Painel ADM
-                    </button>
-                </div>
+          <!-- Top Bar Luxuosa -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="cart-section">
+                <button class="cart-btn" onclick="toggleCart()">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-count" id="cartCount">3</span>
+                </button>
+            </div>
+            
+            <div class="promo-banner">
+                <span class="promo-tag">✨ Promoção Exclusiva</span>
+                <span class="promo-text">Frete grátis acima de R$ 100 • 10% off no PIX</span>
+            </div>
+            
+            <div class="header-actions">
+                <button class="admin-btn" onclick="goToAdminPage()">
+                    <i class="fas fa-cog"></i>
+                    <span>Painel ADM</span>
+                </button>
             </div>
         </div>
+    </div>
 
         <!-- Logo e Navegação -->
-        <div class="header-main">
-            <div class="container">
-                <div class="logo-section">
-                    <div class="logo">
-                        <img id="profileImage" src="caminho/para/logo.png" alt="Atacadão dos Revendedores">
-                        <h1 id="profileName">Atacadão dos Revendedores</h1>
-                    </div>
-                </div>
-
-                <div class="search-section">
-    <div class="search-container">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="searchInput" class="search-input" placeholder="Buscar joias, acessórios..." oninput="searchProducts()">
-        <button class="search-btn" onclick="searchProducts()">
-            <i class="fas fa-arrow-right"></i>
-        </button>
-    </div>
-    
-    <!-- Container para resultados da pesquisa -->
-    <div id="searchResults" class="search-results" style="display: none;">
-        <div class="search-results-header">
-            <h4>Resultados da Pesquisa</h4>
-            <button class="close-search-results" onclick="closeSearchResults()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div id="searchResultsContent" class="search-results-content">
-            <!-- Resultados serão carregados aqui -->
-        </div>
-    </div>
-</div>
-
-                <div class="cart-section">
-                    <button class="cart-btn" onclick="toggleCart()">
-                        <i class="fas fa-shopping-bag"></i>
-                        <span class="cart-count" id="cartCount">0</span>
-                    </button>
+         <div class="header-main">
+        <div class="container">
+            <div class="logo-section">
+                <div class="logo">
+                    <img id="profileImage" src="https://via.placeholder.com/150x50/1a1a1a/ffffff?text=TNT+STORE" alt="TNT Store">
+                    <h1 id="profileName">TNT STORE</h1>
                 </div>
             </div>
+
+            <div class="search-section">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar joias, acessórios..." oninput="searchProducts()">
+                    <button class="search-btn" onclick="searchProducts()">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Container para resultados da pesquisa -->
+                <div id="searchResults" class="search-results">
+                    <div class="search-results-header">
+                        <h4>Resultados da Pesquisa</h4>
+                        <button class="close-search-results" onclick="closeSearchResults()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div id="searchResultsContent" class="search-results-content">
+                        <!-- Resultados serão carregados aqui -->
+                    </div>
+                </div>
+            </div>
+
+            
         </div>
+    </div>
 
         <!-- Navegação por Categorias -->
         <nav class="category-nav">
