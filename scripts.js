@@ -65,7 +65,7 @@ async function initializeApp() {
         await loadFeaturedProducts();
         setupEventListeners();
         updateCartUI();
-        
+        setupConfigListener();
         hideLoading();
         showMessage('Loja carregada com sucesso!', 'success');
         console.log('🎉 Aplicação inicializada com sucesso!');
@@ -1342,7 +1342,7 @@ function cacheData(key, data) {
 
 // ===== ADMIN =====
 function goToAdminPage() {
-    window.open('admin.html', '_blank');
+    window.open('pgadm.html', '_blank');
 }
 
 // Adicione CSS para as subcategorias
@@ -2031,4 +2031,465 @@ document.addEventListener("DOMContentLoaded", () => {
     exclusiveSection.style.background = `linear-gradient(135deg, ${exStart} 0%, ${exEnd} 100%)`;
   }
 });
+
+
+
+// ===== APLICAR CONFIGURAÇÕES DO BANNER NO SITE PRINCIPAL =====
+
+async function applyStoreConfig() {
+    try {
+        const doc = await db.collection('config').doc('store').get();
+        if (doc.exists) {
+            const config = doc.data();
+            
+            // Aplicar logo
+            const profileImage = document.getElementById('profileImage');
+            if (profileImage && config.logoUrl) {
+                profileImage.src = config.logoUrl;
+                profileImage.onerror = function() {
+                    this.src = 'https://via.placeholder.com/150x50/1a1a1a/ffffff?text=TNT+STORE';
+                };
+            }
+            
+            // Aplicar nome da loja
+            const profileName = document.getElementById('profileName');
+            if (profileName && config.name) {
+                profileName.textContent = config.name;
+            }
+            
+            // Aplicar background do header
+            const headerMain = document.querySelector('.header-main');
+            if (headerMain && config.headerBackgroundUrl) {
+                headerMain.style.background = `
+                    linear-gradient(135deg, rgba(26, 26, 26, 0.85) 0%, rgba(45, 45, 45, 0.75) 100%),
+                    url('${config.headerBackgroundUrl}') center/cover no-repeat
+                `;
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao aplicar configurações:', error);
+    }
+}
+
+// Aplicar configurações quando a página carregar
+document.addEventListener('DOMContentLoaded', applyStoreConfig);
+
+// Opcional: Escutar mudanças em tempo real
+function setupConfigListener() {
+    db.collection('config').doc('store')
+        .onSnapshot((doc) => {
+            if (doc.exists) {
+                applyStoreConfig();
+            }
+        });
+}
+
+// Iniciar listener (opcional)
+// setupConfigListener();
+
+// ===== APLICAR CORES PERSONALIZADAS NO SITE PRINCIPAL =====
+
+// Função para aplicar as cores
+function applyCustomColors(colors) {
+    console.log('🎨 Aplicando cores personalizadas:', colors);
+    
+    // Remover estilo anterior se existir
+    const existingStyle = document.getElementById('custom-colors');
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+    
+    // Criar novo estilo
+    const style = document.createElement('style');
+    style.id = 'custom-colors';
+    
+    // Gerar CSS com as cores personalizadas
+    style.textContent = `
+        /* Top Bar */
+        .top-bar {
+            background: linear-gradient(${colors.topBarDirection}, ${colors.topBarColor1} 0%, ${colors.topBarColor2} 100%) !important;
+            border-bottom: 1px solid ${hexToRgba(colors.borderColor, colors.borderOpacity / 100)} !important;
+        }
+        
+        /* Variáveis CSS */
+        :root {
+            --primary: ${colors.primaryColor} !important;
+            --secondary: ${colors.secondaryColor} !important;
+            --primary-dark: ${darkenColor(colors.primaryColor, 10)} !important;
+        }
+        
+        /* Elementos com cor primária */
+        .promo-tag {
+            background: linear-gradient(135deg, ${colors.primaryColor}, ${lightenColor(colors.primaryColor, 20)}) !important;
+            color: ${getContrastColor(colors.primaryColor)} !important;
+        }
+        
+        .cart-btn:hover, 
+        .admin-btn:hover {
+            background: ${hexToRgba(colors.primaryColor, 0.15)} !important;
+            border-color: ${colors.primaryColor} !important;
+        }
+        
+        .cart-count {
+            background: ${colors.primaryColor} !important;
+            color: ${getContrastColor(colors.primaryColor)} !important;
+        }
+        
+        /* Botões admin */
+        .admin-btn {
+            border-color: ${colors.primaryColor} !important;
+            color: ${colors.primaryColor} !important;
+        }
+        
+        .admin-btn:hover {
+            background: ${colors.primaryColor} !important;
+            color: ${getContrastColor(colors.primaryColor)} !important;
+        }
+        
+        /* Efeitos de brilho */
+        .top-bar::before {
+            background: linear-gradient(90deg, transparent, ${colors.primaryColor}, transparent) !important;
+        }
+    `;
+    
+    document.head.appendChild(style);
+    console.log('✅ Cores aplicadas com sucesso!');
+}
+
+// Função para carregar e aplicar cores
+async function loadAndApplyColors() {
+    try {
+        console.log('🔄 Carregando cores do Firestore...');
+        
+        const doc = await db.collection('config').doc('colors').get();
+        
+        if (doc.exists) {
+            const colors = doc.data();
+            console.log('🎨 Cores encontradas:', colors);
+            applyCustomColors(colors);
+        } else {
+            console.log('ℹ️  Nenhuma cor personalizada encontrada, usando padrão');
+        }
+    } catch (error) {
+        console.error('❌ Erro ao carregar cores:', error);
+    }
+}
+
+// Funções utilitárias para cores
+function hexToRgba(hex, opacity) {
+    if (!hex) return `rgba(255, 215, 0, ${opacity})`;
+    
+    hex = hex.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
+function lightenColor(hex, percent) {
+    if (!hex) return '#ffed4e';
+    
+    hex = hex.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    const newR = Math.min(255, r + (255 - r) * (percent / 100));
+    const newG = Math.min(255, g + (255 - g) * (percent / 100));
+    const newB = Math.min(255, b + (255 - b) * (percent / 100));
+    
+    return `rgb(${Math.round(newR)}, ${Math.round(newG)}, ${Math.round(newB)})`;
+}
+
+function darkenColor(hex, percent) {
+    if (!hex) return '#e6c200';
+    
+    hex = hex.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    const newR = Math.max(0, r * (1 - percent / 100));
+    const newG = Math.max(0, g * (1 - percent / 100));
+    const newB = Math.max(0, b * (1 - percent / 100));
+    
+    return `rgb(${Math.round(newR)}, ${Math.round(newG)}, ${Math.round(newB)})`;
+}
+
+function getContrastColor(hex) {
+    if (!hex) return '#000000';
+    
+    hex = hex.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    // Fórmula de luminância
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.5 ? '#000000' : '#ffffff';
+}
+
+// Escutar mudanças em tempo real (opcional)
+function setupColorListener() {
+    console.log('👂 Iniciando listener de cores...');
+    
+    db.collection('config').doc('colors')
+        .onSnapshot((doc) => {
+            if (doc.exists) {
+                console.log('🔄 Cores atualizadas em tempo real!');
+                const colors = doc.data();
+                applyCustomColors(colors);
+            }
+        }, (error) => {
+            console.error('❌ Erro no listener de cores:', error);
+        });
+}
+// Inicialização separada no site principal
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Página carregada, aplicando cores...');
+    
+    setTimeout(() => {
+        // Aplicar cores do HEADER
+        loadAndApplyColors();
+            loadAndApplyBannerSettings();
+
+        // Aplicar cores da NAVEGAÇÃO (separado)
+        loadAndApplyNavigationColors();
+        
+        // Opcional: Ativar listeners em tempo real
+        // setupColorListener();
+        // setupNavigationColorListener();
+    }, 1000);
+});
+
+// Funções separadas para teste
+window.reloadHeaderColors = loadAndApplyColors;
+window.reloadNavigationColors = loadAndApplyNavigationColors;
+
+// Forçar recarregamento de cores (para teste)
+window.reloadColors = loadAndApplyColors;
+
+// DEBUG - Verificar se as cores estão sendo carregadas
+async function debugColorLoad() {
+    try {
+        console.log('🎨 Iniciando carregamento de cores...');
+        const doc = await db.collection('config').doc('colors').get();
+        console.log('📦 Documento de cores:', doc.exists ? 'EXISTE' : 'NÃO EXISTE');
+        if (doc.exists) {
+            const colors = doc.data();
+            console.log('🌈 Cores carregadas:', colors);
+            return colors;
+        } else {
+            console.log('❌ Nenhuma configuração de cores encontrada');
+            return null;
+        }
+    } catch (error) {
+        console.error('❌ Erro ao carregar cores:', error);
+        return null;
+    }
+}
+
+
+// ===== APLICAR CORES DA NAVEGAÇÃO NO SITE PRINCIPAL =====
+
+// Função para aplicar as cores da navegação
+function applyNavigationColors(navColors) {
+    console.log('🎨 Aplicando cores da navegação:', navColors);
+    
+    // Remover estilo anterior se existir
+    const existingStyle = document.getElementById('custom-navigation-colors');
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+    
+    // Criar novo estilo
+    const style = document.createElement('style');
+    style.id = 'custom-navigation-colors';
+    
+    // Gerar CSS com as cores da navegação
+    style.textContent = `
+        /* Category Nav */
+        .category-nav {
+            background: linear-gradient(${navColors.categoryNavDirection || '135deg'}, ${navColors.categoryNavColor1 || '#d33434'} 0%, ${navColors.categoryNavColor2 || '#2d2d2d'} 100%) !important;
+            border-bottom: 1px solid ${hexToRgba(navColors.categoryNavBorderColor || '#ffd700', (navColors.categoryNavBorderOpacity || 30) / 100)} !important;
+        }
+        
+        /* Botões da Category Nav */
+        .category-btn {
+            background: ${navColors.categoryBtnBgColor || 'rgba(255,255,255,0.1)'} !important;
+            color: ${navColors.categoryBtnTextColor || '#e0e0e0'} !important;
+            border: 1px solid ${navColors.categoryBtnBorderColor || 'rgba(255, 255, 255, 0.1)'} !important;
+        }
+        
+        .category-btn:hover {
+            background: ${navColors.categoryBtnHoverColor || 'rgba(255,215,0,0.15)'} !important;
+            color: #ffffff !important;
+            border-color: ${hexToRgba(navColors.categoryBtnActiveColor || '#ffd700', 0.3)} !important;
+        }
+        
+        .category-btn.active {
+            background: ${navColors.categoryBtnActiveColor || '#ffd700'} !important;
+            color: ${getContrastColor(navColors.categoryBtnActiveColor || '#ffd700')} !important;
+            border-color: ${navColors.categoryBtnActiveColor || '#ffd700'} !important;
+        }
+        
+        /* Subcategory Nav */
+        .subcategory-nav {
+            background: linear-gradient(${navColors.categoryNavDirection || '135deg'}, ${darkenColor(navColors.categoryNavColor1 || '#d33434', 10)} 0%, ${darkenColor(navColors.categoryNavColor2 || '#2d2d2d', 10)} 100%) !important;
+            border-bottom: 1px solid ${hexToRgba(navColors.categoryNavBorderColor || '#ffd700', (navColors.categoryNavBorderOpacity || 30) / 200)} !important;
+        }
+        
+        .subcategory-btn {
+            background: ${darkenColor(navColors.categoryBtnBgColor || 'rgba(255,255,255,0.1)', 20)} !important;
+            color: ${navColors.categoryBtnTextColor || '#e0e0e0'} !important;
+            border: 1px solid ${darkenColor(navColors.categoryBtnBorderColor || 'rgba(255,255,255,0.1)', 20)} !important;
+        }
+        
+        .subcategory-btn:hover {
+            background: ${navColors.categoryBtnHoverColor || 'rgba(255,215,0,0.15)'} !important;
+            color: #ffffff !important;
+        }
+        
+        .subcategory-btn.active {
+            background: ${hexToRgba(navColors.categoryBtnActiveColor || '#ffd700', 0.15)} !important;
+            color: ${navColors.categoryBtnActiveColor || '#ffd700'} !important;
+            border-color: ${hexToRgba(navColors.categoryBtnActiveColor || '#ffd700', 0.4)} !important;
+        }
+    `;
+    
+    document.head.appendChild(style);
+    console.log('✅ Cores da navegação aplicadas com sucesso!');
+}
+
+// Função para carregar e aplicar cores da navegação
+async function loadAndApplyNavigationColors() {
+    try {
+        console.log('🔄 Carregando cores da navegação...');
+        
+        const doc = await db.collection('config').doc('navigation').get();
+        
+        if (doc.exists) {
+            const navColors = doc.data();
+            console.log('🎨 Cores da navegação encontradas:', navColors);
+            applyNavigationColors(navColors);
+        } else {
+            console.log('ℹ️  Nenhuma cor de navegação personalizada encontrada, usando padrão');
+        }
+    } catch (error) {
+        console.error('❌ Erro ao carregar cores da navegação:', error);
+    }
+}
+
+// Escutar mudanças em tempo real na navegação
+function setupNavigationColorListener() {
+    console.log('👂 Iniciando listener de cores da navegação...');
+    
+    db.collection('config').doc('navigation')
+        .onSnapshot((doc) => {
+            if (doc.exists) {
+                console.log('🔄 Cores da navegação atualizadas em tempo real!');
+                const navColors = doc.data();
+                applyNavigationColors(navColors);
+            }
+        }, (error) => {
+            console.error('❌ Erro no listener de cores da navegação:', error);
+        });
+}
+
+// ===== APLICAR CONFIGURAÇÕES DO BANNER NO SITE PRINCIPAL =====
+
+// Função para aplicar as configurações do banner
+function applyBannerSettings(bannerConfig) {
+    console.log('🎨 Aplicando configurações do banner:', bannerConfig);
+    
+    // Remover estilo anterior se existir
+    const existingStyle = document.getElementById('custom-banner-styles');
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+    
+    // Criar novo estilo
+    const style = document.createElement('style');
+    style.id = 'custom-banner-styles';
+    
+    // Gerar CSS com as configurações do banner
+    style.textContent = `
+        /* Banner Promocional */
+        .promo-banner {
+            background: linear-gradient(${bannerConfig.bannerBgDirection || '135deg'}, ${bannerConfig.bannerBgColor1 || '#0a0a0a'} 0%, ${bannerConfig.bannerBgColor2 || '#1a1a1a'} 100%) !important;
+            border: 1px solid ${hexToRgba(bannerConfig.bannerBorderColor || '#ffd700', (bannerConfig.bannerBorderOpacity || 10) / 100)} !important;
+            border-radius: ${bannerConfig.bannerBorderRadius || '30px'} !important;
+            backdrop-filter: blur(10px) !important;
+        }
+        
+        /* Tag Promocional */
+        .promo-tag {
+            background: ${bannerConfig.promoTagBgColor || '#ffd700'} !important;
+            color: ${bannerConfig.promoTagTextColor || '#1a1a1a'} !important;
+            font-size: ${bannerConfig.promoTagFontSize || '0.75rem'} !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+        }
+        
+        /* Texto Principal */
+        .promo-text {
+            color: ${bannerConfig.promoTextColor || '#e0e0e0'} !important;
+            font-size: ${bannerConfig.promoTextFontSize || '0.875rem'} !important;
+            font-weight: ${bannerConfig.promoTextFontWeight || '500'} !important;
+        }
+    `;
+    
+    document.head.appendChild(style);
+    
+    // Atualizar textos dinamicamente
+    updateBannerTexts(bannerConfig);
+    
+    console.log('✅ Configurações do banner aplicadas com sucesso!');
+}
+
+// Atualizar textos do banner
+function updateBannerTexts(bannerConfig) {
+    const promoTag = document.querySelector('.promo-tag');
+    const promoText = document.querySelector('.promo-text');
+    
+    if (promoTag && bannerConfig.promoTagText) {
+        promoTag.textContent = bannerConfig.promoTagText;
+    }
+    
+    if (promoText && bannerConfig.promoMainText) {
+        promoText.textContent = bannerConfig.promoMainText;
+    }
+}
+
+// Carregar e aplicar configurações do banner
+async function loadAndApplyBannerSettings() {
+    try {
+        console.log('🔄 Carregando configurações do banner...');
+        
+        const doc = await db.collection('config').doc('banner').get();
+        
+        if (doc.exists) {
+            const bannerConfig = doc.data();
+            console.log('🎨 Configurações do banner encontradas:', bannerConfig);
+            applyBannerSettings(bannerConfig);
+        } else {
+            console.log('ℹ️  Nenhuma configuração de banner personalizada encontrada, usando padrão');
+        }
+    } catch (error) {
+        console.error('❌ Erro ao carregar configurações do banner:', error);
+    }
+}
+
+// Listener para mudanças em tempo real
+function setupBannerListener() {
+    db.collection('config').doc('banner')
+        .onSnapshot((doc) => {
+            if (doc.exists) {
+                console.log('🔄 Banner atualizado em tempo real!');
+                const bannerConfig = doc.data();
+                applyBannerSettings(bannerConfig);
+            }
+        });
+}
 

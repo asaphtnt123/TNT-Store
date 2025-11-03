@@ -1112,6 +1112,8 @@ p { margin-bottom: var(--space-md); }
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--primary);
+  background-color: #000000a6;
+      width: fit-content;
   margin-bottom: var(--space-md);
 }
 
@@ -1468,7 +1470,7 @@ p { margin-bottom: var(--space-md); }
 
 /* ===== FOOTER ===== */
 .main-footer {
-  background: var(--secondary);
+  background: black;
   color: var(--white);
   padding: var(--space-2xl) 0 var(--space-lg);
 }

@@ -507,6 +507,281 @@
     font-style: italic;
 }
 
+/* Estilos para a seção de banner e logo */
+.image-preview {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    background: #f8f9fa;
+    margin-top: 0.5rem;
+}
+
+.header-preview {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.preview-logo img {
+    height: 30px;
+    width: auto;
+    border-radius: 4px;
+}
+
+/* Indicadores de validação */
+.form-control.valid {
+    border-color: #28a745 !important;
+}
+
+.form-control.invalid {
+    border-color: #dc3545 !important;
+}
+
+/* Loading states */
+.loading-preview {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+
+/* Estilos para personalização de cores */
+.color-grid {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.color-group {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.color-group h4 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.color-inputs {
+    display: grid;
+    gap: 1rem;
+}
+
+.color-input {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.color-input label {
+    font-weight: 500;
+    color: black;
+    font-size: 1.5rem;
+}
+
+.color-picker {
+    height: 45px;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+.hex-input {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+}
+
+.gradient-direction {
+    margin-top: 1rem;
+}
+
+.opacity-control {
+    margin-top: 0.5rem;
+}
+
+.opacity-control label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+/* Preview */
+.color-preview {
+    margin: 2rem 0;
+}
+
+.top-bar-preview {
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    position: relative;
+}
+
+.preview-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    height: 100%;
+    color: white;
+}
+
+.preview-logo {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.preview-promo {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .color-inputs {
+        grid-template-columns: 1fr;
+    }
+    
+    .preview-content {
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.5rem;
+        text-align: center;
+    }
+}
+
+/* Estilos para preview da category nav */
+.category-nav-preview {
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+}
+
+.preview-category-buttons {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    width: 100%;
+    padding: 0.5rem 0;
+}
+
+.preview-category-btn {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    cursor: default;
+    transition: all 0.3s ease;
+}
+
+.preview-category-btn.active {
+    background: #ffd700;
+    color: #1a1a1a;
+    border-color: #ffd700;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .preview-category-buttons {
+        gap: 0.25rem;
+    }
+    
+    .preview-category-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+    }
+}
+
+
+/* Estilos para personalização do banner */
+.banner-customization {
+    margin-bottom: 2rem;
+}
+
+.font-size-control,
+.font-weight-control,
+.border-radius-control {
+    margin-top: 1rem;
+}
+
+.font-size-control label,
+.font-weight-control label,
+.border-radius-control label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--gray-300);
+}
+
+/* Preview do Banner */
+.preview-top-bar {
+    background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.preview-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    backdrop-filter: blur(10px);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.preview-promo-tag {
+    padding: 0.375rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.preview-promo-text {
+    font-weight: 500;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Responsividade do Preview */
+@media (max-width: 768px) {
+    .preview-banner {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .preview-promo-text::before,
+    .preview-promo-text::after {
+        display: none;
+    }
+}
+
 
     </style>
 </head>
@@ -584,22 +859,34 @@
                     <h2><i class="fas fa-cog"></i> Configurações da Loja</h2>
                     
                     <!-- Seção Logotipo Simplificada -->
-<div class="form-group">
-    <label for="storeLogoUrl">URL do Logotipo</label>
-    <input type="text" id="storeLogoUrl" class="form-control" placeholder="https://exemplo.com/logo.png">
-    <small style="color: #666; font-size: 0.875rem;">
-        Cole a URL completa da imagem do logotipo (JPG, PNG, SVG)
-    </small>
+
+
+<div class="settings-section">
+    <h3><i class="fas fa-image"></i> Banner & Logo da Loja</h3>
     
-    <!-- Preview do Logotipo -->
-    <div class="logo-preview" style="margin-top: 15px;">
-        <img id="logoPreview" src="" alt="Preview do logotipo" style="display: none; max-width: 150px; max-height: 150px; border-radius: 8px;">
-        <div id="noLogo" class="no-logo-placeholder" style="text-align: center; color: #666; padding: 20px; border: 2px dashed #ddd; border-radius: 8px;">
-            <i class="fas fa-store" style="font-size: 2rem; display: block; margin-bottom: 8px;"></i>
-            <span>Nenhum logotipo carregado</span>
-        </div>
+    <div class="form-group">
+        <label for="storeName">Nome da Loja *</label>
+        <input type="text" id="storeName" class="form-control" value="TNT STORE" required>
     </div>
+
+    <div class="form-group">
+        <label for="storeLogoUrl">URL do Logo</label>
+        <input type="url" id="storeLogoUrl" class="form-control" 
+               placeholder="https://exemplo.com/logo.png">
+    </div>
+
+    <div class="form-group">
+        <label for="headerBackgroundUrl">URL do Banner do Header</label>
+        <input type="url" id="headerBackgroundUrl" class="form-control" 
+               placeholder="https://exemplo.com/header-banner.jpg">
+    </div>
+
+    <!-- Botão com onclick correto -->
+    <button class="btn btn-primary" onclick="saveStoreConfig()">
+        <i class="fas fa-save"></i> Salvar Configurações
+    </button>
 </div>
+
                     <div class="form-group">
                         <label for="storeName">Nome da Loja</label>
                         <input type="text" id="storeName" class="form-control" placeholder="Ex: Atacadão dos Revendedores">
@@ -622,36 +909,335 @@
                     </div>
 
 
-                    <div class="admin-section">
-  <h3>🎨 Personalização de Cores</h3>
-
-  <label>Cor 1 do Fundo Madreperola:</label>
-  <input type="color" id="bgColor1" value="#ffffff">
-
-  <label>Cor 2 do Fundo Madreperola:</label>
-  <input type="color" id="bgColor2" value="#f5f5f5">
-
-  <label>Cor 3 (Reflexo Radial Esquerda):</label>
-  <input type="color" id="bgRadial1" value="#fff0dc">
-
-  <label>Cor 4 (Reflexo Radial Direita):</label>
-  <input type="color" id="bgRadial2" value="#e6e6ff">
-
-  <hr>
-
-  <label>Gradiente Exclusivos – Cor Inicial:</label>
-  <input type="color" id="exclusiveStart" value="#f5f3ed">
-
-  <label>Gradiente Exclusivos – Cor Final:</label>
-  <input type="color" id="exclusiveEnd" value="#d9c089">
-
-  <button id="saveColors">Salvar Cores</button>
-</div>
+              
 
 
                     <button class="btn btn-primary" onclick="saveStoreConfig()">
                         <i class="fas fa-save"></i> Salvar Configurações
                     </button>
+
+
+                      <h3><i class="fas fa-palette"></i> Personalização de Cores & Gradientes</h3>
+    
+    <div class="color-grid">
+        <!-- Top Bar Gradient -->
+        <div class="color-group">
+            <h4>Top Bar Gradient</h4>
+            <div class="color-inputs">
+                <div class="color-input">
+                    <label for="topBarColor1">Cor Inicial</label>
+                    <input type="color" id="topBarColor1" class="form-control color-picker" value="#ddcbcb">
+                    <input type="text" id="topBarColor1Hex" class="form-control hex-input" value="#ddcbcb" placeholder="#ddcbcb">
+                </div>
+                <div class="color-input">
+                    <label for="topBarColor2">Cor Final</label>
+                    <input type="color" id="topBarColor2" class="form-control color-picker" value="#1a1a1a">
+                    <input type="text" id="topBarColor2Hex" class="form-control hex-input" value="#1a1a1a" placeholder="#1a1a1a">
+                </div>
+            </div>
+            <div class="gradient-direction">
+                <label>Direção do Gradiente:</label>
+                <select id="topBarDirection" class="form-control">
+                    <option value="135deg">Diagonal (135°)</option>
+                    <option value="90deg">Horizontal →</option>
+                    <option value="180deg">Vertical ↓</option>
+                    <option value="45deg">Diagonal (45°)</option>
+                    <option value="to right bottom">Canto Superior Esquerdo</option>
+                    <option value="to right top">Canto Inferior Esquerdo</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Cores Principais -->
+        <div class="color-group">
+            <h4>Cores Principais</h4>
+            <div class="color-inputs">
+                <div class="color-input">
+                    <label for="primaryColor">Cor Primária (Dourado)</label>
+                    <input type="color" id="primaryColor" class="form-control color-picker" value="#ffd700">
+                    <input type="text" id="primaryColorHex" class="form-control hex-input" value="#ffd700">
+                </div>
+                <div class="color-input">
+                    <label for="secondaryColor">Cor Secundária</label>
+                    <input type="color" id="secondaryColor" class="form-control color-picker" value="#1a1a1a">
+                    <input type="text" id="secondaryColorHex" class="form-control hex-input" value="#1a1a1a">
+                </div>
+            </div>
+        </div>
+
+        <!-- Border Color -->
+        <div class="color-group">
+            <h4>Cor da Borda</h4>
+            <div class="color-input">
+                <label for="borderColor">Cor da Borda Inferior</label>
+                <input type="color" id="borderColor" class="form-control color-picker" value="#ffd700">
+                <input type="text" id="borderColorHex" class="form-control hex-input" value="#ffd700">
+                <div class="opacity-control">
+                    <label>Opacidade: <span id="borderOpacityValue">20%</span></label>
+                    <input type="range" id="borderOpacity" class="form-control" min="0" max="100" value="20">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="color-preview">
+        <h4>Preview do Top Bar</h4>
+        <div id="topBarPreview" class="top-bar-preview">
+            <div class="preview-content">
+                <div class="preview-logo">TNT STORE</div>
+                <div class="preview-promo">✨ Frete grátis acima de R$ 100</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="saveColorSettings()">
+        <i class="fas fa-save"></i> Salvar Cores
+    </button>
+
+ <h3><i class="fas fa-layer-group"></i> Personalização da Navegação</h3>
+    
+    <div class="color-grid">
+        <!-- Category Nav Gradient -->
+        <div class="color-group">
+            <h4>Fundo da Navegação</h4>
+            <div class="color-inputs">
+                <div class="color-input">
+                    <label for="categoryNavColor1">Cor Inicial</label>
+                    <input type="color" id="categoryNavColor1" class="form-control color-picker" value="#d33434">
+                    <input type="text" id="categoryNavColor1Hex" class="form-control hex-input" value="#d33434" placeholder="#d33434">
+                </div>
+                <div class="color-input">
+                    <label for="categoryNavColor2">Cor Final</label>
+                    <input type="color" id="categoryNavColor2" class="form-control color-picker" value="#2d2d2d">
+                    <input type="text" id="categoryNavColor2Hex" class="form-control hex-input" value="#2d2d2d" placeholder="#2d2d2d">
+                </div>
+            </div>
+            <div class="gradient-direction">
+                <label>Direção do Gradiente:</label>
+                <select id="categoryNavDirection" class="form-control">
+                    <option value="135deg">Diagonal (135°)</option>
+                    <option value="90deg">Horizontal →</option>
+                    <option value="180deg">Vertical ↓</option>
+                    <option value="45deg">Diagonal (45°)</option>
+                    <option value="to right bottom">Canto Superior Esquerdo</option>
+                    <option value="to right top">Canto Inferior Esquerdo</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Border da Category Nav -->
+        <div class="color-group">
+            <h4>Borda da Navegação</h4>
+            <div class="color-input">
+                <label for="categoryNavBorderColor">Cor da Borda</label>
+                <input type="color" id="categoryNavBorderColor" class="form-control color-picker" value="#ffd700">
+                <input type="text" id="categoryNavBorderColorHex" class="form-control hex-input" value="#ffd700">
+                <div class="opacity-control">
+                    <label>Opacidade: <span id="categoryNavBorderOpacityValue">30%</span></label>
+                    <input type="range" id="categoryNavBorderOpacity" class="form-control" min="0" max="100" value="30">
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões da Category Nav -->
+        <div class="color-group">
+            <h4>Botões da Categoria</h4>
+            <div class="color-inputs">
+                <div class="color-input">
+                    <label for="categoryBtnBgColor">Fundo do Botão</label>
+                    <input type="color" id="categoryBtnBgColor" class="form-control color-picker" value="#1a1a1a">
+                    <input type="text" id="categoryBtnBgColorHex" class="form-control hex-input" value="#1a1a1a">
+                </div>
+                <div class="color-input">
+                    <label for="categoryBtnTextColor">Texto do Botão</label>
+                    <input type="color" id="categoryBtnTextColor" class="form-control color-picker" value="#e0e0e0">
+                    <input type="text" id="categoryBtnTextColorHex" class="form-control hex-input" value="#e0e0e0">
+                </div>
+                <div class="color-input">
+                    <label for="categoryBtnBorderColor">Borda do Botão</label>
+                    <input type="color" id="categoryBtnBorderColor" class="form-control color-picker" value="rgba(255,255,255,0.1)">
+                    <input type="text" id="categoryBtnBorderColorHex" class="form-control hex-input" value="rgba(255,255,255,0.1)">
+                </div>
+                <div class="color-input">
+                    <label for="categoryBtnActiveColor">Botão Ativo</label>
+                    <input type="color" id="categoryBtnActiveColor" class="form-control color-picker" value="#ffd700">
+                    <input type="text" id="categoryBtnActiveColorHex" class="form-control hex-input" value="#ffd700">
+                </div>
+                <div class="color-input">
+                    <label for="categoryBtnHoverColor">Botão Hover</label>
+                    <input type="color" id="categoryBtnHoverColor" class="form-control color-picker" value="rgba(255,215,0,0.15)">
+                    <input type="text" id="categoryBtnHoverColorHex" class="form-control hex-input" value="rgba(255,215,0,0.15)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview da Category Nav -->
+    <div class="color-preview">
+        <h4>Preview da Navegação</h4>
+        <div id="categoryNavPreview" class="category-nav-preview">
+            <div class="preview-category-buttons">
+                <div class="preview-category-btn">Todos</div>
+                <div class="preview-category-btn active">Anéis</div>
+                <div class="preview-category-btn">Colares</div>
+                <div class="preview-category-btn">Pulseiras</div>
+                <div class="preview-category-btn">Brincos</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÃO SEPARADO para salvar apenas as cores da navegação -->
+    <button class="btn btn-primary" onclick="saveNavigationColors()" style="background: linear-gradient(135deg, #d33434, #2d2d2d);">
+        <i class="fas fa-save"></i> Salvar Cores da Navegação
+    </button>
+
+     <h3><i class="fas fa-bullhorn"></i> Personalização do Banner Promocional</h3>
+    
+    <div class="banner-customization">
+        <!-- Configurações de Texto -->
+        <div class="color-group">
+            <h4>Texto do Banner</h4>
+            <div class="form-group">
+                <label for="promoTagText">Texto da Tag Promocional</label>
+                <input type="text" id="promoTagText" class="form-control" value="✨ Promoção Exclusiva" 
+                       placeholder="Ex: ✨ Promoção Exclusiva">
+            </div>
+            <div class="form-group">
+                <label for="promoMainText">Texto Principal do Banner</label>
+                <input type="text" id="promoMainText" class="form-control" 
+                       value="Frete grátis acima de R$ 100 • 10% off no PIX"
+                       placeholder="Ex: Frete grátis acima de R$ 100 • 10% off no PIX">
+            </div>
+        </div>
+
+        <!-- Cores do Banner -->
+        <div class="color-grid">
+            <!-- Cores do Fundo -->
+            <div class="color-group">
+                <h4>Fundo do Banner</h4>
+                <div class="color-inputs">
+                    <div class="color-input">
+                        <label for="bannerBgColor1">Cor Inicial</label>
+                        <input type="color" id="bannerBgColor1" class="form-control color-picker" value="#0a0a0a">
+                        <input type="text" id="bannerBgColor1Hex" class="form-control hex-input" value="#0a0a0a">
+                    </div>
+                    <div class="color-input">
+                        <label for="bannerBgColor2">Cor Final</label>
+                        <input type="color" id="bannerBgColor2" class="form-control color-picker" value="#1a1a1a">
+                        <input type="text" id="bannerBgColor2Hex" class="form-control hex-input" value="#1a1a1a">
+                    </div>
+                </div>
+                <div class="gradient-direction">
+                    <label>Direção do Gradiente:</label>
+                    <select id="bannerBgDirection" class="form-control">
+                        <option value="135deg">Diagonal (135°)</option>
+                        <option value="90deg">Horizontal →</option>
+                        <option value="180deg">Vertical ↓</option>
+                        <option value="45deg">Diagonal (45°)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Cores da Tag Promocional -->
+            <div class="color-group">
+                <h4>Tag Promocional</h4>
+                <div class="color-inputs">
+                    <div class="color-input">
+                        <label for="promoTagBgColor">Cor de Fundo</label>
+                        <input type="color" id="promoTagBgColor" class="form-control color-picker" value="#ffd700">
+                        <input type="text" id="promoTagBgColorHex" class="form-control hex-input" value="#ffd700">
+                    </div>
+                    <div class="color-input">
+                        <label for="promoTagTextColor">Cor do Texto</label>
+                        <input type="color" id="promoTagTextColor" class="form-control color-picker" value="#1a1a1a">
+                        <input type="text" id="promoTagTextColorHex" class="form-control hex-input" value="#1a1a1a">
+                    </div>
+                </div>
+                <div class="font-size-control">
+                    <label>Tamanho da Fonte: <span id="promoTagFontSizeValue">0.75rem</span></label>
+                    <select id="promoTagFontSize" class="form-control">
+                        <option value="0.625rem">Pequeno (10px)</option>
+                        <option value="0.75rem" selected>Médio (12px)</option>
+                        <option value="0.875rem">Grande (14px)</option>
+                        <option value="1rem">Extra Grande (16px)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Cores do Texto Principal -->
+            <div class="color-group">
+                <h4>Texto Principal</h4>
+                <div class="color-inputs">
+                    <div class="color-input">
+                        <label for="promoTextColor">Cor do Texto</label>
+                        <input type="color" id="promoTextColor" class="form-control color-picker" value="#e0e0e0">
+                        <input type="text" id="promoTextColorHex" class="form-control hex-input" value="#e0e0e0">
+                    </div>
+                </div>
+                <div class="font-size-control">
+                    <label>Tamanho da Fonte: <span id="promoTextFontSizeValue">0.875rem</span></label>
+                    <select id="promoTextFontSize" class="form-control">
+                        <option value="0.75rem">Pequeno (12px)</option>
+                        <option value="0.875rem" selected>Médio (14px)</option>
+                        <option value="1rem">Grande (16px)</option>
+                        <option value="1.125rem">Extra Grande (18px)</option>
+                    </select>
+                </div>
+                <div class="font-weight-control">
+                    <label>Peso da Fonte:</label>
+                    <select id="promoTextFontWeight" class="form-control">
+                        <option value="400">Normal</option>
+                        <option value="500" selected>Medium</option>
+                        <option value="600">Semi-Bold</option>
+                        <option value="700">Bold</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Borda do Banner -->
+            <div class="color-group">
+                <h4>Borda do Banner</h4>
+                <div class="color-input">
+                    <label for="bannerBorderColor">Cor da Borda</label>
+                    <input type="color" id="bannerBorderColor" class="form-control color-picker" value="#ffd700">
+                    <input type="text" id="bannerBorderColorHex" class="form-control hex-input" value="#ffd700">
+                </div>
+                <div class="opacity-control">
+                    <label>Opacidade: <span id="bannerBorderOpacityValue">10%</span></label>
+                    <input type="range" id="bannerBorderOpacity" class="form-control" min="0" max="100" value="10">
+                </div>
+                <div class="border-radius-control">
+                    <label>Border Radius: <span id="bannerBorderRadiusValue">30px</span></label>
+                    <select id="bannerBorderRadius" class="form-control">
+                        <option value="20px">Pequeno (20px)</option>
+                        <option value="30px" selected>Médio (30px)</option>
+                        <option value="40px">Grande (40px)</option>
+                        <option value="50px">Extra Grande (50px)</option>
+                        <option value="9999px">Pílula</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview do Banner -->
+    <div class="color-preview">
+        <h4>Preview do Banner Promocional</h4>
+        <div class="preview-top-bar">
+            <div id="bannerPreview" class="preview-banner">
+                <span class="preview-promo-tag" id="previewPromoTag">✨ Promoção Exclusiva</span>
+                <span class="preview-promo-text" id="previewPromoText">Frete grátis acima de R$ 100 • 10% off no PIX</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão Separado para Salvar Banner -->
+    <button class="btn btn-primary" onclick="saveBannerSettings()" style="background: linear-gradient(135deg, #0a0a0a, #1a1a1a);">
+        <i class="fas fa-save"></i> Salvar Configurações do Banner
+    </button>
+
+
                 </section>
 
                 <!-- Seção Categorias -->
@@ -838,46 +1424,214 @@
             document.getElementById('lastUpdate').textContent = new Date().toLocaleString('pt-BR');
         }
 
-        // ===== CONFIGURAÇÕES DA LOJA =====
-        async function loadStoreConfig() {
-            try {
-                const doc = await db.collection('config').doc('store').get();
-                if (doc.exists) {
-                    storeConfig = doc.data();
-                    document.getElementById('storeName').value = storeConfig.name || '';
-                    document.getElementById('storeDescription').value = storeConfig.description || '';
-                    document.getElementById('whatsappNumber').value = storeConfig.whatsapp || '';
-                    document.getElementById('deliveryFee').value = storeConfig.deliveryFee || 2.00;
-                }
-            } catch (error) {
-                console.error('Erro ao carregar configurações:', error);
-                throw error;
+       async function loadStoreConfig() {
+    try {
+        const doc = await db.collection('config').doc('store').get();
+        if (doc.exists) {
+            storeConfig = doc.data();
+            
+            // Configurações básicas
+            document.getElementById('storeName').value = storeConfig.name || '';
+            document.getElementById('storeDescription').value = storeConfig.description || '';
+            document.getElementById('whatsappNumber').value = storeConfig.whatsapp || '';
+            document.getElementById('deliveryFee').value = storeConfig.deliveryFee || 2.00;
+            
+            // URLs do banner e logo
+            document.getElementById('storeLogoUrl').value = storeConfig.logoUrl || '';
+            document.getElementById('headerBackgroundUrl').value = storeConfig.headerBackgroundUrl || '';
+            
+            // Atualizar previews
+            updateLogoPreview(storeConfig.logoUrl);
+            updateHeaderPreview(storeConfig.headerBackgroundUrl, storeConfig.logoUrl, storeConfig.name);
+        }
+    } catch (error) {
+        console.error('Erro ao carregar configurações:', error);
+        throw error;
+    }
+}
+// Função corrigida para salvar configurações
+async function saveStoreConfig() {
+    console.log('🚀 saveStoreConfig executando...');
+    
+    try {
+        // Coletar valores dos inputs
+        const storeName = document.getElementById('storeName');
+        const storeDescription = document.getElementById('storeDescription');
+        const whatsappNumber = document.getElementById('whatsappNumber');
+        const deliveryFee = document.getElementById('deliveryFee');
+        const storeLogoUrl = document.getElementById('storeLogoUrl');
+        const headerBackgroundUrl = document.getElementById('headerBackgroundUrl');
+
+        // Verificar se elementos existem
+        if (!storeName) {
+            console.error('❌ Elemento storeName não encontrado');
+            showMessage('Erro: Campo nome da loja não encontrado', 'error');
+            return;
+        }
+
+        const logoUrl = storeLogoUrl ? storeLogoUrl.value.trim() : '';
+        const headerBgUrl = headerBackgroundUrl ? headerBackgroundUrl.value.trim() : '';
+        
+        const config = {
+            name: storeName.value || '',
+            description: storeDescription?.value || '',
+            whatsapp: whatsappNumber?.value || '',
+            deliveryFee: deliveryFee ? parseFloat(deliveryFee.value) || 2.00 : 2.00,
+            logoUrl: logoUrl,
+            headerBackgroundUrl: headerBgUrl,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        console.log('📦 Configurações a serem salvas:', config);
+
+        // Validação básica
+        if (!config.name.trim()) {
+            showMessage('❌ Digite o nome da loja', 'error');
+            return;
+        }
+
+        // Mostrar loading
+        showMessage('💾 Salvando configurações...', 'info');
+
+        // Salvar no Firestore
+        await db.collection('config').doc('store').set(config, { merge: true });
+        
+        // Atualizar variável global
+        storeConfig = config;
+        
+        // Atualizar previews (com verificação de segurança)
+        safeUpdatePreviews(logoUrl, headerBgUrl, config.name);
+        
+        console.log('✅ Configurações salvas com sucesso!');
+        showMessage('✅ Configurações salvas com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('❌ Erro ao salvar configurações:', error);
+        showMessage(`❌ Erro ao salvar: ${error.message}`, 'error');
+    }
+}
+
+// Função segura para atualizar previews
+function safeUpdatePreviews(logoUrl, headerBgUrl, storeName) {
+    try {
+        // Tentar atualizar logo preview se o elemento existir
+        const logoPreviewImage = document.getElementById('logoPreviewImage');
+        if (logoPreviewImage) {
+            if (logoUrl && isValidUrl(logoUrl)) {
+                logoPreviewImage.src = logoUrl;
+                logoPreviewImage.style.display = 'block';
             }
         }
 
-        async function saveStoreConfig() {
-            try {
-                const config = {
-                    name: document.getElementById('storeName').value,
-                    description: document.getElementById('storeDescription').value,
-                    whatsapp: document.getElementById('whatsappNumber').value,
-                    deliveryFee: parseFloat(document.getElementById('deliveryFee').value),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-
-                if (!config.name.trim()) {
-                    showMessage('Digite o nome da loja', 'error');
-                    return;
-                }
-
-                await db.collection('config').doc('store').set(config, { merge: true });
-                storeConfig = config;
-                showMessage('Configurações salvas com sucesso!', 'success');
-            } catch (error) {
-                console.error('Erro ao salvar configurações:', error);
-                showMessage('Erro ao salvar configurações', 'error');
+        // Tentar atualizar header preview se os elementos existirem
+        const headerPreview = document.getElementById('headerPreview');
+        const headerPreviewLogo = document.getElementById('headerPreviewLogo');
+        const headerPreviewText = document.getElementById('headerPreviewText');
+        
+        if (headerPreview) {
+            if (headerBgUrl && isValidUrl(headerBgUrl)) {
+                headerPreview.style.background = `linear-gradient(135deg, rgba(26, 26, 26, 0.85) 0%, rgba(45, 45, 45, 0.75) 100%), url('${headerBgUrl}') center/cover no-repeat`;
+            } else {
+                headerPreview.style.background = 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)';
             }
         }
+        
+        if (headerPreviewLogo && logoUrl && isValidUrl(logoUrl)) {
+            headerPreviewLogo.src = logoUrl;
+        }
+        
+        if (headerPreviewText && storeName) {
+            headerPreviewText.textContent = storeName;
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Erro ao atualizar previews:', error);
+        // Não interrompe o fluxo principal se houver erro nos previews
+    }
+}
+
+// Função corrigida para atualizar logo preview
+function updateLogoPreview(logoUrl) {
+    try {
+        const previewImage = document.getElementById('logoPreviewImage');
+        const logoUrlInput = document.getElementById('storeLogoUrl');
+        
+        if (!previewImage) {
+            console.warn('⚠️ Elemento logoPreviewImage não encontrado');
+            return;
+        }
+        
+        if (logoUrl && isValidUrl(logoUrl)) {
+            previewImage.src = logoUrl;
+            previewImage.style.display = 'block';
+            if (logoUrlInput) {
+                logoUrlInput.style.borderColor = '#28a745';
+            }
+        } else {
+            previewImage.src = 'https://via.placeholder.com/150x50/1a1a1a/ffffff?text=TNT+STORE';
+            if (logoUrlInput) {
+                logoUrlInput.style.borderColor = '#dc3545';
+            }
+        }
+    } catch (error) {
+        console.error('❌ Erro em updateLogoPreview:', error);
+    }
+}
+
+// Função corrigida para atualizar header preview
+function updateHeaderPreview(headerBgUrl, logoUrl, storeName) {
+    try {
+        const headerPreview = document.getElementById('headerPreview');
+        const headerPreviewLogo = document.getElementById('headerPreviewLogo');
+        const headerPreviewText = document.getElementById('headerPreviewText');
+        const headerBgInput = document.getElementById('headerBackgroundUrl');
+        
+        if (!headerPreview) {
+            console.warn('⚠️ Elemento headerPreview não encontrado');
+            return;
+        }
+        
+        // Atualizar background do header
+        if (headerBgUrl && isValidUrl(headerBgUrl)) {
+            headerPreview.style.background = `linear-gradient(135deg, rgba(26, 26, 26, 0.85) 0%, rgba(45, 45, 45, 0.75) 100%), url('${headerBgUrl}') center/cover no-repeat`;
+            if (headerBgInput) {
+                headerBgInput.style.borderColor = '#28a745';
+            }
+        } else {
+            headerPreview.style.background = 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)';
+            if (headerBgInput) {
+                headerBgInput.style.borderColor = '#dc3545';
+            }
+        }
+        
+        // Atualizar logo no preview
+        if (headerPreviewLogo) {
+            if (logoUrl && isValidUrl(logoUrl)) {
+                headerPreviewLogo.src = logoUrl;
+            } else {
+                headerPreviewLogo.src = 'https://via.placeholder.com/150x50/1a1a1a/ffffff?text=TNT+STORE';
+            }
+        }
+        
+        // Atualizar texto
+        if (headerPreviewText && storeName) {
+            headerPreviewText.textContent = storeName;
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro em updateHeaderPreview:', error);
+    }
+}
+
+// Função para validar URL (mantém a mesma)
+function isValidUrl(string) {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
 
         // ===== GERENCIAMENTO DE CATEGORIAS =====
         async function loadCategories() {
@@ -1387,69 +2141,36 @@ async function loadStoreConfig() {
     }
 }
 
-// Atualizar a função saveStoreConfig para salvar o logo também
-async function saveStoreConfig() {
-    try {
-        const logoUrl = document.getElementById('storeLogoUrl').value.trim();
-        
-        const config = {
-            name: document.getElementById('storeName').value,
-            description: document.getElementById('storeDescription').value,
-            whatsapp: document.getElementById('whatsappNumber').value,
-            deliveryFee: parseFloat(document.getElementById('deliveryFee').value),
-            logoUrl: logoUrl, // ✅ Salvar a URL do logo
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
 
-        if (!config.name.trim()) {
-            showMessage('Digite o nome da loja', 'error');
-            return;
-        }
 
-        await db.collection('config').doc('store').set(config, { merge: true });
-        storeConfig = config;
-        
-        // Atualizar preview
-        if (logoUrl) {
-            updateLogoPreview(logoUrl);
-        } else {
-            clearLogoPreview();
-        }
-        
-        showMessage('Configurações salvas com sucesso!', 'success');
-    } catch (error) {
-        console.error('Erro ao salvar configurações:', error);
-        showMessage('Erro ao salvar configurações', 'error');
-    }
-}
-
-// Função para atualizar o preview do logo
-function updateLogoPreview(logoUrl) {
-    const preview = document.getElementById('logoPreview');
-    const noLogo = document.getElementById('noLogo');
+// Event listeners para preview em tempo real
+document.addEventListener('DOMContentLoaded', function() {
+    const logoUrlInput = document.getElementById('storeLogoUrl');
+    const headerBgInput = document.getElementById('headerBackgroundUrl');
+    const storeNameInput = document.getElementById('storeName');
     
-    if (preview && noLogo) {
-        // Verificar se a imagem carrega
-        const tempImage = new Image();
-        
-        tempImage.onload = function() {
-            preview.src = logoUrl;
-            preview.style.display = 'block';
-            noLogo.style.display = 'none';
-            console.log('✅ Preview do logotipo atualizado');
-        };
-        
-        tempImage.onerror = function() {
-            console.error('❌ Erro ao carregar imagem do logo');
-            preview.style.display = 'none';
-            noLogo.style.display = 'block';
-            showMessage('URL da imagem inválida. Verifique o link.', 'warning');
-        };
-        
-        tempImage.src = logoUrl;
+    if (logoUrlInput) {
+        logoUrlInput.addEventListener('input', function() {
+            updateLogoPreview(this.value);
+        });
     }
-}
-
+    
+    if (headerBgInput) {
+        headerBgInput.addEventListener('input', function() {
+            updateHeaderPreview(this.value, 
+                              document.getElementById('storeLogoUrl').value,
+                              document.getElementById('storeName').value);
+        });
+    }
+    
+    if (storeNameInput) {
+        storeNameInput.addEventListener('input', function() {
+            updateHeaderPreview(document.getElementById('headerBackgroundUrl').value,
+                              document.getElementById('storeLogoUrl').value,
+                              this.value);
+        });
+    }
+});
 // Função para limpar o preview
 function clearLogoPreview() {
     const preview = document.getElementById('logoPreview');
@@ -1493,14 +2214,543 @@ document.getElementById("saveColors").addEventListener("click", () => {
   alert("Cores salvas com sucesso!");
 });
 
+// Função de debug para verificar se o clique está funcionando
+document.addEventListener('DOMContentLoaded', function() {
+    const saveButton = document.querySelector('.btn-primary');
+    if (saveButton) {
+        saveButton.addEventListener('click', function(e) {
+            console.log('✅ Botão clicado!');
+            console.log('📝 Dados do formulário:');
+            console.log('Nome:', document.getElementById('storeName')?.value);
+            console.log('Logo URL:', document.getElementById('storeLogoUrl')?.value);
+            console.log('Header URL:', document.getElementById('headerBackgroundUrl')?.value);
+        });
+    } else {
+        console.log('❌ Botão não encontrado!');
+    }
+});
 
+
+// Função para mostrar mensagens (se não tiver)
+function showMessage(message, type = 'info') {
+    // Remove mensagens anteriores
+    const existingMessage = document.querySelector('.alert-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+
+    // Cria nova mensagem
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert-message alert-${type}`;
+    alertDiv.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()">&times;</button>
+    `;
+
+    // Estilos básicos
+    alertDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        color: white;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    `;
+
+    // Cores por tipo
+    const colors = {
+        success: '#28a745',
+        error: '#dc3545',
+        warning: '#ffc107',
+        info: '#17a2b8'
+    };
+
+    alertDiv.style.background = colors[type] || colors.info;
+
+    document.body.appendChild(alertDiv);
+
+    // Auto-remove após 5 segundos
+    setTimeout(() => {
+        if (alertDiv.parentElement) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+
+
+// ===== SISTEMA DE PERSONALIZAÇÃO DE CORES =====
+
+// Carregar configurações de cores
+async function loadColorSettings() {
+    try {
+        const doc = await db.collection('config').doc('colors').get();
+        if (doc.exists) {
+            const colors = doc.data();
+            
+            // Top Bar Gradient
+            document.getElementById('topBarColor1').value = colors.topBarColor1 || '#ddcbcb';
+            document.getElementById('topBarColor1Hex').value = colors.topBarColor1 || '#ddcbcb';
+            document.getElementById('topBarColor2').value = colors.topBarColor2 || '#1a1a1a';
+            document.getElementById('topBarColor2Hex').value = colors.topBarColor2 || '#1a1a1a';
+            document.getElementById('topBarDirection').value = colors.topBarDirection || '135deg';
+            
+            // Cores principais
+            document.getElementById('primaryColor').value = colors.primaryColor || '#ffd700';
+            document.getElementById('primaryColorHex').value = colors.primaryColor || '#ffd700';
+            document.getElementById('secondaryColor').value = colors.secondaryColor || '#1a1a1a';
+            document.getElementById('secondaryColorHex').value = colors.secondaryColor || '#1a1a1a';
+            
+            // Borda
+            document.getElementById('borderColor').value = colors.borderColor || '#ffd700';
+            document.getElementById('borderColorHex').value = colors.borderColor || '#ffd700';
+            document.getElementById('borderOpacity').value = colors.borderOpacity || 20;
+            document.getElementById('borderOpacityValue').textContent = `${colors.borderOpacity || 20}%`;
+            
+            // Atualizar preview
+            updateColorPreview();
+        }
+    } catch (error) {
+        console.error('Erro ao carregar cores:', error);
+    }
+}
+// Função atualizada para salvar cores
+async function saveColorSettings() {
+    try {
+        const colorConfig = {
+            // Top Bar Gradient
+            topBarColor1: document.getElementById('topBarColor1').value,
+            topBarColor2: document.getElementById('topBarColor2').value,
+            topBarDirection: document.getElementById('topBarDirection').value,
+            
+            // Cores principais
+            primaryColor: document.getElementById('primaryColor').value,
+            secondaryColor: document.getElementById('secondaryColor').value,
+            
+            // Borda
+            borderColor: document.getElementById('borderColor').value,
+            borderOpacity: parseInt(document.getElementById('borderOpacity').value),
+            
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        console.log('💾 Salvando cores:', colorConfig);
+        
+        await db.collection('config').doc('colors').set(colorConfig, { merge: true });
+        
+        // Atualizar preview
+        updateColorPreview();
+        
+        showMessage('🎨 Cores salvas com sucesso!', 'success');
+        
+        // Forçar atualização no site principal (opcional)
+        console.log('✅ Cores salvas no Firestore. Recarregue o site principal para ver as mudanças.');
+        
+    } catch (error) {
+        console.error('❌ Erro ao salvar cores:', error);
+        showMessage('❌ Erro ao salvar cores', 'error');
+    }
+}
+
+// Atualizar preview em tempo real
+function updateColorPreview() {
+    try {
+        const topBarColor1 = document.getElementById('topBarColor1').value;
+        const topBarColor2 = document.getElementById('topBarColor2').value;
+        const direction = document.getElementById('topBarDirection').value;
+        const borderColor = document.getElementById('borderColor').value;
+        const borderOpacity = parseInt(document.getElementById('borderOpacity').value);
+        
+        const topBarPreview = document.getElementById('topBarPreview');
+        if (topBarPreview) {
+            topBarPreview.style.background = `linear-gradient(${direction}, ${topBarColor1} 0%, ${topBarColor2} 100%)`;
+            topBarPreview.style.borderBottom = `1px solid ${hexToRgba(borderColor, borderOpacity / 100)}`;
+        }
+    } catch (error) {
+        console.warn('Erro ao atualizar preview:', error);
+    }
+}
+
+// Aplicar cores no site principal
+function applyColorSettings(colors) {
+    // Esta função será chamada no site principal
+    const style = document.createElement('style');
+    style.id = 'custom-colors';
+    style.textContent = `
+        .top-bar {
+            background: linear-gradient(${colors.topBarDirection}, ${colors.topBarColor1} 0%, ${colors.topBarColor2} 100%) !important;
+            border-bottom: 1px solid ${hexToRgba(colors.borderColor, colors.borderOpacity / 100)} !important;
+        }
+        
+        :root {
+            --primary: ${colors.primaryColor};
+            --secondary: ${colors.secondaryColor};
+        }
+        
+        .promo-tag {
+            background: linear-gradient(135deg, ${colors.primaryColor}, ${lightenColor(colors.primaryColor, 20)}) !important;
+        }
+        
+        .cart-btn:hover, .admin-btn:hover {
+            background: ${hexToRgba(colors.primaryColor, 0.15)} !important;
+            border-color: ${colors.primaryColor} !important;
+        }
+    `;
+    
+    // Remove estilo anterior se existir
+    const existingStyle = document.getElementById('custom-colors');
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+    
+    document.head.appendChild(style);
+}
+
+// Funções utilitárias para cores
+function hexToRgba(hex, opacity) {
+    hex = hex.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
+function lightenColor(hex, percent) {
+    hex = hex.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    const newR = Math.min(255, r + (255 - r) * (percent / 100));
+    const newG = Math.min(255, g + (255 - g) * (percent / 100));
+    const newB = Math.min(255, b + (255 - b) * (percent / 100));
+    
+    return `rgb(${Math.round(newR)}, ${Math.round(newG)}, ${Math.round(newB)})`;
+}
+
+// Event listeners para atualização em tempo real
+// Event listeners SEPARADOS
+document.addEventListener('DOMContentLoaded', function() {
+    // Carregar configurações do HEADER (cores gerais)
+    loadColorSettings();
+    
+    // Carregar configurações da NAVEGAÇÃO (separado)
+    loadNavigationColors();
+    
+    // Event listeners para cores do HEADER
+    const headerColorInputs = document.querySelectorAll('#topBarColor1, #topBarColor2, #topBarDirection, #borderColor, #borderOpacity, #primaryColor, #secondaryColor');
+    headerColorInputs.forEach(input => {
+        input.addEventListener('input', updateColorPreview);
+    });
+    
+    // Event listeners para cores da NAVEGAÇÃO
+    const navColorInputs = document.querySelectorAll('#categoryNavColor1, #categoryNavColor2, #categoryNavDirection, #categoryNavBorderColor, #categoryNavBorderOpacity, #categoryBtnBgColor, #categoryBtnTextColor, #categoryBtnBorderColor, #categoryBtnActiveColor, #categoryBtnHoverColor');
+    navColorInputs.forEach(input => {
+        input.addEventListener('input', updateCategoryNavPreview);
+    });
+});
+
+// Validar hex color
+function isValidHex(color) {
+    return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
+}
+
+
+
+// ===== SISTEMA SEPARADO PARA CORES DA NAVEGAÇÃO =====
+
+// Carregar configurações da navegação
+async function loadNavigationColors() {
+    try {
+        const doc = await db.collection('config').doc('navigation').get();
+        if (doc.exists) {
+            const navColors = doc.data();
+            
+            // Category Nav Gradient
+            document.getElementById('categoryNavColor1').value = navColors.categoryNavColor1 || '#d33434';
+            document.getElementById('categoryNavColor1Hex').value = navColors.categoryNavColor1 || '#d33434';
+            document.getElementById('categoryNavColor2').value = navColors.categoryNavColor2 || '#2d2d2d';
+            document.getElementById('categoryNavColor2Hex').value = navColors.categoryNavColor2 || '#2d2d2d';
+            document.getElementById('categoryNavDirection').value = navColors.categoryNavDirection || '135deg';
+            
+            // Border da Category Nav
+            document.getElementById('categoryNavBorderColor').value = navColors.categoryNavBorderColor || '#ffd700';
+            document.getElementById('categoryNavBorderColorHex').value = navColors.categoryNavBorderColor || '#ffd700';
+            document.getElementById('categoryNavBorderOpacity').value = navColors.categoryNavBorderOpacity || 30;
+            document.getElementById('categoryNavBorderOpacityValue').textContent = `${navColors.categoryNavBorderOpacity || 30}%`;
+            
+            // Botões da categoria
+            document.getElementById('categoryBtnBgColor').value = navColors.categoryBtnBgColor || 'rgba(255,255,255,0.1)';
+            document.getElementById('categoryBtnBgColorHex').value = navColors.categoryBtnBgColor || 'rgba(255,255,255,0.1)';
+            document.getElementById('categoryBtnTextColor').value = navColors.categoryBtnTextColor || '#e0e0e0';
+            document.getElementById('categoryBtnTextColorHex').value = navColors.categoryBtnTextColor || '#e0e0e0';
+            document.getElementById('categoryBtnBorderColor').value = navColors.categoryBtnBorderColor || 'rgba(255,255,255,0.1)';
+            document.getElementById('categoryBtnBorderColorHex').value = navColors.categoryBtnBorderColor || 'rgba(255,255,255,0.1)';
+            document.getElementById('categoryBtnActiveColor').value = navColors.categoryBtnActiveColor || '#ffd700';
+            document.getElementById('categoryBtnActiveColorHex').value = navColors.categoryBtnActiveColor || '#ffd700';
+            document.getElementById('categoryBtnHoverColor').value = navColors.categoryBtnHoverColor || 'rgba(255,215,0,0.15)';
+            document.getElementById('categoryBtnHoverColorHex').value = navColors.categoryBtnHoverColor || 'rgba(255,215,0,0.15)';
+            
+            // Atualizar preview
+            updateCategoryNavPreview();
+        }
+    } catch (error) {
+        console.error('Erro ao carregar cores da navegação:', error);
+    }
+}
+
+// Salvar APENAS as cores da navegação
+async function saveNavigationColors() {
+    try {
+        const navConfig = {
+            // Category Nav Gradient
+            categoryNavColor1: document.getElementById('categoryNavColor1').value,
+            categoryNavColor2: document.getElementById('categoryNavColor2').value,
+            categoryNavDirection: document.getElementById('categoryNavDirection').value,
+            
+            // Border da Category Nav
+            categoryNavBorderColor: document.getElementById('categoryNavBorderColor').value,
+            categoryNavBorderOpacity: parseInt(document.getElementById('categoryNavBorderOpacity').value),
+            
+            // Botões da categoria
+            categoryBtnBgColor: document.getElementById('categoryBtnBgColor').value,
+            categoryBtnTextColor: document.getElementById('categoryBtnTextColor').value,
+            categoryBtnBorderColor: document.getElementById('categoryBtnBorderColor').value,
+            categoryBtnActiveColor: document.getElementById('categoryBtnActiveColor').value,
+            categoryBtnHoverColor: document.getElementById('categoryBtnHoverColor').value,
+            
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        console.log('💾 Salvando cores da navegação:', navConfig);
+        
+        await db.collection('config').doc('navigation').set(navConfig, { merge: true });
+        
+        // Atualizar preview
+        updateCategoryNavPreview();
+        
+        showMessage('🎨 Cores da navegação salvas com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('❌ Erro ao salvar cores da navegação:', error);
+        showMessage('❌ Erro ao salvar cores da navegação', 'error');
+    }
+}
+
+// Atualizar preview da category nav
+function updateCategoryNavPreview() {
+    try {
+        const color1 = document.getElementById('categoryNavColor1').value;
+        const color2 = document.getElementById('categoryNavColor2').value;
+        const direction = document.getElementById('categoryNavDirection').value;
+        const borderColor = document.getElementById('categoryNavBorderColor').value;
+        const borderOpacity = parseInt(document.getElementById('categoryNavBorderOpacity').value);
+        const btnBgColor = document.getElementById('categoryBtnBgColor').value;
+        const btnTextColor = document.getElementById('categoryBtnTextColor').value;
+        const btnBorderColor = document.getElementById('categoryBtnBorderColor').value;
+        const btnActiveColor = document.getElementById('categoryBtnActiveColor').value;
+        const btnHoverColor = document.getElementById('categoryBtnHoverColor').value;
+        
+        const categoryNavPreview = document.getElementById('categoryNavPreview');
+        const categoryBtns = document.querySelectorAll('.preview-category-btn');
+        
+        if (categoryNavPreview) {
+            // Aplicar gradiente
+            categoryNavPreview.style.background = `linear-gradient(${direction}, ${color1} 0%, ${color2} 100%)`;
+            categoryNavPreview.style.borderBottom = `1px solid ${hexToRgba(borderColor, borderOpacity / 100)}`;
+        }
+        
+        // Aplicar cores nos botões
+        categoryBtns.forEach(btn => {
+            if (!btn.classList.contains('active')) {
+                btn.style.background = btnBgColor;
+                btn.style.color = btnTextColor;
+                btn.style.borderColor = btnBorderColor;
+            } else {
+                btn.style.background = btnActiveColor;
+                btn.style.color = getContrastColor(btnActiveColor);
+                btn.style.borderColor = btnActiveColor;
+            }
+        });
+        
+    } catch (error) {
+        console.warn('Erro ao atualizar preview da category nav:', error);
+    }
+}
 
         // Inicializar com dashboard
         showSection('dashboard');
+
+
+        // ===== SISTEMA PARA PERSONALIZAÇÃO DO BANNER =====
+
+// Carregar configurações do banner
+async function loadBannerSettings() {
+    try {
+        const doc = await db.collection('config').doc('banner').get();
+        if (doc.exists) {
+            const bannerConfig = doc.data();
+            
+            // Textos
+            document.getElementById('promoTagText').value = bannerConfig.promoTagText || '✨ Promoção Exclusiva';
+            document.getElementById('promoMainText').value = bannerConfig.promoMainText || 'Frete grátis acima de R$ 100 • 10% off no PIX';
+            
+            // Cores do fundo
+            document.getElementById('bannerBgColor1').value = bannerConfig.bannerBgColor1 || '#0a0a0a';
+            document.getElementById('bannerBgColor1Hex').value = bannerConfig.bannerBgColor1 || '#0a0a0a';
+            document.getElementById('bannerBgColor2').value = bannerConfig.bannerBgColor2 || '#1a1a1a';
+            document.getElementById('bannerBgColor2Hex').value = bannerConfig.bannerBgColor2 || '#1a1a1a';
+            document.getElementById('bannerBgDirection').value = bannerConfig.bannerBgDirection || '135deg';
+            
+            // Tag promocional
+            document.getElementById('promoTagBgColor').value = bannerConfig.promoTagBgColor || '#ffd700';
+            document.getElementById('promoTagBgColorHex').value = bannerConfig.promoTagBgColor || '#ffd700';
+            document.getElementById('promoTagTextColor').value = bannerConfig.promoTagTextColor || '#1a1a1a';
+            document.getElementById('promoTagTextColorHex').value = bannerConfig.promoTagTextColor || '#1a1a1a';
+            document.getElementById('promoTagFontSize').value = bannerConfig.promoTagFontSize || '0.75rem';
+            document.getElementById('promoTagFontSizeValue').textContent = bannerConfig.promoTagFontSize || '0.75rem';
+            
+            // Texto principal
+            document.getElementById('promoTextColor').value = bannerConfig.promoTextColor || '#e0e0e0';
+            document.getElementById('promoTextColorHex').value = bannerConfig.promoTextColor || '#e0e0e0';
+            document.getElementById('promoTextFontSize').value = bannerConfig.promoTextFontSize || '0.875rem';
+            document.getElementById('promoTextFontSizeValue').textContent = bannerConfig.promoTextFontSize || '0.875rem';
+            document.getElementById('promoTextFontWeight').value = bannerConfig.promoTextFontWeight || '500';
+            
+            // Borda
+            document.getElementById('bannerBorderColor').value = bannerConfig.bannerBorderColor || '#ffd700';
+            document.getElementById('bannerBorderColorHex').value = bannerConfig.bannerBorderColor || '#ffd700';
+            document.getElementById('bannerBorderOpacity').value = bannerConfig.bannerBorderOpacity || 10;
+            document.getElementById('bannerBorderOpacityValue').textContent = `${bannerConfig.bannerBorderOpacity || 10}%`;
+            document.getElementById('bannerBorderRadius').value = bannerConfig.bannerBorderRadius || '30px';
+            document.getElementById('bannerBorderRadiusValue').textContent = bannerConfig.bannerBorderRadius || '30px';
+            
+            // Atualizar preview
+            updateBannerPreview();
+        }
+    } catch (error) {
+        console.error('Erro ao carregar configurações do banner:', error);
+    }
+}
+
+// Salvar configurações do banner
+async function saveBannerSettings() {
+    try {
+        const bannerConfig = {
+            // Textos
+            promoTagText: document.getElementById('promoTagText').value,
+            promoMainText: document.getElementById('promoMainText').value,
+            
+            // Cores do fundo
+            bannerBgColor1: document.getElementById('bannerBgColor1').value,
+            bannerBgColor2: document.getElementById('bannerBgColor2').value,
+            bannerBgDirection: document.getElementById('bannerBgDirection').value,
+            
+            // Tag promocional
+            promoTagBgColor: document.getElementById('promoTagBgColor').value,
+            promoTagTextColor: document.getElementById('promoTagTextColor').value,
+            promoTagFontSize: document.getElementById('promoTagFontSize').value,
+            
+            // Texto principal
+            promoTextColor: document.getElementById('promoTextColor').value,
+            promoTextFontSize: document.getElementById('promoTextFontSize').value,
+            promoTextFontWeight: document.getElementById('promoTextFontWeight').value,
+            
+            // Borda
+            bannerBorderColor: document.getElementById('bannerBorderColor').value,
+            bannerBorderOpacity: parseInt(document.getElementById('bannerBorderOpacity').value),
+            bannerBorderRadius: document.getElementById('bannerBorderRadius').value,
+            
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        console.log('💾 Salvando configurações do banner:', bannerConfig);
+        
+        await db.collection('config').doc('banner').set(bannerConfig, { merge: true });
+        
+        // Atualizar preview
+        updateBannerPreview();
+        
+        showMessage('🎨 Configurações do banner salvas com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('❌ Erro ao salvar configurações do banner:', error);
+        showMessage('❌ Erro ao salvar configurações do banner', 'error');
+    }
+}
+
+// Atualizar preview do banner
+function updateBannerPreview() {
+    try {
+        // Textos
+        const promoTagText = document.getElementById('promoTagText').value;
+        const promoMainText = document.getElementById('promoMainText').value;
+        
+        // Cores do fundo
+        const bgColor1 = document.getElementById('bannerBgColor1').value;
+        const bgColor2 = document.getElementById('bannerBgColor2').value;
+        const bgDirection = document.getElementById('bannerBgDirection').value;
+        
+        // Tag promocional
+        const tagBgColor = document.getElementById('promoTagBgColor').value;
+        const tagTextColor = document.getElementById('promoTagTextColor').value;
+        const tagFontSize = document.getElementById('promoTagFontSize').value;
+        
+        // Texto principal
+        const textColor = document.getElementById('promoTextColor').value;
+        const textFontSize = document.getElementById('promoTextFontSize').value;
+        const textFontWeight = document.getElementById('promoTextFontWeight').value;
+        
+        // Borda
+        const borderColor = document.getElementById('bannerBorderColor').value;
+        const borderOpacity = parseInt(document.getElementById('bannerBorderOpacity').value);
+        const borderRadius = document.getElementById('bannerBorderRadius').value;
+        
+        const bannerPreview = document.getElementById('bannerPreview');
+        const previewPromoTag = document.getElementById('previewPromoTag');
+        const previewPromoText = document.getElementById('previewPromoText');
+        
+        if (bannerPreview) {
+            // Aplicar estilos ao banner
+            bannerPreview.style.background = `linear-gradient(${bgDirection}, ${bgColor1} 0%, ${bgColor2} 100%)`;
+            bannerPreview.style.border = `1px solid ${hexToRgba(borderColor, borderOpacity / 100)}`;
+            bannerPreview.style.borderRadius = borderRadius;
+        }
+        
+        if (previewPromoTag) {
+            previewPromoTag.textContent = promoTagText;
+            previewPromoTag.style.background = tagBgColor;
+            previewPromoTag.style.color = tagTextColor;
+            previewPromoTag.style.fontSize = tagFontSize;
+        }
+        
+        if (previewPromoText) {
+            previewPromoText.textContent = promoMainText;
+            previewPromoText.style.color = textColor;
+            previewPromoText.style.fontSize = textFontSize;
+            previewPromoText.style.fontWeight = textFontWeight;
+        }
+        
+    } catch (error) {
+        console.warn('Erro ao atualizar preview do banner:', error);
+    }
+}
+
+
+
+
     </script>
 
     <!-- Font Awesome -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 </body>
 </html>
+
+
 
