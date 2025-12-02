@@ -2547,60 +2547,318 @@ function setupBannerListener() {
 
 
 
-// Contador com Firebase (Recomendado para estatísticas reais)
-function initFirebaseVisitorCounter() {
-    // Certifique-se de que o Firebase está inicializado
-    if (typeof db !== 'undefined') {
-        const counterRef = db.collection('site_stats').doc('visitors');
-        
-        // Verificar sessão
-        if (!sessionStorage.getItem('firebase_session')) {
-            sessionStorage.setItem('firebase_session', 'active');
-            
-            // Incrementar no Firebase
-            counterRef.get().then((doc) => {
-                if (doc.exists) {
-                    const currentCount = doc.data().count || 0;
-                    counterRef.update({
-                        count: firebase.firestore.FieldValue.increment(1),
-                        lastUpdate: firebase.firestore.FieldValue.serverTimestamp(),
-                        today: firebase.firestore.FieldValue.increment(1)
-                    });
-                    
-                    // Atualizar contador local
-                    updateCounterDisplay(currentCount + 1);
-                } else {
-                    counterRef.set({
-                        count: 1,
-                        lastUpdate: firebase.firestore.FieldValue.serverTimestamp(),
-                        today: 1,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    updateCounterDisplay(1);
-                }
-            }).catch((error) => {
-                console.error('Erro no contador:', error);
-                // Fallback para localStorage
-                initVisitorCounter();
-            });
-        } else {
-            // Apenas mostrar contador atual
-            counterRef.get().then((doc) => {
-                if (doc.exists) {
-                    updateCounterDisplay(doc.data().count);
-                }
-            });
+// Contador de Visitantes com Firebase - VERSÃO CORRIGIDA
+async function initFirebaseVisitorCounter() {
+    try {
+        // Verificar se Firebase está disponível
+        if (typeof firebase === 'undefined' || typeof db === 'undefined') {
+            console.log('Firebase não disponível, usando localStorage');
+            return initSimpleCounter();
         }
-    } else {
-        // Fallback para localStorage se Firebase não estiver disponível
-        initVisitorCounter();
+
+        // Elemento para mostrar o contador
+        let counterElement = document.getElementById('counter');
+        if (!counterElement) {
+            // Criar elemento se não existir
+            const counterDiv = document.createElement('div');
+            counterDiv.id = 'visitor-counter';
+            counterDiv.innerHTML = `
+                <i class="fas fa-users me-1"></i>
+                <span id="counter">0</span> visitantes
+            `;
+            counterDiv.style.cssText = `
+                position: fixed; 
+                bottom: 10px; 
+                right: 10px; 
+                background: linear-gradient(135deg, #667eea, #764ba2); 
+                color: white; 
+                padding: 8px 15px; 
+                border-radius: 20px; 
+                font-size: 12px; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+                z-index: 9999;
+                cursor: pointer;
+            `;
+            document.body.appendChild(counterDiv);
+            counterElement = document.getElementById('counter');
+        }
+
+        // ID único para este dispositivo (persistente)
+        let deviceId = localStorage.getItem('comerciante_device_id');
+        if (!deviceId) {
+            deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('comerciante_device_id', deviceId);
+        }
+
+        // Verificar se este dispositivo já foi contado hoje
+        const today = new Date().toISOString().split('T')[0];
+        const lastCountedDate = localStorage.getItem('last_counted_date');
+        
+        // Referência do Firebase
+        const statsRef = db.collection('site_stats').doc('visitors');
+        
+        // Buscar dados atuais
+        const doc = await statsRef.get();
+        let currentStats = { total: 0, today: 0, devices: [], updatedAt: null };
+
+        if (doc.exists) {
+            currentStats = doc.data();
+            // Mostrar contador atual imediatamente
+            counterElement.textContent = currentStats.total.toLocaleString('pt-BR');
+        }
+
+        // Se este dispositivo ainda não foi contado hoje, incrementar
+        if (lastCountedDate !== today) {
+            try {
+                // Preparar dados para atualização
+                const updateData = {
+                    total: firebase.firestore.FieldValue.increment(1),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                // Incrementar contador de hoje
+                if (currentStats.lastResetDate !== today) {
+                    updateData.today = 1;
+                    updateData.lastResetDate = today;
+                    updateData.devices = [deviceId]; // Resetar array de dispositivos do dia
+                } else {
+                    updateData.today = firebase.firestore.FieldValue.increment(1);
+                    
+                    // Adicionar dispositivo ao array se não existir
+                    if (!currentStats.devices || !currentStats.devices.includes(deviceId)) {
+                        updateData.devices = firebase.firestore.FieldValue.arrayUnion(deviceId);
+                    }
+                }
+
+                // Salvar no Firebase
+                await statsRef.set(updateData, { merge: true });
+
+                // Atualizar localStorage
+                localStorage.setItem('last_counted_date', today);
+
+                // Buscar dados atualizados
+                const updatedDoc = await statsRef.get();
+                if (updatedDoc.exists) {
+                    const newStats = updatedDoc.data();
+                    counterElement.textContent = newStats.total.toLocaleString('pt-BR');
+                    
+                    // Animar contador
+                    animateCounter(counterElement, newStats.total);
+                    
+                    // Mostrar notificação para novo visitante
+                    if (!currentStats.devices || !currentStats.devices.includes(deviceId)) {
+                        showVisitNotification(newStats.total);
+                    }
+                }
+
+            } catch (error) {
+                console.error('Erro ao atualizar contador:', error);
+                // Fallback para localStorage
+                initSimpleCounter();
+            }
+        } else {
+            // Já foi contado hoje, apenas mostrar número
+            counterElement.textContent = currentStats.total.toLocaleString('pt-BR');
+            animateCounter(counterElement, currentStats.total);
+        }
+
+        // Adicionar clique para mostrar detalhes
+        document.getElementById('visitor-counter').addEventListener('click', function() {
+            showVisitorDetails(statsRef);
+        });
+
+    } catch (error) {
+        console.error('Erro no contador:', error);
+        initSimpleCounter();
     }
 }
 
-function updateCounterDisplay(count) {
-    const counterElement = document.getElementById('counter');
+// Função para mostrar detalhes dos visitantes
+async function showVisitorDetails(statsRef) {
+    try {
+        const doc = await statsRef.get();
+        if (doc.exists) {
+            const stats = doc.data();
+            
+            const detailsHTML = `
+                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                         background: white; padding: 30px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                         z-index: 10000; min-width: 300px; max-width: 500px;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <i class="fas fa-chart-bar fa-2x mb-2" style="color: #667eea;"></i>
+                        <h4 style="margin: 0; color: #2d3748;">Estatísticas do Site</h4>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 2em; font-weight: 800; color: #667eea;">${stats.total || 0}</div>
+                            <div style="font-size: 0.9em; color: #718096;">Total de Visitantes</div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 2em; font-weight: 800; color: #48bb78;">${stats.today || 0}</div>
+                            <div style="font-size: 0.9em; color: #718096;">Visitantes Hoje</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f0f7ff; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="color: #4a5568;">Última atualização:</span>
+                            <span style="color: #667eea; font-weight: 600;">${stats.updatedAt ? new Date(stats.updatedAt.seconds * 1000).toLocaleString('pt-BR') : 'Agora'}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #4a5568;">Dispositivos únicos hoje:</span>
+                            <span style="color: #667eea; font-weight: 600;">${stats.devices ? stats.devices.length : 0}</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="this.parentElement.remove()" 
+                            style="width: 100%; background: #667eea; color: white; border: none; padding: 12px; 
+                                   border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-times me-2"></i>Fechar
+                    </button>
+                </div>
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                         background: rgba(0,0,0,0.5); z-index: 9999;" 
+                     onclick="this.remove(); this.previousElementSibling.remove()"></div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', detailsHTML);
+        }
+    } catch (error) {
+        console.error('Erro ao mostrar detalhes:', error);
+    }
+}
+
+// Função de animação do contador
+function animateCounter(element, finalNumber) {
+    const currentNumber = parseInt(element.textContent.replace(/\D/g, '')) || 0;
+    if (currentNumber >= finalNumber) return;
+    
+    let count = currentNumber;
+    const increment = Math.ceil((finalNumber - currentNumber) / 50);
+    
+    const timer = setInterval(() => {
+        count += increment;
+        if (count >= finalNumber) {
+            count = finalNumber;
+            clearInterval(timer);
+        }
+        element.textContent = count.toLocaleString('pt-BR');
+    }, 20);
+}
+
+// Função para mostrar notificação
+function showVisitNotification(visitNumber) {
+    if (visitNumber % 10 === 0) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(72, 187, 120, 0.3);
+            z-index: 10000;
+            animation: slideIn 0.5s ease-out;
+        `;
+        
+        notification.innerHTML = `
+            <i class="fas fa-trophy me-2"></i>
+            <strong>🎉 ${visitNumber}º Visitante!</strong>
+            <div style="font-size: 0.9em; opacity: 0.9; margin-top: 5px;">
+                Obrigado por fazer parte!
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.5s ease-in forwards';
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    }
+}
+
+// Fallback: Contador simples com localStorage
+function initSimpleCounter() {
+    const key = 'comerciante_total_visits';
+    let visits = localStorage.getItem(key);
+    visits = visits ? parseInt(visits) + 1 : 1;
+    localStorage.setItem(key, visits);
+    
+    const counterElement = document.getElementById('counter') || document.querySelector('#visitor-counter span');
     if (counterElement) {
-        counterElement.textContent = count.toLocaleString('pt-BR');
-        animateCounter(counterElement);
+        counterElement.textContent = visits.toLocaleString('pt-BR');
+        animateCounter(counterElement, visits);
+    }
+}
+
+// Inicializar quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    // Adicionar estilos CSS
+    const styles = `
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+        }
+        
+        #visitor-counter:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        #visitor-counter {
+            transition: all 0.3s ease;
+        }
+    `;
+    
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+    
+    // Iniciar contador
+    setTimeout(() => {
+        initFirebaseVisitorCounter();
+    }, 1000);
+});
+
+// Função para resetar contador (apenas para desenvolvimento)
+function resetVisitorCounter() {
+    if (confirm('Tem certeza que deseja resetar o contador de visitantes?')) {
+        localStorage.removeItem('comerciante_device_id');
+        localStorage.removeItem('last_counted_date');
+        localStorage.removeItem('comerciante_total_visits');
+        
+        if (typeof db !== 'undefined') {
+            db.collection('site_stats').doc('visitors').set({
+                total: 0,
+                today: 0,
+                devices: [],
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastResetDate: new Date().toISOString().split('T')[0]
+            });
+        }
+        
+        location.reload();
     }
 }
