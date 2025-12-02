@@ -2057,14 +2057,66 @@ async function applyStoreConfig() {
                 profileName.textContent = config.name;
             }
             
-            // Aplicar background do header
-            const headerMain = document.querySelector('.header-main');
-            if (headerMain && config.headerBackgroundUrl) {
-                headerMain.style.background = `
-                    linear-gradient(135deg, rgba(26, 26, 26, 0.85) 0%, rgba(45, 45, 45, 0.75) 100%),
-                    url('${config.headerBackgroundUrl}') center/cover no-repeat
-                `;
-            }
+           // Aplicar background do header mantendo os efeitos
+const headerMain = document.querySelector('.header-main');
+if (headerMain && config.headerBackgroundUrl) {
+    // Cria um elemento interno para a imagem
+    const bgContainer = document.createElement('div');
+    bgContainer.className = 'header-bg-container';
+    bgContainer.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        background: 
+            linear-gradient(135deg, rgba(15, 15, 15, 0.7) 0%, rgba(35, 35, 35, 0.6) 100%),
+            url('${config.headerBackgroundUrl}') center/cover no-repeat;
+    `;
+    
+    // Limpa o header e adiciona o novo container
+    headerMain.style.background = 'none';
+    headerMain.style.position = 'relative';
+    headerMain.insertBefore(bgContainer, headerMain.firstChild);
+    
+    // Garante que os efeitos de brilho fiquem acima
+    const sparkleLayer = document.createElement('div');
+    sparkleLayer.className = 'header-sparkle-layer';
+    sparkleLayer.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+        background: 
+            radial-gradient(circle at 25% 35%, rgba(255, 255, 255, 0.12) 0%, transparent 100px),
+            radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.1) 0%, transparent 120px),
+            radial-gradient(circle at 45% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 90px);
+        mix-blend-mode: overlay;
+        animation: pulseGlow 8s infinite alternate;
+    `;
+    
+    headerMain.appendChild(sparkleLayer);
+    
+    // Adiciona a animação
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @keyframes pulseGlow {
+            0% { opacity: 0.6; }
+            100% { opacity: 0.9; }
+        }
+        
+        /* Garante que o conteúdo fique acima de tudo */
+        .header-main > *:not(.header-bg-container):not(.header-sparkle-layer) {
+            position: relative;
+            z-index: 2;
+        }
+    `;
+    document.head.appendChild(style);
+}
         }
     } catch (error) {
         console.error('Erro ao aplicar configurações:', error);
@@ -2493,3 +2545,62 @@ function setupBannerListener() {
         });
 }
 
+
+
+// Contador com Firebase (Recomendado para estatísticas reais)
+function initFirebaseVisitorCounter() {
+    // Certifique-se de que o Firebase está inicializado
+    if (typeof db !== 'undefined') {
+        const counterRef = db.collection('site_stats').doc('visitors');
+        
+        // Verificar sessão
+        if (!sessionStorage.getItem('firebase_session')) {
+            sessionStorage.setItem('firebase_session', 'active');
+            
+            // Incrementar no Firebase
+            counterRef.get().then((doc) => {
+                if (doc.exists) {
+                    const currentCount = doc.data().count || 0;
+                    counterRef.update({
+                        count: firebase.firestore.FieldValue.increment(1),
+                        lastUpdate: firebase.firestore.FieldValue.serverTimestamp(),
+                        today: firebase.firestore.FieldValue.increment(1)
+                    });
+                    
+                    // Atualizar contador local
+                    updateCounterDisplay(currentCount + 1);
+                } else {
+                    counterRef.set({
+                        count: 1,
+                        lastUpdate: firebase.firestore.FieldValue.serverTimestamp(),
+                        today: 1,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    updateCounterDisplay(1);
+                }
+            }).catch((error) => {
+                console.error('Erro no contador:', error);
+                // Fallback para localStorage
+                initVisitorCounter();
+            });
+        } else {
+            // Apenas mostrar contador atual
+            counterRef.get().then((doc) => {
+                if (doc.exists) {
+                    updateCounterDisplay(doc.data().count);
+                }
+            });
+        }
+    } else {
+        // Fallback para localStorage se Firebase não estiver disponível
+        initVisitorCounter();
+    }
+}
+
+function updateCounterDisplay(count) {
+    const counterElement = document.getElementById('counter');
+    if (counterElement) {
+        counterElement.textContent = count.toLocaleString('pt-BR');
+        animateCounter(counterElement);
+    }
+}
