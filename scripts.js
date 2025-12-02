@@ -2547,7 +2547,7 @@ function setupBannerListener() {
 
 
 
-// Contador de Visitantes com Firebase - VERSÃO CORRIGIDA
+// Contador de Visitantes com Firebase - VERSÃO COMPLETA COM DETALHES
 async function initFirebaseVisitorCounter() {
     try {
         // Verificar se Firebase está disponível
@@ -2585,9 +2585,21 @@ async function initFirebaseVisitorCounter() {
 
         // ID único para este dispositivo (persistente)
         let deviceId = localStorage.getItem('comerciante_device_id');
+        let visitorData = {};
+        
         if (!deviceId) {
             deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('comerciante_device_id', deviceId);
+            
+            // Coletar dados do visitante apenas na primeira visita
+            visitorData = await collectVisitorData();
+            localStorage.setItem('comerciante_visitor_data', JSON.stringify(visitorData));
+        } else {
+            // Recuperar dados existentes
+            const savedData = localStorage.getItem('comerciante_visitor_data');
+            if (savedData) {
+                visitorData = JSON.parse(savedData);
+            }
         }
 
         // Verificar se este dispositivo já foi contado hoje
@@ -2596,10 +2608,20 @@ async function initFirebaseVisitorCounter() {
         
         // Referência do Firebase
         const statsRef = db.collection('site_stats').doc('visitors');
+        const visitorsDetailRef = db.collection('visitors_detail');
         
         // Buscar dados atuais
         const doc = await statsRef.get();
-        let currentStats = { total: 0, today: 0, devices: [], updatedAt: null };
+        let currentStats = { 
+            total: 0, 
+            today: 0, 
+            devices: [], 
+            updatedAt: null,
+            countries: {},
+            browsers: {},
+            devicesType: {},
+            referrers: {}
+        };
 
         if (doc.exists) {
             currentStats = doc.data();
@@ -2621,6 +2643,12 @@ async function initFirebaseVisitorCounter() {
                     updateData.today = 1;
                     updateData.lastResetDate = today;
                     updateData.devices = [deviceId]; // Resetar array de dispositivos do dia
+                    
+                    // Resetar estatísticas do dia
+                    updateData.todayCountries = {};
+                    updateData.todayDevices = {};
+                    updateData.todayBrowsers = {};
+                    
                 } else {
                     updateData.today = firebase.firestore.FieldValue.increment(1);
                     
@@ -2630,8 +2658,31 @@ async function initFirebaseVisitorCounter() {
                     }
                 }
 
+                // Atualizar estatísticas detalhadas
+                if (visitorData.country) {
+                    updateData[`countries.${visitorData.country}`] = firebase.firestore.FieldValue.increment(1);
+                    updateData[`todayCountries.${visitorData.country}`] = firebase.firestore.FieldValue.increment(1);
+                }
+                
+                if (visitorData.browser) {
+                    updateData[`browsers.${visitorData.browser}`] = firebase.firestore.FieldValue.increment(1);
+                    updateData[`todayBrowsers.${visitorData.browser}`] = firebase.firestore.FieldValue.increment(1);
+                }
+                
+                if (visitorData.deviceType) {
+                    updateData[`devicesType.${visitorData.deviceType}`] = firebase.firestore.FieldValue.increment(1);
+                    updateData[`todayDevices.${visitorData.deviceType}`] = firebase.firestore.FieldValue.increment(1);
+                }
+                
+                if (visitorData.referrer) {
+                    updateData[`referrers.${visitorData.referrer}`] = firebase.firestore.FieldValue.increment(1);
+                }
+
                 // Salvar no Firebase
                 await statsRef.set(updateData, { merge: true });
+
+                // Salvar detalhes do visitante em coleção separada
+                await saveVisitorDetails(deviceId, visitorData);
 
                 // Atualizar localStorage
                 localStorage.setItem('last_counted_date', today);
@@ -2673,49 +2724,352 @@ async function initFirebaseVisitorCounter() {
     }
 }
 
-// Função para mostrar detalhes dos visitantes
+// Função para coletar dados do visitante
+async function collectVisitorData() {
+    const data = {
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        platform: navigator.platform,
+        screenWidth: window.screen.width,
+        screenHeight: window.screen.height,
+        deviceType: getDeviceType(),
+        browser: getBrowserName(),
+        os: getOSName(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        cookiesEnabled: navigator.cookieEnabled,
+        online: navigator.onLine,
+        referrer: document.referrer || 'Direct',
+        pageUrl: window.location.href,
+        pageTitle: document.title,
+        sessionStart: new Date().toISOString()
+    };
+
+    try {
+        // Coletar dados de geolocalização via IP (usando serviço gratuito)
+        const ipData = await fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .catch(() => null);
+
+        if (ipData) {
+            data.ip = ipData.ip;
+            data.city = ipData.city;
+            data.region = ipData.region;
+            data.country = ipData.country_name;
+            data.countryCode = ipData.country_code;
+            data.postalCode = ipData.postal;
+            data.latitude = ipData.latitude;
+            data.longitude = ipData.longitude;
+            data.currency = ipData.currency;
+            data.org = ipData.org; // Provedor de internet
+            data.timezone = ipData.timezone;
+        }
+
+        // Tentar usar Geolocation API se permitido
+        if (navigator.geolocation) {
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: false,
+                    timeout: 5000,
+                    maximumAge: 60000
+                });
+            }).catch(() => null);
+
+            if (position) {
+                data.geoLocation = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy
+                };
+            }
+        }
+
+    } catch (error) {
+        console.log('Não foi possível coletar todos os dados:', error);
+    }
+
+    return data;
+}
+
+// Função para salvar detalhes do visitante no Firebase
+async function saveVisitorDetails(deviceId, visitorData) {
+    try {
+        const visitorRef = db.collection('visitors_detail').doc(deviceId);
+        
+        const visitorDoc = {
+            ...visitorData,
+            deviceId: deviceId,
+            firstVisit: firebase.firestore.FieldValue.serverTimestamp(),
+            lastVisit: firebase.firestore.FieldValue.serverTimestamp(),
+            visitCount: firebase.firestore.FieldValue.increment(1),
+            pagesVisited: [visitorData.pageUrl],
+            sessionDuration: 0 // Será atualizado quando sair
+        };
+
+        await visitorRef.set(visitorDoc, { merge: true });
+
+    } catch (error) {
+        console.error('Erro ao salvar detalhes do visitante:', error);
+    }
+}
+
+// Função para detectar tipo de dispositivo
+function getDeviceType() {
+    const ua = navigator.userAgent;
+    if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+        return "Tablet";
+    }
+    if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) {
+        return "Mobile";
+    }
+    return "Desktop";
+}
+
+// Função para detectar navegador
+function getBrowserName() {
+    const ua = navigator.userAgent;
+    let browser = "Unknown";
+    
+    if (ua.includes("Firefox")) browser = "Firefox";
+    else if (ua.includes("SamsungBrowser")) browser = "Samsung Browser";
+    else if (ua.includes("Opera") || ua.includes("OPR")) browser = "Opera";
+    else if (ua.includes("Trident") || ua.includes("MSIE")) browser = "Internet Explorer";
+    else if (ua.includes("Edge")) browser = "Microsoft Edge";
+    else if (ua.includes("Chrome")) browser = "Chrome";
+    else if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
+    
+    return browser;
+}
+
+// Função para detectar sistema operacional
+function getOSName() {
+    const ua = navigator.userAgent;
+    let os = "Unknown";
+    
+    if (ua.includes("Windows")) os = "Windows";
+    else if (ua.includes("Mac")) os = "macOS";
+    else if (ua.includes("X11")) os = "UNIX";
+    else if (ua.includes("Linux")) os = "Linux";
+    else if (ua.includes("Android")) os = "Android";
+    else if (ua.includes("iOS") || ua.includes("like Mac")) os = "iOS";
+    
+    return os;
+}
+
+// Função para rastrear comportamento na página
+function trackPageBehavior() {
+    let startTime = Date.now();
+    let scrollDepth = 0;
+    let clickedElements = [];
+    
+    // Rastrear profundidade de rolagem
+    window.addEventListener('scroll', () => {
+        const scrolled = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight * 100;
+        scrollDepth = Math.max(scrollDepth, scrolled);
+    }, { passive: true });
+    
+    // Rastrear cliques
+    document.addEventListener('click', (e) => {
+        const element = {
+            tag: e.target.tagName,
+            id: e.target.id,
+            className: e.target.className,
+            text: e.target.textContent.substring(0, 50),
+            href: e.target.href || null,
+            timestamp: new Date().toISOString()
+        };
+        clickedElements.push(element);
+        
+        // Limitar array para evitar memória excessiva
+        if (clickedElements.length > 50) {
+            clickedElements = clickedElements.slice(-50);
+        }
+    }, { passive: true });
+    
+    // Quando o usuário sai da página
+    window.addEventListener('beforeunload', () => {
+        const sessionDuration = Date.now() - startTime;
+        const behaviorData = {
+            sessionDuration: sessionDuration,
+            scrollDepth: scrollDepth,
+            clickedElements: clickedElements,
+            exitTime: new Date().toISOString(),
+            pageLoadTime: performance.timing.loadEventEnd - performance.timing.navigationStart
+        };
+        
+        // Salvar dados comportamentais no localStorage para próxima sincronização
+        const deviceId = localStorage.getItem('comerciante_device_id');
+        if (deviceId) {
+            localStorage.setItem(`comerciante_behavior_${deviceId}`, JSON.stringify(behaviorData));
+        }
+    });
+}
+
+// Função para mostrar detalhes dos visitantes (ATUALIZADA)
 async function showVisitorDetails(statsRef) {
     try {
         const doc = await statsRef.get();
         if (doc.exists) {
             const stats = doc.data();
             
+            // Buscar últimos visitantes detalhados
+            const visitorsSnapshot = await db.collection('visitors_detail')
+                .orderBy('lastVisit', 'desc')
+                .limit(10)
+                .get();
+            
+            const recentVisitors = [];
+            visitorsSnapshot.forEach(doc => {
+                recentVisitors.push(doc.data());
+            });
+            
             const detailsHTML = `
                 <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
                          background: white; padding: 30px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                         z-index: 10000; min-width: 300px; max-width: 500px;">
+                         z-index: 10000; min-width: 350px; max-width: 700px; max-height: 90vh; overflow-y: auto;">
+                    
                     <div style="text-align: center; margin-bottom: 20px;">
                         <i class="fas fa-chart-bar fa-2x mb-2" style="color: #667eea;"></i>
-                        <h4 style="margin: 0; color: #2d3748;">Estatísticas do Site</h4>
+                        <h4 style="margin: 0; color: #2d3748;">Estatísticas Detalhadas</h4>
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center;">
-                            <div style="font-size: 2em; font-weight: 800; color: #667eea;">${stats.total || 0}</div>
-                            <div style="font-size: 0.9em; color: #718096;">Total de Visitantes</div>
+                    <!-- Estatísticas Gerais -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px;">
+                        <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 15px; border-radius: 10px; text-align: center; color: white;">
+                            <div style="font-size: 1.5em; font-weight: 800;">${stats.total || 0}</div>
+                            <div style="font-size: 0.8em; opacity: 0.9;">Total de Visitantes</div>
                         </div>
                         
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center;">
-                            <div style="font-size: 2em; font-weight: 800; color: #48bb78;">${stats.today || 0}</div>
-                            <div style="font-size: 0.9em; color: #718096;">Visitantes Hoje</div>
+                        <div style="background: linear-gradient(135deg, #48bb78, #38a169); padding: 15px; border-radius: 10px; text-align: center; color: white;">
+                            <div style="font-size: 1.5em; font-weight: 800;">${stats.today || 0}</div>
+                            <div style="font-size: 0.8em; opacity: 0.9;">Visitantes Hoje</div>
+                        </div>
+                        
+                        <div style="background: linear-gradient(135deg, #ed8936, #dd6b20); padding: 15px; border-radius: 10px; text-align: center; color: white;">
+                            <div style="font-size: 1.5em; font-weight: 800;">${stats.devices ? stats.devices.length : 0}</div>
+                            <div style="font-size: 0.8em; opacity: 0.9;">Únicos Hoje</div>
                         </div>
                     </div>
                     
-                    <div style="background: #f0f7ff; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                            <span style="color: #4a5568;">Última atualização:</span>
-                            <span style="color: #667eea; font-weight: 600;">${stats.updatedAt ? new Date(stats.updatedAt.seconds * 1000).toLocaleString('pt-BR') : 'Agora'}</span>
+                    <!-- Tabs -->
+                    <div style="display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px;">
+                        <button class="tab-btn active" onclick="switchTab('general')" style="flex: 1; padding: 10px; border: none; background: none; cursor: pointer; font-weight: 600; color: #667eea;">
+                            <i class="fas fa-globe me-2"></i>Geral
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('devices')" style="flex: 1; padding: 10px; border: none; background: none; cursor: pointer; font-weight: 600; color: #718096;">
+                            <i class="fas fa-mobile-alt me-2"></i>Dispositivos
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('locations')" style="flex: 1; padding: 10px; border: none; background: none; cursor: pointer; font-weight: 600; color: #718096;">
+                            <i class="fas fa-map-marker-alt me-2"></i>Localizações
+                        </button>
+                    </div>
+                    
+                    <!-- Conteúdo das Tabs -->
+                    <div id="tab-general" class="tab-content">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <!-- Distribuição por País -->
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                                <h6 style="margin: 0 0 10px 0; color: #4a5568;">
+                                    <i class="fas fa-flag me-2"></i>Países
+                                </h6>
+                                ${stats.countries ? Object.entries(stats.countries).slice(0, 5).map(([country, count]) => `
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9em;">
+                                        <span>${country}</span>
+                                        <span style="font-weight: 600; color: #667eea;">${count}</span>
+                                    </div>
+                                `).join('') : '<div style="color: #a0aec0;">Nenhum dado disponível</div>'}
+                            </div>
+                            
+                            <!-- Distribuição por Browser -->
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                                <h6 style="margin: 0 0 10px 0; color: #4a5568;">
+                                    <i class="fas fa-window-maximize me-2"></i>Navegadores
+                                </h6>
+                                ${stats.browsers ? Object.entries(stats.browsers).slice(0, 5).map(([browser, count]) => `
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9em;">
+                                        <span>${browser}</span>
+                                        <span style="font-weight: 600; color: #48bb78;">${count}</span>
+                                    </div>
+                                `).join('') : '<div style="color: #a0aec0;">Nenhum dado disponível</div>'}
+                            </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span style="color: #4a5568;">Dispositivos únicos hoje:</span>
-                            <span style="color: #667eea; font-weight: 600;">${stats.devices ? stats.devices.length : 0}</span>
+                        
+                        <!-- Últimos Visitantes -->
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                            <h6 style="margin: 0 0 10px 0; color: #4a5568;">
+                                <i class="fas fa-users me-2"></i>Últimas Visitas
+                            </h6>
+                            ${recentVisitors.length > 0 ? recentVisitors.map(visitor => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                                    <div>
+                                        <div style="font-weight: 600; color: #2d3748;">
+                                            ${visitor.country || 'Desconhecido'} - ${visitor.city || ''}
+                                        </div>
+                                        <div style="font-size: 0.8em; color: #718096;">
+                                            ${visitor.deviceType || ''} • ${visitor.browser || ''}
+                                            ${visitor.referrer && visitor.referrer !== 'Direct' ? `• ${visitor.referrer}` : ''}
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 0.8em; color: #667eea; font-weight: 600;">
+                                        ${visitor.visitCount || 1} visita(s)
+                                    </div>
+                                </div>
+                            `).join('') : '<div style="color: #a0aec0;">Nenhum dado disponível</div>'}
                         </div>
                     </div>
                     
-                    <button onclick="this.parentElement.remove()" 
-                            style="width: 100%; background: #667eea; color: white; border: none; padding: 12px; 
+                    <!-- Tab Dispositivos -->
+                    <div id="tab-devices" class="tab-content" style="display: none;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <!-- Tipos de Dispositivos -->
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                                <h6 style="margin: 0 0 10px 0; color: #4a5568;">
+                                    <i class="fas fa-mobile-alt me-2"></i>Tipos de Dispositivos
+                                </h6>
+                                ${stats.devicesType ? Object.entries(stats.devicesType).map(([device, count]) => `
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9em;">
+                                        <span>${device}</span>
+                                        <span style="font-weight: 600; color: #ed8936;">${count}</span>
+                                    </div>
+                                `).join('') : '<div style="color: #a0aec0;">Nenhum dado disponível</div>'}
+                            </div>
+                            
+                            <!-- Sistemas Operacionais -->
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                                <h6 style="margin: 0 0 10px 0; color: #4a5568;">
+                                    <i class="fas fa-laptop me-2"></i>Sistemas Operacionais
+                                </h6>
+                                <div style="color: #a0aec0; font-size: 0.9em;">
+                                    Coletado individualmente por visitante
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab Localizações -->
+                    <div id="tab-locations" class="tab-content" style="display: none;">
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                            <h6 style="margin: 0 0 10px 0; color: #4a5568;">
+                                <i class="fas fa-map-marked-alt me-2"></i>Distribuição Geográfica
+                            </h6>
+                            ${stats.countries ? Object.entries(stats.countries).map(([country, count]) => `
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                                    <div style="display: flex; align-items: center;">
+                                        <span style="font-weight: 600; color: #2d3748; min-width: 150px;">${country}</span>
+                                        <div style="flex-grow: 1; margin: 0 10px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                                            <div style="height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 4px; width: ${(count / stats.total * 100)}%"></div>
+                                        </div>
+                                    </div>
+                                    <span style="font-weight: 600; color: #667eea; min-width: 50px; text-align: right;">${count}</span>
+                                </div>
+                            `).join('') : '<div style="color: #a0aec0;">Nenhum dado disponível</div>'}
+                        </div>
+                    </div>
+                    
+                    <button onclick="this.closest('.tab-content').parentElement.remove(); document.querySelector('[style*=\"background: rgba(0,0,0,0.5)\"]').remove()" 
+                            style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px; 
                                    border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                        <i class="fas fa-times me-2"></i>Fechar
+                        <i class="fas fa-times me-2"></i>Fechar Dashboard
                     </button>
                 </div>
                 <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -2724,75 +3078,69 @@ async function showVisitorDetails(statsRef) {
             `;
             
             document.body.insertAdjacentHTML('beforeend', detailsHTML);
+            
+            // Adicionar função de troca de tabs
+            window.switchTab = function(tabName) {
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.style.color = '#718096';
+                    btn.classList.remove('active');
+                });
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                event.target.style.color = '#667eea';
+                event.target.classList.add('active');
+                document.getElementById(`tab-${tabName}`).style.display = 'block';
+            };
         }
     } catch (error) {
         console.error('Erro ao mostrar detalhes:', error);
     }
 }
 
-// Função de animação do contador
-function animateCounter(element, finalNumber) {
-    const currentNumber = parseInt(element.textContent.replace(/\D/g, '')) || 0;
-    if (currentNumber >= finalNumber) return;
-    
-    let count = currentNumber;
-    const increment = Math.ceil((finalNumber - currentNumber) / 50);
-    
-    const timer = setInterval(() => {
-        count += increment;
-        if (count >= finalNumber) {
-            count = finalNumber;
-            clearInterval(timer);
-        }
-        element.textContent = count.toLocaleString('pt-BR');
-    }, 20);
-}
-
-// Função para mostrar notificação
-function showVisitNotification(visitNumber) {
-    if (visitNumber % 10 === 0) {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #48bb78, #38a169);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(72, 187, 120, 0.3);
-            z-index: 10000;
-            animation: slideIn 0.5s ease-out;
-        `;
+// Função para exportar dados (opcional)
+async function exportVisitorData() {
+    try {
+        const visitorsSnapshot = await db.collection('visitors_detail').get();
+        const visitorsData = [];
         
-        notification.innerHTML = `
-            <i class="fas fa-trophy me-2"></i>
-            <strong>🎉 ${visitNumber}º Visitante!</strong>
-            <div style="font-size: 0.9em; opacity: 0.9; margin-top: 5px;">
-                Obrigado por fazer parte!
-            </div>
-        `;
+        visitorsSnapshot.forEach(doc => {
+            visitorsData.push(doc.data());
+        });
         
-        document.body.appendChild(notification);
+        // Criar CSV
+        const headers = ['IP', 'Cidade', 'País', 'Dispositivo', 'Navegador', 'OS', 'Primeira Visita', 'Última Visita', 'Total Visitas'];
+        const csvContent = [
+            headers.join(','),
+            ...visitorsData.map(v => [
+                v.ip || '',
+                v.city || '',
+                v.country || '',
+                v.deviceType || '',
+                v.browser || '',
+                v.os || '',
+                v.firstVisit ? new Date(v.firstVisit.seconds * 1000).toLocaleString('pt-BR') : '',
+                v.lastVisit ? new Date(v.lastVisit.seconds * 1000).toLocaleString('pt-BR') : '',
+                v.visitCount || 1
+            ].join(','))
+        ].join('\n');
         
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.5s ease-in forwards';
-            setTimeout(() => notification.remove(), 500);
-        }, 3000);
-    }
-}
-
-// Fallback: Contador simples com localStorage
-function initSimpleCounter() {
-    const key = 'comerciante_total_visits';
-    let visits = localStorage.getItem(key);
-    visits = visits ? parseInt(visits) + 1 : 1;
-    localStorage.setItem(key, visits);
-    
-    const counterElement = document.getElementById('counter') || document.querySelector('#visitor-counter span');
-    if (counterElement) {
-        counterElement.textContent = visits.toLocaleString('pt-BR');
-        animateCounter(counterElement, visits);
+        // Criar download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `visitors_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+    } catch (error) {
+        console.error('Erro ao exportar dados:', error);
+        alert('Erro ao exportar dados');
     }
 }
 
@@ -2830,6 +3178,15 @@ document.addEventListener('DOMContentLoaded', function() {
         #visitor-counter {
             transition: all 0.3s ease;
         }
+        
+        .tab-btn.active {
+            border-bottom: 3px solid #667eea !important;
+            color: #667eea !important;
+        }
+        
+        .tab-content {
+            transition: all 0.3s ease;
+        }
     `;
     
     const styleSheet = document.createElement('style');
@@ -2839,26 +3196,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Iniciar contador
     setTimeout(() => {
         initFirebaseVisitorCounter();
+        trackPageBehavior(); // Iniciar rastreamento de comportamento
     }, 1000);
 });
 
-// Função para resetar contador (apenas para desenvolvimento)
-function resetVisitorCounter() {
-    if (confirm('Tem certeza que deseja resetar o contador de visitantes?')) {
-        localStorage.removeItem('comerciante_device_id');
-        localStorage.removeItem('last_counted_date');
-        localStorage.removeItem('comerciante_total_visits');
-        
-        if (typeof db !== 'undefined') {
-            db.collection('site_stats').doc('visitors').set({
-                total: 0,
-                today: 0,
-                devices: [],
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                lastResetDate: new Date().toISOString().split('T')[0]
-            });
-        }
-        
-        location.reload();
-    }
+// Adicionar botão de exportação no console (para desenvolvimento)
+if (typeof db !== 'undefined') {
+    console.log('%c📊 Visitor Analytics', 'color: #667eea; font-size: 16px; font-weight: bold;');
+    console.log('%cPara exportar dados dos visitantes, execute: exportVisitorData()', 'color: #48bb78;');
 }
