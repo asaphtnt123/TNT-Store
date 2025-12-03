@@ -2547,6 +2547,357 @@ function setupBannerListener() {
 
 
 
+// Contador de Visitantes com Firebase - VERSÃO COMPLETA
+
+// Função para detectar tipo de dispositivo
+function getDeviceType() {
+    const ua = navigator.userAgent;
+    if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+        return "Tablet";
+    }
+    if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) {
+        return "Mobile";
+    }
+    return "Desktop";
+}
+
+// Função para detectar navegador
+function getBrowserName() {
+    const ua = navigator.userAgent;
+    let browser = "Unknown";
+    
+    if (ua.includes("Firefox")) browser = "Firefox";
+    else if (ua.includes("SamsungBrowser")) browser = "Samsung Browser";
+    else if (ua.includes("Opera") || ua.includes("OPR")) browser = "Opera";
+    else if (ua.includes("Trident") || ua.includes("MSIE")) browser = "Internet Explorer";
+    else if (ua.includes("Edge")) browser = "Microsoft Edge";
+    else if (ua.includes("Chrome")) browser = "Chrome";
+    else if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
+    
+    return browser;
+}
+
+// Função para detectar sistema operacional
+function getOSName() {
+    const ua = navigator.userAgent;
+    let os = "Unknown";
+    
+    if (ua.includes("Windows")) os = "Windows";
+    else if (ua.includes("Mac")) os = "macOS";
+    else if (ua.includes("X11")) os = "UNIX";
+    else if (ua.includes("Linux")) os = "Linux";
+    else if (ua.includes("Android")) os = "Android";
+    else if (ua.includes("iOS") || ua.includes("like Mac")) os = "iOS";
+    
+    return os;
+}
+
+// Função de animação do contador
+function animateCounter(element, finalNumber) {
+    const currentNumber = parseInt(element.textContent.replace(/\D/g, '')) || 0;
+    if (currentNumber >= finalNumber) return;
+    
+    let count = currentNumber;
+    const increment = Math.ceil((finalNumber - currentNumber) / 50);
+    
+    const timer = setInterval(() => {
+        count += increment;
+        if (count >= finalNumber) {
+            count = finalNumber;
+            clearInterval(timer);
+        }
+        element.textContent = count.toLocaleString('pt-BR');
+    }, 20);
+}
+
+// Função para mostrar notificação
+function showVisitNotification(visitNumber) {
+    if (visitNumber % 10 === 0) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(72, 187, 120, 0.3);
+            z-index: 10000;
+            animation: slideIn 0.5s ease-out;
+        `;
+        
+        notification.innerHTML = `
+            <i class="fas fa-trophy me-2"></i>
+            <strong>🎉 ${visitNumber}º Visitante!</strong>
+            <div style="font-size: 0.9em; opacity: 0.9; margin-top: 5px;">
+                Obrigado por fazer parte!
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.5s ease-in forwards';
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    }
+}
+
+// Fallback: Contador simples com localStorage
+function initSimpleCounter() {
+    const key = 'comerciante_total_visits';
+    let visits = localStorage.getItem(key);
+    visits = visits ? parseInt(visits) + 1 : 1;
+    localStorage.setItem(key, visits);
+    
+    const counterElement = document.getElementById('counter') || document.querySelector('#visitor-counter span');
+    if (counterElement) {
+        counterElement.textContent = visits.toLocaleString('pt-BR');
+        animateCounter(counterElement, visits);
+    }
+}
+
+// Função alternativa para obter IP via WebRTC (último recurso)
+function getIPFromWebRTC() {
+    return new Promise((resolve) => {
+        try {
+            const pc = new RTCPeerConnection({ iceServers: [] });
+            pc.createDataChannel('');
+            pc.createOffer().then(offer => pc.setLocalDescription(offer)).catch(() => {});
+            
+            pc.onicecandidate = (ice) => {
+                if (!ice || !ice.candidate || !ice.candidate.candidate) return;
+                const regex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/;
+                const match = regex.exec(ice.candidate.candidate);
+                if (match) {
+                    resolve(match[1]);
+                }
+                pc.close();
+            };
+            
+            setTimeout(() => {
+                pc.close();
+                resolve(null);
+            }, 1000);
+        } catch (error) {
+            resolve(null);
+        }
+    });
+}
+
+// ATUALIZADO: Função melhorada para coletar dados do visitante
+async function collectVisitorData() {
+    const data = {
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        platform: navigator.platform,
+        screenWidth: window.screen.width,
+        screenHeight: window.screen.height,
+        deviceType: getDeviceType(),
+        browser: getBrowserName(),
+        os: getOSName(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        cookiesEnabled: navigator.cookieEnabled,
+        online: navigator.onLine,
+        referrer: document.referrer || 'Direct',
+        pageUrl: window.location.href,
+        pageTitle: document.title,
+        sessionStart: new Date().toISOString(),
+        // Novos campos adicionados
+        ip: null,
+        city: null,
+        region: null,
+        country: null,
+        countryCode: null,
+        postalCode: null,
+        latitude: null,
+        longitude: null,
+        currency: null,
+        org: null,
+        asn: null
+    };
+
+    try {
+        // TENTATIVA 1: Usar ipapi.co (mais confiável para localização)
+        const ipapiResponse = await fetch('https://ipapi.co/json/', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        }).then(response => response.json())
+          .catch(() => null);
+
+        if (ipapiResponse && ipapiResponse.ip) {
+            console.log('Dados do ipapi.co:', ipapiResponse);
+            data.ip = ipapiResponse.ip;
+            data.city = ipapiResponse.city;
+            data.region = ipapiResponse.region;
+            data.country = ipapiResponse.country_name;
+            data.countryCode = ipapiResponse.country_code;
+            data.postalCode = ipapiResponse.postal;
+            data.latitude = ipapiResponse.latitude;
+            data.longitude = ipapiResponse.longitude;
+            data.currency = ipapiResponse.currency;
+            data.org = ipapiResponse.org || ipapiResponse.asn;
+            data.timezone = ipapiResponse.timezone;
+            data.asn = ipapiResponse.asn;
+        }
+        
+        // Se ipapi.co falhou, tentar ipify para apenas IP
+        if (!data.ip) {
+            const ipifyResponse = await fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .catch(() => null);
+                
+            if (ipifyResponse && ipifyResponse.ip) {
+                data.ip = ipifyResponse.ip;
+                
+                // Com o IP, tentar outra API para geolocalização
+                // Note: ipinfo.io precisa de token, então comentei
+                /*
+                const geoResponse = await fetch(`https://ipinfo.io/${data.ip}/json?token=SEU_TOKEN`)
+                    .then(response => response.json())
+                    .catch(() => null);
+                    
+                if (geoResponse) {
+                    data.city = geoResponse.city;
+                    data.region = geoResponse.region;
+                    data.country = geoResponse.country;
+                    data.postalCode = geoResponse.postal;
+                    data.org = geoResponse.org;
+                    const loc = geoResponse.loc ? geoResponse.loc.split(',') : null;
+                    if (loc) {
+                        data.latitude = loc[0];
+                        data.longitude = loc[1];
+                    }
+                }
+                */
+            }
+        }
+        
+        // Fallback: Usar API pública gratuita (ip-api.com) - HTTP apenas
+        if (!data.ip) {
+            const ipApiResponse = await fetch('http://ip-api.com/json/?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query')
+                .then(response => response.json())
+                .catch(() => null);
+                
+            if (ipApiResponse && ipApiResponse.status === 'success') {
+                data.ip = ipApiResponse.query;
+                data.city = ipApiResponse.city;
+                data.region = ipApiResponse.regionName;
+                data.country = ipApiResponse.country;
+                data.countryCode = ipApiResponse.countryCode;
+                data.postalCode = ipApiResponse.zip;
+                data.latitude = ipApiResponse.lat;
+                data.longitude = ipApiResponse.lon;
+                data.timezone = ipApiResponse.timezone;
+                data.org = ipApiResponse.isp || ipApiResponse.org;
+                data.asn = ipApiResponse.as;
+            }
+        }
+
+        // Se ainda não tem IP, usar WebRTC como último recurso (pode ser bloqueado)
+        if (!data.ip) {
+            const webrtcIP = await getIPFromWebRTC();
+            if (webrtcIP) data.ip = webrtcIP;
+        }
+
+    } catch (error) {
+        console.log('Erro ao coletar dados de IP:', error);
+        // Não interrompe o fluxo se falhar
+    }
+
+    return data;
+}
+
+// ATUALIZADO: Função para salvar detalhes do visitante
+async function saveVisitorDetails(deviceId, visitorData) {
+    try {
+        const visitorRef = db.collection('visitors_detail').doc(deviceId);
+        
+        const existingDoc = await visitorRef.get();
+        const existingData = existingDoc.exists ? existingDoc.data() : {};
+        
+        const visitorDoc = {
+            ...existingData,
+            ...visitorData,
+            deviceId: deviceId,
+            lastVisit: firebase.firestore.FieldValue.serverTimestamp(),
+            visitCount: firebase.firestore.FieldValue.increment(1),
+            pagesVisited: firebase.firestore.FieldValue.arrayUnion(visitorData.pageUrl)
+        };
+
+        // Se for primeira visita, adicionar timestamp
+        if (!existingDoc.exists) {
+            visitorDoc.firstVisit = firebase.firestore.FieldValue.serverTimestamp();
+            visitorDoc.pagesVisited = [visitorData.pageUrl];
+            visitorDoc.visitCount = 1;
+        }
+
+        await visitorRef.set(visitorDoc);
+
+        console.log('Dados do visitante salvos:', {
+            ip: visitorData.ip,
+            cidade: visitorData.city,
+            região: visitorData.region,
+            país: visitorData.country,
+            provedor: visitorData.org
+        });
+
+    } catch (error) {
+        console.error('Erro ao salvar detalhes do visitante:', error);
+    }
+}
+
+// Nova função para atualizar último acesso
+async function updateLastAccess(deviceId) {
+    try {
+        const visitorRef = db.collection('visitors_detail').doc(deviceId);
+        await visitorRef.update({
+            lastAccess: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    } catch (error) {
+        console.error('Erro ao atualizar último acesso:', error);
+    }
+}
+
+// Função para gerar CSV
+async function generateCSV(visitors) {
+    const headers = ['IP', 'Cidade', 'Região', 'País', 'CEP', 'Dispositivo', 'Navegador', 'OS', 'Provedor', 'Primeira Visita', 'Última Visita', 'Total Visitas'];
+    
+    const rows = visitors.map(v => [
+        v.ip || '',
+        v.city || '',
+        v.region || '',
+        v.country || '',
+        v.postalCode || '',
+        v.deviceType || '',
+        v.browser || '',
+        v.os || '',
+        v.org || '',
+        v.formattedFirstVisit || '',
+        v.formattedLastVisit || '',
+        v.visitCount || 1
+    ]);
+    
+    return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+}
+
+// Função para baixar CSV
+function downloadCSV(content, filename) {
+    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 // Contador de Visitantes com Firebase - VERSÃO CORRIGIDA
 async function initFirebaseVisitorCounter() {
     try {
@@ -2754,209 +3105,6 @@ async function initFirebaseVisitorCounter() {
     } catch (error) {
         console.error('Erro no contador:', error);
         initSimpleCounter();
-    }
-}
-
-// ATUALIZADO: Função melhorada para coletar dados do visitante
-async function collectVisitorData() {
-    const data = {
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent,
-        language: navigator.language,
-        platform: navigator.platform,
-        screenWidth: window.screen.width,
-        screenHeight: window.screen.height,
-        deviceType: getDeviceType(),
-        browser: getBrowserName(),
-        os: getOSName(),
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        cookiesEnabled: navigator.cookieEnabled,
-        online: navigator.onLine,
-        referrer: document.referrer || 'Direct',
-        pageUrl: window.location.href,
-        pageTitle: document.title,
-        sessionStart: new Date().toISOString(),
-        // Novos campos adicionados
-        ip: null,
-        city: null,
-        region: null,
-        country: null,
-        countryCode: null,
-        postalCode: null,
-        latitude: null,
-        longitude: null,
-        currency: null,
-        org: null,
-        asn: null
-    };
-
-    try {
-        // TENTATIVA 1: Usar ipapi.co (mais confiável para localização)
-        const ipapiResponse = await fetch('https://ipapi.co/json/', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            },
-            timeout: 5000
-        }).then(response => response.json())
-          .catch(() => null);
-
-        if (ipapiResponse && ipapiResponse.ip) {
-            console.log('Dados do ipapi.co:', ipapiResponse);
-            data.ip = ipapiResponse.ip;
-            data.city = ipapiResponse.city;
-            data.region = ipapiResponse.region;
-            data.country = ipapiResponse.country_name;
-            data.countryCode = ipapiResponse.country_code;
-            data.postalCode = ipapiResponse.postal;
-            data.latitude = ipapiResponse.latitude;
-            data.longitude = ipapiResponse.longitude;
-            data.currency = ipapiResponse.currency;
-            data.org = ipapiResponse.org || ipapiResponse.asn;
-            data.timezone = ipapiResponse.timezone;
-            data.asn = ipapiResponse.asn;
-        }
-        
-        // Se ipapi.co falhou, tentar ipify para apenas IP
-        if (!data.ip) {
-            const ipifyResponse = await fetch('https://api.ipify.org?format=json')
-                .then(response => response.json())
-                .catch(() => null);
-                
-            if (ipifyResponse && ipifyResponse.ip) {
-                data.ip = ipifyResponse.ip;
-                
-                // Com o IP, tentar outra API para geolocalização
-                const geoResponse = await fetch(`https://ipinfo.io/${data.ip}/json?token=YOUR_TOKEN`) // Precisa de token
-                    .then(response => response.json())
-                    .catch(() => null);
-                    
-                if (geoResponse) {
-                    data.city = geoResponse.city;
-                    data.region = geoResponse.region;
-                    data.country = geoResponse.country;
-                    data.postalCode = geoResponse.postal;
-                    data.org = geoResponse.org;
-                    const loc = geoResponse.loc ? geoResponse.loc.split(',') : null;
-                    if (loc) {
-                        data.latitude = loc[0];
-                        data.longitude = loc[1];
-                    }
-                }
-            }
-        }
-        
-        // Fallback: Usar API pública gratuita (ip-api.com)
-        if (!data.ip) {
-            const ipApiResponse = await fetch('http://ip-api.com/json/?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query')
-                .then(response => response.json())
-                .catch(() => null);
-                
-            if (ipApiResponse && ipApiResponse.status === 'success') {
-                data.ip = ipApiResponse.query;
-                data.city = ipApiResponse.city;
-                data.region = ipApiResponse.regionName;
-                data.country = ipApiResponse.country;
-                data.countryCode = ipApiResponse.countryCode;
-                data.postalCode = ipApiResponse.zip;
-                data.latitude = ipApiResponse.lat;
-                data.longitude = ipApiResponse.lon;
-                data.timezone = ipApiResponse.timezone;
-                data.org = ipApiResponse.isp || ipApiResponse.org;
-                data.asn = ipApiResponse.as;
-            }
-        }
-
-        // Se ainda não tem IP, usar WebRTC como último recurso (pode ser bloqueado)
-        if (!data.ip) {
-            const webrtcIP = await getIPFromWebRTC();
-            if (webrtcIP) data.ip = webrtcIP;
-        }
-
-    } catch (error) {
-        console.log('Erro ao coletar dados de IP:', error);
-        // Não interrompe o fluxo se falhar
-    }
-
-    return data;
-}
-
-// Função alternativa para obter IP via WebRTC (último recurso)
-function getIPFromWebRTC() {
-    return new Promise((resolve) => {
-        try {
-            const pc = new RTCPeerConnection({ iceServers: [] });
-            pc.createDataChannel('');
-            pc.createOffer().then(offer => pc.setLocalDescription(offer)).catch(() => {});
-            
-            pc.onicecandidate = (ice) => {
-                if (!ice || !ice.candidate || !ice.candidate.candidate) return;
-                const regex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/;
-                const match = regex.exec(ice.candidate.candidate);
-                if (match) {
-                    resolve(match[1]);
-                }
-                pc.close();
-            };
-            
-            setTimeout(() => {
-                pc.close();
-                resolve(null);
-            }, 1000);
-        } catch (error) {
-            resolve(null);
-        }
-    });
-}
-
-// ATUALIZADO: Função para salvar detalhes do visitante
-async function saveVisitorDetails(deviceId, visitorData) {
-    try {
-        const visitorRef = db.collection('visitors_detail').doc(deviceId);
-        
-        const existingDoc = await visitorRef.get();
-        const existingData = existingDoc.exists ? existingDoc.data() : {};
-        
-        const visitorDoc = {
-            ...existingData,
-            ...visitorData,
-            deviceId: deviceId,
-            lastVisit: firebase.firestore.FieldValue.serverTimestamp(),
-            visitCount: firebase.firestore.FieldValue.increment(1),
-            pagesVisited: firebase.firestore.FieldValue.arrayUnion(visitorData.pageUrl)
-        };
-
-        // Se for primeira visita, adicionar timestamp
-        if (!existingDoc.exists) {
-            visitorDoc.firstVisit = firebase.firestore.FieldValue.serverTimestamp();
-            visitorDoc.pagesVisited = [visitorData.pageUrl];
-            visitorDoc.visitCount = 1;
-        }
-
-        await visitorRef.set(visitorDoc);
-
-        console.log('Dados do visitante salvos:', {
-            ip: visitorData.ip,
-            cidade: visitorData.city,
-            região: visitorData.region,
-            país: visitorData.country,
-            provedor: visitorData.org
-        });
-
-    } catch (error) {
-        console.error('Erro ao salvar detalhes do visitante:', error);
-    }
-}
-
-// Nova função para atualizar último acesso
-async function updateLastAccess(deviceId) {
-    try {
-        const visitorRef = db.collection('visitors_detail').doc(deviceId);
-        await visitorRef.update({
-            lastAccess: firebase.firestore.FieldValue.serverTimestamp()
-        });
-    } catch (error) {
-        console.error('Erro ao atualizar último acesso:', error);
     }
 }
 
@@ -3236,39 +3384,26 @@ async function showVisitorDetails(statsRef) {
     }
 }
 
-// Função para gerar CSV
-async function generateCSV(visitors) {
-    const headers = ['IP', 'Cidade', 'Região', 'País', 'CEP', 'Dispositivo', 'Navegador', 'OS', 'Provedor', 'Primeira Visita', 'Última Visita', 'Total Visitas'];
-    
-    const rows = visitors.map(v => [
-        v.ip || '',
-        v.city || '',
-        v.region || '',
-        v.country || '',
-        v.postalCode || '',
-        v.deviceType || '',
-        v.browser || '',
-        v.os || '',
-        v.org || '',
-        v.formattedFirstVisit || '',
-        v.formattedLastVisit || '',
-        v.visitCount || 1
-    ]);
-    
-    return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
-}
-
-// Função para baixar CSV
-function downloadCSV(content, filename) {
-    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', filename);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+// Função para resetar contador (apenas para desenvolvimento)
+function resetVisitorCounter() {
+    if (confirm('Tem certeza que deseja resetar o contador de visitantes?')) {
+        localStorage.removeItem('comerciante_device_id');
+        localStorage.removeItem('last_counted_date');
+        localStorage.removeItem('comerciante_total_visits');
+        localStorage.removeItem('comerciante_visitor_data');
+        
+        if (typeof db !== 'undefined') {
+            db.collection('site_stats').doc('visitors').set({
+                total: 0,
+                today: 0,
+                devices: [],
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastResetDate: new Date().toISOString().split('T')[0]
+            });
+        }
+        
+        location.reload();
+    }
 }
 
 // Inicializar quando a página carregar
