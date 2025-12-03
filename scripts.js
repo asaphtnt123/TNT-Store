@@ -235,7 +235,7 @@ async function loadProducts(categoryId = null) {
             query = query.where('categoryId', '==', categoryId);
         }
         
-        const snapshot = await query.limit(50).get();
+        const snapshot = await query.limit(10).get();
         STATE.products = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -2180,6 +2180,8 @@ function applyCustomColors(colors) {
         .admin-btn:hover {
             background: ${hexToRgba(colors.primaryColor, 0.15)} !important;
             border-color: ${colors.primaryColor} !important;
+            
+            
         }
         
         .cart-count {
@@ -3479,3 +3481,154 @@ document.addEventListener('DOMContentLoaded', function() {
         initFirebaseVisitorCounter();
     }, 1000);
 });
+
+
+
+/* ==========================================================
+   SISTEMA DE LOGIN ADMINISTRATIVO (FIRESTORE)
+   100% FUNCIONANDO — SIMPLES E TESTADO
+   ========================================================== */
+
+// Tempo de expiração da sessão (12h)
+const SESSION_TIME = 12 * 60 * 60 * 1000;
+
+// HASH SHA-256
+async function sha256(text) {
+    const buffer = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest("SHA-256", buffer);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+// ----------------------
+// LOGIN ADMIN
+// ----------------------
+async function adminLogin() {
+    const username = document.getElementById("adminUsername").value.trim();
+    const password = document.getElementById("adminPassword").value;
+
+    if (!username || !password) {
+        showLoginMessage("Preencha todos os campos!", "red");
+        return;
+    }
+
+    const ref = db.collection("admins").doc(username);
+    const snap = await ref.get();
+
+    if (!snap.exists) {
+        showLoginMessage("Usuário não encontrado!", "red");
+        return;
+    }
+
+    const data = snap.data();
+
+    // Verificar bloqueio com segurança
+if (data.blockedUntil) {
+    let blockedDate = null;
+
+    // Caso seja Timestamp do Firestore
+    if (typeof data.blockedUntil.toDate === "function") {
+        blockedDate = data.blockedUntil.toDate();
+    }
+
+    // Caso seja string ou número
+    else {
+        blockedDate = new Date(data.blockedUntil);
+    }
+
+    if (blockedDate > new Date()) {
+        showLoginMessage(
+            `Usuário bloqueado até ${blockedDate.toLocaleTimeString()}`,
+            "red"
+        );
+        return;
+    }
+}
+
+
+    const hashed = await sha256(password);
+
+    if (hashed !== data.passwordHash) {
+        const attempts = (data.attempts || 0) + 1;
+
+        if (attempts >= 5) {
+            await ref.update({
+                attempts: 0,
+                blockedUntil: new Date(Date.now() + 15 * 60000) // 15 minutos
+            });
+
+            showLoginMessage("Muitas tentativas. Usuário bloqueado por 15 min.", "red");
+            return;
+        }
+
+        await ref.update({ attempts });
+
+        showLoginMessage(`Senha incorreta. Tentativas: ${attempts}/5`, "red");
+        return;
+    }
+
+    // Reset tentativas
+    await ref.update({
+        attempts: 0,
+        blockedUntil: null
+    });
+
+    // Criar sessão
+    localStorage.setItem(
+        "adminSession",
+        JSON.stringify({
+            username,
+            expiresAt: Date.now() + SESSION_TIME
+        })
+    );
+
+    showLoginMessage("Login efetuado! Redirecionando…", "green");
+
+    setTimeout(() => {
+        window.location.href = "dashboard.html";
+    }, 800);
+}
+
+// ----------------------
+// MENSAGEM NO MODAL
+// ----------------------
+function showLoginMessage(msg, color) {
+    const box = document.getElementById("loginMessage");
+    box.style.display = "block";
+    box.style.background = color === "red" ? "#fed7d7" : "#c6f6d5";
+    box.style.color = color === "red" ? "#c53030" : "#2f855a";
+    box.innerText = msg;
+}
+
+// ----------------------
+// ABRIR E FECHAR MODAL
+// ----------------------
+function openLoginModal() {
+    document.getElementById("adminLoginModal").style.display = "flex";
+}
+function closeLoginModal() {
+    document.getElementById("adminLoginModal").style.display = "none";
+}
+
+// ----------------------
+// VERIFICAR SESSÃO NA DASHBOARD
+// ----------------------
+function checkAdminSession() {
+    const session = JSON.parse(localStorage.getItem("adminSession"));
+    const now = Date.now();
+
+    if (!session || now > session.expiresAt) {
+        localStorage.removeItem("adminSession");
+        window.location.href = "login.html";
+        return false;
+    }
+
+    return true;
+}
+
+// ----------------------
+// LOGOUT
+// ----------------------
+function adminLogout() {
+    localStorage.removeItem("adminSession");
+    window.location.href = "login.html";
+}

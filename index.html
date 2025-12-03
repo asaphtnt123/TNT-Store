@@ -42,7 +42,7 @@
             </div>
             
             <div class="header-actions">
-                <button class="admin-btn" onclick="goToAdminPage()">
+                <button class="admin-btn" onclick="openLoginModal()">
                     <i class="fas fa-cog"></i>
                     <span>Painel ADM</span>
                 </button>
@@ -329,7 +329,47 @@
     <span id="counter">0</span> visitantes
 </div>
 
-
+<!-- Adicione este código no final do <body> do seu site -->
+<div id="adminLoginModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 99999; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 40px; border-radius: 20px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <i class="fas fa-lock fa-3x mb-3" style="color: #667eea;"></i>
+            <h3 style="margin: 0; color: #2d3748;">Acesso Administrativo</h3>
+            <small style="color: #718096;">Digite suas credenciais de administrador</small>
+        </div>
+        
+        <div id="loginMessage" style="display: none; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;"></div>
+        
+        <form id="adminLoginForm" onsubmit="event.preventDefault(); adminLogin();">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 600;">Usuário</label>
+                <input type="text" id="adminUsername" 
+                       style="width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; transition: all 0.3s; box-sizing: border-box;"
+                       placeholder="Digite seu usuário"
+                       required>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 600;">Senha</label>
+                <input type="password" id="adminPassword" 
+                       style="width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; transition: all 0.3s; box-sizing: border-box;"
+                       placeholder="Digite sua senha"
+                       required>
+            </div>
+            
+            <button type="submit" 
+                    style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                <i class="fas fa-sign-in-alt me-2"></i>Entrar
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="closeLoginModal()" style="background: none; border: none; color: #718096; cursor: pointer; font-size: 14px;">
+                <i class="fas fa-times me-2"></i>Cancelar
+            </button>
+        </div>
+    </div>
+</div>
 
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
