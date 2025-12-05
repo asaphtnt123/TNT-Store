@@ -980,13 +980,15 @@ function showProductDetails(productId) {
                             </div>
                         </div>
                         
-                        ${product.description ? `
-                            <div class="product-description-section">
-                                <h4>Descrição</h4>
-                                <p class="product-description-text">${product.description}</p>
-                            </div>
-                        ` : '<p class="no-description">Este produto não possui descrição.</p>'}
-                        
+                       ${product.description ? `
+    <div class="product-description-section">
+        <h4><i class="fas fa-gem"></i> Detalhes da Joia</h4>
+        <div class="product-description-text jewelry-description">
+            ${formatJewelryDescription(product.description)}
+        </div>
+    </div>
+` : '<p class="no-description">Este produto não possui descrição.</p>'}
+
                         <div class="product-detail-actions">
                             <div class="quantity-selector">
                                 <label for="detailQuantity">Quantidade:</label>
@@ -1027,6 +1029,90 @@ function showProductDetails(productId) {
     console.log('✅ Modal de detalhes aberto');
 }
 
+
+// Adicione emojis automáticos baseados em palavras-chave
+function addJewelryEmojis(text) {
+    const emojiKeywords = {
+        'diamante|diamantes': '💎',
+        'ouro': '🟡',
+        'prata': '⚪',
+        'anel|aliança': '💍',
+        'colar|gargantilha': '📿',
+        'brinco': '🔗',
+        'pulseira|bracelete': '📿',
+        'relógio': '⌚',
+        'presente|presentear': '🎁',
+        'luxo|exclusivo': '👑',
+        'garantia|certificado': '📜',
+        'entrega|frete': '🚚'
+    };
+    
+    let result = text;
+    
+    Object.keys(emojiKeywords).forEach(keyword => {
+        const regex = new RegExp(`\\b(${keyword})\\b`, 'gi');
+        result = result.replace(regex, `${emojiKeywords[keyword]} $1`);
+    });
+    
+    return result;
+}
+// ===== FORMATADOR DE DESCRIÇÃO PARA JOIAS =====
+function formatJewelryDescription(description) {
+    if (!description) return '';
+    
+    let formatted = description;
+    
+    // 1. Substituir quebras de linha por <br> ou <p>
+    formatted = formatted.replace(/\n/g, '<br>');
+    
+    // 2. Detectar e formatar listas
+    // Para listas com marcadores como *, -, •, ✓
+    formatted = formatted.replace(/(\*|\-|\•|\✓)\s+(.+?)(?=\n|$)/g, 
+        '<li><span class="jewelry-list-icon">•</span>$2</li>');
+    
+    // 3. Envolver parágrafos em <p>
+    const paragraphs = formatted.split('<br><br>');
+    formatted = paragraphs.map(p => {
+        if (p.trim()) {
+            // Se parece com uma lista, manter como está
+            if (p.includes('<li>')) {
+                return `<ul class="jewelry-features-list">${p}</ul>`;
+            }
+            return `<p class="jewelry-paragraph">${p}</p>`;
+        }
+        return '';
+    }).join('');
+    
+    // 4. Formatar títulos dentro da descrição
+    formatted = formatted.replace(/\[(.*?)\]/g, 
+        '<h4 class="jewelry-subtitle">$1</h4>');
+    
+    // 5. Destacar especificações técnicas
+    const techTerms = ['ouro', 'prata', 'quilate', 'ct', 'gramas', 'g', 'cm', 'mm', 'diamante', 'rubi', 'esmeralda', 'safira', 'pérola'];
+    techTerms.forEach(term => {
+        const regex = new RegExp(`\\b(${term}s?|${term.toUpperCase()}S?)\\b`, 'gi');
+        formatted = formatted.replace(regex, '<strong class="tech-term">$1</strong>');
+    });
+    
+    // 6. Adicionar emojis para características especiais
+    const emojiMap = {
+        'brilhante|brilho|brilha': '✨',
+        'luxo|luxuoso|sofisticado': '👑',
+        'presente|presentear|presenteável': '🎁',
+        'exclusivo|exclusividade|limitado': '⭐',
+        'garantia|certificado|autenticidade': '🏅',
+        'entrega grátis|frete grátis': '🚚',
+        'promoção|ofertas|desconto': '💎'
+    };
+    
+    Object.keys(emojiMap).forEach(pattern => {
+        const regex = new RegExp(`\\b(${pattern})\\b`, 'gi');
+        formatted = formatted.replace(regex, 
+            (match, p1) => `${emojiMap[pattern]} ${match} ${emojiMap[pattern]}`);
+    });
+    
+    return formatted;
+}
 function closeProductModal() {
     console.log('❌ Fechando modal de detalhes');
     const modal = document.getElementById('productModal');

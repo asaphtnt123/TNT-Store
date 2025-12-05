@@ -2,12 +2,61 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Atacadão dos Revendedores - Joias e Acessórios com Preços Imbatíveis">
-    <meta property="og:title" content="Atacadão dos Revendedores - Sua Loja de Joias Online">
-    <meta property="og:image" content="https://exemplo.com/logo-social.jpg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     
-    <title>Atacadão dos Revendedores - Joias & Acessórios</title>
+    <!-- Título Principal Otimizado -->
+    <title>Quero'Luxo Joias | Joias e Semi-Joias Importadas - Prata 925 e Banhadas a Ouro 18K</title>
+    
+    <!-- Meta Description Emocional + Comercial -->
+    <meta name="description" content="✨ Joias e Semi-joias importadas que celebram sua beleza única. Prata 925, peças banhadas a Ouro 18K, luxo acessível para mulheres que merecem brilhar. Entrega em todo Brasil.">
+    
+    <!-- Palavras-chave para nicho feminino -->
+    <meta name="keywords" content="joias importadas, semi-joias, prata 925, joias banhadas ouro 18k, joias femininas, colares, anéis, brincos, pulseiras, acessórios femininos, joias delicadas, joias elegantes, presentes para ela">
+    
+    <!-- Open Graph com apelo feminino -->
+    <meta property="og:title" content="Quero'Luxo Joias - Cada mulher é preciosa ✨">
+    <meta property="og:description" content="Joias importadas que celebram sua essência. Prata 925 e banhadas a Ouro 18K. Luxo acessível para mulheres que brilham.">
+    <meta property="og:image" content="https://queroluxo.com.br/assets/images/og-joias-femininas.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://queroluxo.com.br">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Quero'Luxo Joias">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Quero'Luxo Joias - Brilhe com nossas peças importadas">
+    <meta name="twitter:description" content="Joias e semi-joias importadas em Prata 925 e banhadas a Ouro 18K">
+    <meta name="twitter:image" content="https://queroluxo.com.br/assets/images/twitter-joias.jpg">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://queroluxo.com.br">
+    
+    <!-- Schema Markup para E-commerce de Joias (CRÍTICO) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "JewelryStore",
+        "name": "Quero'Luxo Joias",
+        "image": "https://queroluxo.com.br/logo.jpg",
+        "description": "Joias e semi-joias importadas em Prata 925 e banhadas a Ouro 18K",
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "BR"
+        },
+        "priceRange": "R$25-R$200",
+        "telephone": "+55-19-99624-9702",
+        "openingHours": "Mo-Fr 09:00-18:00",
+        "url": "https://queroluxo.com.br"
+    }
+    </script>
+    
+    <!-- Preload para fontes e imagens críticas -->
+    <link rel="preload" href="/assets/fonts/elegant.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <title>Quero'Luxo - Joias & Semi joias Importadas</title>
     
     <!-- Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -281,11 +330,10 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>Atacadão dos Revendedores</h4>
+                    <h4>Quero'Luxo</h4>
                     <p>Melhores preços em joias, Alta Qualidade com Garantia</p>
                     <div class="contact-info">
-                        <p><i class="fas fa-map-marker-alt"></i> Rua Italo Avancini, 123 - Itapira, SP</p>
-                        <p><i class="fas fa-phone"></i> (19) 9999-28467</p>
+                        <p><i class="fas fa-phone"></i> (19) 99624-9702</p>
                     </div>
                 </div>
                 
@@ -299,14 +347,7 @@
                     </div>
                 </div>
                 
-                <div class="footer-section">
-                    <h4>Categorias</h4>
-                    <div class="footer-links">
-                        <a href="#" onclick="loadCategory('ProdutosCat5')">Joias</a>
-                        <a href="#" onclick="loadCategory('ProdutosCat1')">Acessórios</a>
-                        <a href="#" onclick="loadCategory('ProdutosCat4')">Roupa</a>
-                    </div>
-                </div>
+               
             </div>
             
             <div class="footer-bottom">
@@ -370,6 +411,10 @@
         </div>
     </div>
 </div>
+
+<!-- Páginação -->
+<div id="pageInfo" class="pagination-info"></div>
+<div id="paginationContainer" class="pagination-container"></div>
 
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>

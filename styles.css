@@ -2420,3 +2420,105 @@ p { margin-bottom: var(--space-md); }
         flex: 1;
     }
 }
+
+/* ===== ESTILOS PARA DESCRIÇÃO DE JOIAS ===== */
+.product-description-section {
+    margin: 25px 0;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.product-description-section h4 {
+    color: #b8860b; /* Dourado */
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.jewelry-description {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #555;
+}
+
+.jewelry-paragraph {
+    margin-bottom: 15px;
+    text-align: justify;
+}
+
+.jewelry-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+}
+
+.jewelry-features-list li {
+    padding: 8px 0;
+    padding-left: 25px;
+    position: relative;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.jewelry-features-list li:last-child {
+    border-bottom: none;
+}
+
+.jewelry-list-icon {
+    position: absolute;
+    left: 0;
+    color: #d4af37; /* Dourado */
+    font-weight: bold;
+}
+
+.jewelry-subtitle {
+    color: #a67c52; /* Marrom dourado */
+    font-size: 1.1rem;
+    margin: 20px 0 10px 0;
+    font-weight: 600;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #f5e6d3;
+}
+
+.tech-term {
+    color: #8b7355;
+    background-color: #fffaf0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+/* Destaques especiais */
+.jewelry-description strong {
+    color: #b8860b;
+}
+
+/* Emojis e ícones */
+.jewelry-description .fas {
+    color: #d4af37;
+    margin-right: 8px;
+}
+
+/* Box de informações importantes */
+.jewelry-info-box {
+    background: linear-gradient(135deg, #fffaf0 0%, #fff5e6 100%);
+    border-left: 4px solid #d4af37;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.1);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .jewelry-description {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    .product-description-section h4 {
+        font-size: 1.2rem;
+    }
+}
