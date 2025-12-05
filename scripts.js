@@ -31,6 +31,20 @@ const STATE = {
     detailQuantity: 1
 };
 
+// No início do seu arquivo, adicione estas variáveis ao STATE
+STATE.pagination = {
+    currentPage: 1,
+    itemsPerPage: 10,
+    totalItems: 0,
+    hasMore: true,
+    lastVisible: null, // Para paginação com Firestore
+    loading: false
+};
+
+// Adicione no início do arquivo, após as constantes
+let lastClickTime = 0;
+const CLICK_DELAY = 500; // 500ms entre cliques
+
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
@@ -137,6 +151,7 @@ async function loadInitialData() {
         throw error;
     }
 }
+
 // ===== CARREGAR CONFIGURAÇÕES DA LOJA =====
 async function loadStoreConfig() {
     try {
@@ -226,29 +241,148 @@ async function createDefaultCategories() {
         throw error;
     }
 }
-
-async function loadProducts(categoryId = null) {
+async function loadProducts(categoryId = null, loadMore = false) {
     try {
+        // Evitar múltiplos carregamentos
+        if (STATE.pagination.loading) {
+            console.log('⚠️ Já está carregando, aguarde...');
+            return;
+        }
+        
+        STATE.pagination.loading = true;
+        
+        // Reset para nova categoria ou primeira carga
+        if (!loadMore) {
+            STATE.pagination.currentPage = 1;
+            STATE.pagination.lastVisible = null;
+            STATE.pagination.hasMore = true;
+            STATE.products = [];
+        } else {
+            console.log(`⬇️ Carregando página ${STATE.pagination.currentPage + 1}...`);
+        }
+        
+        // Construir query
         let query = db.collection('products').orderBy('createdAt', 'desc');
         
         if (categoryId) {
             query = query.where('categoryId', '==', categoryId);
         }
         
-        const snapshot = await query.limit(10).get();
-        STATE.products = snapshot.docs.map(doc => ({
+        // Para paginação, usar limit + 1 para verificar se há mais
+        const limit = STATE.pagination.itemsPerPage;
+        query = query.limit(loadMore ? limit : limit + 1);
+        
+        // Usar cursor para paginação
+        if (loadMore && STATE.pagination.lastVisible) {
+            query = query.startAfter(STATE.pagination.lastVisible);
+        }
+        
+        const snapshot = await query.get();
+        
+        if (snapshot.empty) {
+            console.log('📭 Nenhum produto encontrado');
+            STATE.pagination.hasMore = false;
+            
+            if (!loadMore) {
+                // Mostrar estado vazio apenas na primeira carga
+                showEmptyState();
+            }
+            
+            return;
+        }
+        
+        const docs = snapshot.docs;
+        console.log(`✅ ${docs.length} documentos recebidos`);
+        
+        // Verificar se há mais produtos
+        STATE.pagination.hasMore = !loadMore ? docs.length > limit : docs.length === limit;
+        
+        // Pegar apenas os produtos necessários
+        const productsToAdd = !loadMore && docs.length > limit 
+            ? docs.slice(0, limit) 
+            : docs;
+        
+        // Atualizar lastVisible para próxima página
+        if (productsToAdd.length > 0) {
+            STATE.pagination.lastVisible = productsToAdd[productsToAdd.length - 1];
+        }
+        
+        // Converter documentos para produtos
+        const newProducts = productsToAdd.map(doc => ({
             id: doc.id,
             ...doc.data()
         }));
-
-        cacheData('products', STATE.products);
-        displayProducts();
-        console.log(`📦 ${STATE.products.length} produtos carregados`);
+        
+        console.log(`🎁 Adicionando ${newProducts.length} novos produtos`);
+        
+        // Adicionar aos produtos existentes ou substituir
+        if (loadMore) {
+            STATE.products = [...STATE.products, ...newProducts];
+            STATE.pagination.currentPage++;
+        } else {
+            STATE.products = newProducts;
+        }
+        
+        // Atualizar contagem
+        STATE.pagination.totalItems = STATE.products.length;
+        
+        console.log(`📊 Total de produtos: ${STATE.products.length}`);
+        console.log(`➡️ Há mais produtos? ${STATE.pagination.hasMore}`);
+        
+        // Exibir produtos com paginação
+        displayProductsWithPagination(STATE.products);
+        
+        // Marcar que não é mais carga inicial
+        STATE.pagination.isInitialLoad = false;
         
     } catch (error) {
-        console.error('Erro ao carregar produtos:', error);
-        throw error;
+        console.error('❌ ERRO ao carregar produtos:', error);
+        showMessage('Erro ao carregar produtos. Tente novamente.', 'error');
+        
+        // Em caso de erro, garantir que hasMore seja false para evitar loops
+        STATE.pagination.hasMore = false;
+        
+    } finally {
+        // IMPORTANTE: Sempre resetar o estado de loading
+        STATE.pagination.loading = false;
+        
+        // Atualizar botão
+        updateLoadMoreButton();
+        console.log('🏁 Estado de loading finalizado');
     }
+}
+
+
+// Função para carregar mais produtos
+async function loadMoreProducts() {
+    console.log('🎯 loadMoreProducts chamado');
+    
+    if (!STATE.pagination.hasMore) {
+        console.log('⏹️ Não há mais produtos para carregar');
+        return;
+    }
+    
+    if (STATE.pagination.loading) {
+        console.log('⏳ Já está carregando...');
+        return;
+    }
+    
+    console.log(`📥 Carregando página ${STATE.pagination.currentPage + 1}...`);
+    await loadProducts(STATE.currentCategory, true);
+}
+
+
+function showEmptyState() {
+    const container = document.getElementById('selectedCategoryProducts');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+            <i class="fas fa-box-open" style="font-size: 48px; color: #ccc; margin-bottom: 20px;"></i>
+            <h3 style="color: #666; margin-bottom: 10px;">Nenhum produto encontrado</h3>
+            <p style="color: #999;">Tente outra categoria ou volte mais tarde</p>
+        </div>
+    `;
 }
 
 // ===== SISTEMA DE CATEGORIAS E SUBCATEGORIAS =====
@@ -274,36 +408,79 @@ function displayCategories() {
 
 async function loadProductsByCategory(categoryId) {
     try {
-        showLoading();
+        console.log(`📂 Carregando categoria: ${categoryId}`);
+        
+        // Reset do estado
+        STATE.pagination.currentPage = 1;
+        STATE.pagination.lastVisible = null;
+        STATE.pagination.hasMore = true;
+        STATE.pagination.loading = false;
+        
         STATE.currentCategory = categoryId;
         STATE.currentSubcategory = null;
         
-        await loadProducts(categoryId);
+        // Limpar container
+        const container = document.getElementById('selectedCategoryProducts');
+        if (container) {
+            container.innerHTML = '';
+        }
         
-        // Mostrar subcategorias se existirem
+        // Carregar produtos
+        await loadProducts(categoryId, false);
+        
+        // Mostrar subcategorias
         displaySubcategories(categoryId);
         
-        // Atualizar botão ativo da categoria
+        // Atualizar botão ativo
         document.querySelectorAll('.category-btn').forEach(btn => {
             btn.classList.remove('active');
-        });
-        
-        // Encontrar e ativar o botão da categoria clicada
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        categoryButtons.forEach(btn => {
             if (btn.onclick && btn.onclick.toString().includes(categoryId)) {
                 btn.classList.add('active');
             }
         });
         
     } catch (error) {
-        console.error('Erro ao carregar produtos da categoria:', error);
+        console.error('❌ Erro ao carregar categoria:', error);
         showMessage('Erro ao carregar produtos.', 'error');
-    } finally {
-        hideLoading();
     }
 }
 
+async function loadAllSubcategoryProducts(categoryId) {
+    try {
+        console.log(`📂 Carregando TODOS da categoria: ${categoryId}`);
+        
+        // Reset do estado
+        STATE.pagination.currentPage = 1;
+        STATE.pagination.lastVisible = null;
+        STATE.pagination.hasMore = true;
+        STATE.pagination.loading = false;
+        
+        STATE.currentSubcategory = null;
+        
+        await loadProducts(categoryId, false);
+        
+        // Atualizar título
+        const category = STATE.categories.find(cat => cat.id === categoryId);
+        const title = document.getElementById('categoryTitle');
+        if (title && category) {
+            title.textContent = category.name;
+        }
+        
+        // Atualizar botões ativos
+        document.querySelectorAll('.subcategory-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        const allButtons = document.querySelectorAll('.subcategory-btn');
+        if (allButtons.length > 0) {
+            allButtons[0].classList.add('active');
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar todos:', error);
+        showMessage('Erro ao carregar produtos.', 'error');
+    }
+}
 function displaySubcategories(categoryId) {
     const category = STATE.categories.find(cat => cat.id === categoryId);
     const subcategoryNav = document.getElementById('subcategoryNav');
@@ -329,38 +506,6 @@ function displaySubcategories(categoryId) {
     `;
 }
 
-async function loadAllSubcategoryProducts(categoryId) {
-    try {
-        showLoading();
-        STATE.currentSubcategory = null;
-        await loadProducts(categoryId);
-        
-        // Atualizar título
-        const category = STATE.categories.find(cat => cat.id === categoryId);
-        const title = document.getElementById('categoryTitle');
-        if (title && category) {
-            title.textContent = category.name;
-        }
-        
-        // Atualizar botões ativos
-        document.querySelectorAll('.subcategory-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        // Ativar botão "Todos"
-        const allButtons = document.querySelectorAll('.subcategory-btn');
-        if (allButtons.length > 0) {
-            allButtons[0].classList.add('active');
-        }
-        
-    } catch (error) {
-        console.error('Erro ao carregar todos os produtos:', error);
-        showMessage('Erro ao carregar produtos.', 'error');
-    } finally {
-        hideLoading();
-    }
-}
-
 async function loadProductsBySubcategory(categoryId, subcategory) {
     try {
         showLoading();
@@ -368,9 +513,9 @@ async function loadProductsBySubcategory(categoryId, subcategory) {
         STATE.currentSubcategory = subcategory;
         
         // Primeiro carrega todos os produtos da categoria
-        await loadProducts(categoryId);
+        await loadProducts(categoryId, false);
         
-        // Depois filtra pela subcategoria no JavaScript
+        // Depois filtra pela subcategoria
         if (STATE.products.length > 0) {
             const filteredProducts = STATE.products.filter(product => 
                 product.subcategory === subcategory
@@ -383,7 +528,6 @@ async function loadProductsBySubcategory(categoryId, subcategory) {
             btn.classList.remove('active');
         });
         
-        // Ativar o botão da subcategoria clicada
         const subcategoryButtons = document.querySelectorAll('.subcategory-btn');
         subcategoryButtons.forEach(btn => {
             if (btn.textContent.includes(subcategory)) {
@@ -394,8 +538,6 @@ async function loadProductsBySubcategory(categoryId, subcategory) {
     } catch (error) {
         console.error('Erro ao carregar produtos da subcategoria:', error);
         showMessage('Erro ao carregar produtos.', 'error');
-    } finally {
-        hideLoading();
     }
 }
 
@@ -421,9 +563,10 @@ function displayFilteredProducts(products, subcategory) {
         return;
     }
 
+    // Limpar container e mostrar apenas os produtos filtrados
+    container.innerHTML = '';
     displayProductsList(products);
 }
-
 function displayProducts() {
     const container = document.getElementById('selectedCategoryProducts');
     const title = document.getElementById('categoryTitle');
@@ -453,13 +596,25 @@ function displayProducts() {
     displayProductsList(STATE.products);
 }
 
-
-
 function displayProductsList(products) {
     const container = document.getElementById('selectedCategoryProducts');
     if (!container) return;
 
-    container.innerHTML = products.map(product => {
+    // Limpar apenas na primeira página
+    if (STATE.pagination.currentPage === 1) {
+        container.innerHTML = '';
+    }
+
+    // Se não há produtos, mostrar estado vazio
+    if (!products || products.length === 0) {
+        if (STATE.pagination.currentPage === 1) {
+            showEmptyState();
+        }
+        return;
+    }
+
+    // Gerar HTML dos produtos
+    const productsHTML = products.map(product => {
         const category = STATE.categories.find(cat => cat.id === product.categoryId);
         const isOutOfStock = product.stock <= 0;
         
@@ -491,17 +646,79 @@ function displayProductsList(products) {
                         <button class="btn-secondary" onclick="showProductDetails('${product.id}')">
                             <i class="fas fa-eye"></i> Detalhes
                         </button>
-                       <button class="btn-primary" 
-        onclick="addToCartWithTracking('${product.id}')" 
-        ${isOutOfStock ? 'disabled' : ''}>
-    <i class="fas fa-shopping-bag"></i> 
-    ${isOutOfStock ? 'Esgotado' : 'Comprar'}
-</button>
+                        <button class="btn-primary" 
+                                onclick="addToCart('${product.id}')" 
+                                ${isOutOfStock ? 'disabled' : ''}>
+                            <i class="fas fa-shopping-bag"></i> 
+                            ${isOutOfStock ? 'Esgotado' : 'Comprar'}
+                        </button>
                     </div>
                 </div>
             </div>
         `;
     }).join('');
+    
+    // Adicionar produtos ao container
+    container.insertAdjacentHTML('beforeend', productsHTML);
+    
+    // Adicionar/atualizar botão de carregar mais
+    updateLoadMoreUI();
+}
+
+// Nova função para atualizar a UI de carregar mais
+function updateLoadMoreUI() {
+    const container = document.getElementById('selectedCategoryProducts');
+    if (!container) return;
+    
+    // Remover botão existente
+    const existingButton = document.getElementById('loadMoreBtn');
+    const existingContainer = document.getElementById('loadMoreContainer');
+    const existingEnd = document.querySelector('.pagination-end');
+    
+    if (existingButton) existingButton.remove();
+    if (existingContainer) existingContainer.remove();
+    if (existingEnd) existingEnd.remove();
+    
+    // Verificar se deve mostrar botão
+    if (STATE.pagination.hasMore && STATE.products.length > 0) {
+        const loadMoreHTML = `
+            <div class="load-more-container" id="loadMoreContainer" style="grid-column: 1 / -1; text-align: center; margin: 40px 0;">
+                <button id="loadMoreBtn" class="load-more-btn" 
+                        onclick="loadMoreProducts()"
+                        ${STATE.pagination.loading ? 'disabled' : ''}
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                               color: white; border: none; padding: 12px 30px; 
+                               border-radius: 25px; font-size: 14px; cursor: pointer; 
+                               transition: all 0.3s ease; display: inline-flex; 
+                               align-items: center; gap: 8px;">
+                    <i class="fas fa-sync-alt ${STATE.pagination.loading ? 'fa-spin' : ''}"></i>
+                    ${STATE.pagination.loading ? 'Carregando...' : 'Carregar mais produtos'}
+                </button>
+                <div class="pagination-info" style="margin-top: 10px; color: #666; font-size: 12px;">
+                    Mostrando ${STATE.products.length} produtos
+                    ${STATE.pagination.hasMore ? ' (há mais para carregar)' : ''}
+                </div>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', loadMoreHTML);
+        
+    } else if (STATE.products.length > 0) {
+        // Mostrar mensagem de fim
+        const endHTML = `
+            <div class="pagination-end" style="grid-column: 1 / -1; text-align: center; 
+                    padding: 30px; color: #28a745; background: #f8f9fa; 
+                    border-radius: 10px; margin: 20px 0;">
+                <i class="fas fa-check-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                <p style="margin: 0; font-weight: 500;">Todos os produtos carregados</p>
+                <p class="pagination-total" style="margin: 5px 0 0 0; font-size: 13px; color: #666;">
+                    Total: ${STATE.products.length} produtos
+                </p>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', endHTML);
+    }
 }
 
 // ===== PRODUTOS EXCLUSIVOS E EM DESTAQUE =====
@@ -1155,7 +1372,8 @@ function decreaseDetailQuantity() {
         STATE.detailQuantity = newValue;
     }
 }
-// ===== ADICIONAR AO CARRINHO DO MODAL DE DETALHES COM TRACKING =====
+
+// ===== ADICIONAR AO CARRINHO DO MODAL (SEM SUBTRAIR ESTOQUE) =====
 function addToCartFromDetail(productId) {
     console.log('🛒 Adicionando ao carrinho do modal:', productId);
     
@@ -1201,9 +1419,10 @@ function addToCartFromDetail(productId) {
             showMessage(`Você pode adicionar no máximo ${available} unidades.`, 'warning');
             return;
         }
-        // Incrementar quantidade
+        // Incrementar quantidade NO CARRINHO apenas
         existingItem.quantity += quantity;
-        console.log('➕ Quantidade incrementada:', product.name, 'Nova quantidade:', existingItem.quantity);
+        console.log('➕ Quantidade incrementada no carrinho:', product.name, 
+                   'Nova quantidade no carrinho:', existingItem.quantity);
     } else {
         // Adicionar novo item ao carrinho
         STATE.cart.push({
@@ -1211,23 +1430,17 @@ function addToCartFromDetail(productId) {
             name: product.name,
             price: product.price,
             imageURL: product.imageURL,
-            stock: product.stock,
+            stock: product.stock, // Armazena o estoque atual
             quantity: quantity,
             cartId: generateId()
         });
-        console.log('🆕 Novo produto adicionado ao carrinho:', product.name);
+        console.log('🆕 Novo produto adicionado ao carrinho:', product.name, 
+                   'Quantidade:', quantity, 'Estoque disponível:', product.stock);
     }
 
-    // Atualizar estoque localmente (opcional, se quiser refletir imediatamente)
-    // product.stock -= quantity;
+    // NÃO subtrair do estoque local
+    // O estoque só será atualizado na finalização da compra
     
-    // Registrar múltiplos cliques de tracking (um para cada unidade)
-    for (let i = 0; i < quantity; i++) {
-        trackPurchaseClick(productId).catch(error => {
-            console.warn('Aviso: Tracking falhou:', error);
-        });
-    }
-
     // Atualizar interface do carrinho
     updateCartUI();
     
@@ -1242,9 +1455,9 @@ function addToCartFromDetail(productId) {
     cacheData('shoppingCart', STATE.cart);
     
     // Fechar o modal após adicionar (opcional)
-    // setTimeout(() => {
-    //     closeProductModal();
-    // }, 1500);
+     setTimeout(() => {
+         closeProductModal();
+     }, 1500);
 }
 
 // Função auxiliar para obter o ID do produto atual no modal
@@ -1428,9 +1641,36 @@ function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
+// Funções de loading melhoradas
 function showLoading() {
-    document.body.classList.add('loading');
+    const container = document.getElementById('selectedCategoryProducts');
+    if (!container) return;
+    
+    // Apenas mostrar loading na primeira página
+    if (STATE.pagination.currentPage === 1) {
+        container.innerHTML = `
+            <div class="loading-container" style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+                <div class="loading-spinner" style="width: 40px; height: 40px; border: 3px solid #f3f3f3;
+                    border-top: 3px solid #667eea; border-radius: 50%; margin: 0 auto 20px;
+                    animation: spin 1s linear infinite;"></div>
+                <p style="color: #666;">Carregando produtos...</p>
+            </div>
+        `;
+    }
 }
+
+function hideLoading() {
+    // Remove qualquer elemento de loading
+    const loadingElements = document.querySelectorAll('.loading-container, .loading-spinner');
+    loadingElements.forEach(el => {
+        if (el.parentNode) {
+            el.parentNode.removeChild(el);
+        }
+    });
+}
+
+
+document.head.appendChild(style);
 
 function hideLoading() {
     document.body.classList.remove('loading');
@@ -1477,6 +1717,8 @@ function goToAdminPage() {
 const style = document.createElement('style');
 style.textContent = `
     /* ===== SUBCATEGORIAS ===== */
+
+
     .subcategory-nav {
         background: var(--gray-50);
         padding: 20px 0;
@@ -1607,22 +1849,30 @@ style.textContent = `
         background: var(--gray-400);
         cursor: not-allowed;
     }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .fa-spin {
+        animation: fa-spin 1s linear infinite;
+    }
+    
+    @keyframes fa-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 `;
 document.head.appendChild(style);
-// ===== CARRINHO DE COMPRAS COM TRACKING INTEGRADO =====
-let lastClickTime = 0;
-const CLICK_DELAY = 500; // 500ms entre cliques
 
+
+
+
+
+// ===== CARRINHO DE COMPRAS (SEM SUBTRAIR ESTOQUE) =====
 function addToCart(productId) {
-    // Prevenir cliques rápidos duplicados
-    const now = Date.now();
-    if (now - lastClickTime < CLICK_DELAY) {
-        console.log('⏳ Aguarde antes de clicar novamente');
-        return;
-    }
-    lastClickTime = now;
-    
-    console.log('🛒 Tentando adicionar produto ao carrinho:', productId);
+    console.log('🛒 Adicionando produto ao carrinho:', productId);
     
     // Encontrar o produto na lista de produtos
     const product = STATE.products.find(p => p.id === productId);
@@ -1644,15 +1894,17 @@ function addToCart(productId) {
     const existingItem = STATE.cart.find(item => item.id === productId);
     
     if (existingItem) {
-        // Verificar se não excede o estoque
+        // Verificar se não excede o estoque disponível
         if (existingItem.quantity >= product.stock) {
             console.log('📦 Quantidade máxima em estoque atingida:', product.name);
             showMessage('Quantidade máxima em estoque atingida.', 'warning');
             return;
         }
-        // Incrementar quantidade
+        // Incrementar quantidade NO CARRINHO apenas
         existingItem.quantity++;
-        console.log('➕ Quantidade incrementada:', product.name, 'Nova quantidade:', existingItem.quantity);
+        console.log('➕ Quantidade incrementada no carrinho:', product.name, 
+                   'Quantidade no carrinho:', existingItem.quantity, 
+                   'Estoque disponível:', product.stock);
     } else {
         // Adicionar novo item ao carrinho
         STATE.cart.push({
@@ -1660,18 +1912,17 @@ function addToCart(productId) {
             name: product.name,
             price: product.price,
             imageURL: product.imageURL,
-            stock: product.stock,
+            stock: product.stock, // Armazena o estoque atual para referência
             quantity: 1,
-            cartId: generateId() // ID único para o item no carrinho
+            cartId: generateId()
         });
-        console.log('🆕 Novo produto adicionado ao carrinho:', product.name);
+        console.log('🆕 Novo produto adicionado ao carrinho:', product.name, 
+                   'Estoque disponível:', product.stock);
     }
 
-    // Registrar o clique para estatísticas (não-bloqueante)
-    trackPurchaseClick(productId).catch(error => {
-        console.warn('Aviso: Tracking falhou:', error);
-    });
-
+    // NÃO subtrair do estoque local
+    // O estoque só será subtraído na finalização da compra
+    
     // Atualizar interface do carrinho
     updateCartUI();
     
@@ -1680,6 +1931,11 @@ function addToCart(productId) {
     
     // Salvar carrinho no localStorage
     cacheData('shoppingCart', STATE.cart);
+    
+    // Abrir carrinho automaticamente (opcional)
+     if (!STATE.isCartOpen) {
+         toggleCart();
+     }
 }
 
 // Remova a função addToCartWithTracking se não for mais necessária
@@ -3927,178 +4183,311 @@ function adminLogout() {
 
 
 
-// ===== BOTÃO DIAMANTE SUSPENSO =====
+// ===== BOTÃO DIAMANTE - JAVASCRIPT SIMPLES =====
 
-// Inicializar botão diamante
-function initFloatingDiamond() {
-    const diamondBtn = document.getElementById('floatingDiamondBtn');
-    
-    if (!diamondBtn) {
-        console.error('Botão diamante não encontrado');
-        return;
+// Criar botão se não existir
+function createDiamondButton() {
+    if (document.getElementById('diamondTopBtn')) {
+        return; // Já existe
     }
     
-    // Mostrar/ocultar baseado no scroll
-    window.addEventListener('scroll', function() {
-        toggleFloatingDiamond();
-    });
+    const buttonHTML = `
+        <button id="diamondTopBtn" class="diamond-top-btn" aria-label="Voltar ao topo" title="Clique para voltar ao topo">
+            <div class="diamond-container">
+                <div class="diamond-pendant">
+                    <div class="pendant-chain">
+                        <div class="chain-segment"></div>
+                        <div class="chain-segment"></div>
+                        <div class="chain-segment"></div>
+                    </div>
+                    <div class="diamond-gem">
+                        <div class="diamond-facet df-1"></div>
+                        <div class="diamond-facet df-2"></div>
+                        <div class="diamond-facet df-3"></div>
+                        <div class="diamond-facet df-4"></div>
+                        <div class="diamond-core"></div>
+                    </div>
+                    <div class="sparkle s1"></div>
+                    <div class="sparkle s2"></div>
+                    <div class="sparkle s3"></div>
+                </div>
+                <div class="pendant-shadow"></div>
+            </div>
+        </button>
+    `;
     
-    // Adicionar clique suave
-    diamondBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        scrollToTopWithDiamondEffect();
-    });
-    
-    // Verificar estado inicial
-    toggleFloatingDiamond();
-    
-    // Adicionar efeito de clique
-    diamondBtn.addEventListener('mousedown', function() {
-        this.classList.add('clicked');
-    });
-    
-    diamondBtn.addEventListener('mouseup', function() {
-        setTimeout(() => {
-            this.classList.remove('clicked');
-        }, 600);
-    });
-    
-    diamondBtn.addEventListener('mouseleave', function() {
-        this.classList.remove('clicked');
-    });
+    // Adicionar ao body
+    document.body.insertAdjacentHTML('beforeend', buttonHTML);
+    console.log('✅ Botão diamante criado');
 }
 
-// Mostrar/ocultar diamante
-function toggleFloatingDiamond() {
-    const diamondBtn = document.getElementById('floatingDiamondBtn');
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+// Inicializar botão
+function initDiamondButton() {
+    // Criar botão
+    createDiamondButton();
     
-    if (scrollTop > 500) {
-        diamondBtn.classList.add('visible');
-    } else {
-        diamondBtn.classList.remove('visible');
-    }
-}
-
-// Scroll com efeito especial
-function scrollToTopWithDiamondEffect() {
-    const diamondBtn = document.getElementById('floatingDiamondBtn');
-    
-    // Efeito visual de clique
-    diamondBtn.classList.add('clicked');
-    
-    // Efeito de partículas (opcional)
-    createDiamondParticles();
-    
-    // Scroll suave para o topo
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
-    
-    // Remover classe após animação
-    setTimeout(() => {
-        diamondBtn.classList.remove('clicked');
-    }, 600);
-    
-    // Efeito sonoro opcional
-    playCrystalSound();
-}
-
-// Criar partículas de brilho (efeito opcional)
-function createDiamondParticles() {
-    const diamondBtn = document.getElementById('floatingDiamondBtn');
+    const diamondBtn = document.getElementById('diamondTopBtn');
     if (!diamondBtn) return;
     
-    const rect = diamondBtn.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+    // Controlar visibilidade com scroll
+    window.addEventListener('scroll', function() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > 400) {
+            diamondBtn.classList.add('visible');
+        } else {
+            diamondBtn.classList.remove('visible');
+        }
+    });
     
-    // Criar 10 partículas
-    for (let i = 0; i < 10; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'diamond-particle';
+    // Ação de clique
+    diamondBtn.addEventListener('click', function(e) {
+        e.preventDefault();
         
-        // Posição inicial
-        particle.style.left = centerX + 'px';
-        particle.style.top = centerY + 'px';
+        // Efeito visual
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            this.style.transform = '';
+        }, 200);
         
-        // Tamanho aleatório
-        const size = Math.random() * 6 + 3;
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
+        // Scroll suave para o topo
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
         
-        // Cor e efeitos
-        particle.style.background = 'rgba(255, 255, 255, 0.9)';
-        particle.style.borderRadius = '50%';
-        particle.style.position = 'fixed';
-        particle.style.pointerEvents = 'none';
-        particle.style.zIndex = '9998';
-        particle.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.8)';
+        // Criar efeito de partículas
+        createSparkleEffect(this);
+    });
+    
+    // Mostrar inicialmente se já scrolled
+    setTimeout(() => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        if (scrollTop > 400) {
+            diamondBtn.classList.add('visible');
+        }
+    }, 100);
+}
+
+// Efeito de partículas
+function createSparkleEffect(button) {
+    const rect = button.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height - 30;
+    
+    for (let i = 0; i < 6; i++) {
+        const spark = document.createElement('div');
+        spark.style.cssText = `
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            left: ${centerX}px;
+            top: ${centerY}px;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+        `;
         
-        // Adicionar ao body
-        document.body.appendChild(particle);
+        document.body.appendChild(spark);
         
         // Animação
         const angle = Math.random() * Math.PI * 2;
-        const distance = Math.random() * 100 + 50;
-        const duration = Math.random() * 800 + 400;
+        const distance = Math.random() * 40 + 30;
         
-        particle.animate([
+        spark.animate([
             {
-                transform: `translate(0, 0) scale(1)`,
+                transform: 'translate(0, 0) scale(1)',
                 opacity: 1
             },
             {
-                transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`,
+                transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance - 40}px) scale(0)`,
                 opacity: 0
             }
         ], {
-            duration: duration,
-            easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)'
+            duration: 600,
+            easing: 'ease-out'
         });
         
         // Remover após animação
         setTimeout(() => {
-            if (particle.parentNode) {
-                particle.parentNode.removeChild(particle);
+            if (spark.parentNode) {
+                spark.parentNode.removeChild(spark);
             }
-        }, duration);
+        }, 600);
     }
 }
 
-// Efeito sonoro de cristal (opcional)
-function playCrystalSound() {
-    try {
-        // Criar áudio sintetizado para efeito de cristal
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        // Configurar som de cristal
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(1567.98, audioContext.currentTime); // Sol#6
-        oscillator.frequency.exponentialRampToValueAtTime(2093.00, audioContext.currentTime + 0.2); // Dó7
-        
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.5);
-        
-    } catch (error) {
-        console.log('Efeito sonoro não disponível');
+// Função de debug
+function debugDiamondButton() {
+    const btn = document.getElementById('diamondTopBtn');
+    
+    if (!btn) {
+        console.log('❌ Botão não encontrado. Criando...');
+        createDiamondButton();
+        return;
+    }
+    
+    console.log('✅ Botão encontrado!');
+    console.log('📍 Posição:', btn.getBoundingClientRect());
+    
+    // Adicionar estilo de debug
+    btn.classList.add('debug');
+    
+    // Remover debug após 5 segundos
+    setTimeout(() => {
+        btn.classList.remove('debug');
+    }, 5000);
+}
+
+// Inicializar quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', initDiamondButton);
+
+// Se já estiver carregado, inicializar
+if (document.readyState === 'complete') {
+    initDiamondButton();
+}
+
+// Exportar para uso global
+window.debugDiamondButton = debugDiamondButton;
+window.initDiamondButton = initDiamondButton;
+
+
+
+
+
+// ===== FUNÇÕES DE PAGINAÇÃO COMPLETAS =====
+
+// Função para atualizar o botão "Carregar mais"
+function updateLoadMoreButton() {
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (!loadMoreBtn) return;
+    
+    loadMoreBtn.disabled = STATE.pagination.loading;
+    
+    const icon = loadMoreBtn.querySelector('i');
+    if (icon) {
+        if (STATE.pagination.loading) {
+            icon.classList.add('fa-spin');
+        } else {
+            icon.classList.remove('fa-spin');
+        }
+    }
+    
+    loadMoreBtn.innerHTML = `
+        <i class="fas fa-sync-alt ${STATE.pagination.loading ? 'fa-spin' : ''}"></i>
+        ${STATE.pagination.loading ? 'Carregando...' : 'Carregar mais produtos'}
+    `;
+    
+    // Atualizar contador
+    const infoElement = loadMoreBtn.parentElement?.querySelector('.pagination-info');
+    if (infoElement) {
+        infoElement.textContent = `Mostrando ${STATE.products.length} produtos`;
     }
 }
 
+// Função para adicionar botão "Carregar mais" (versão simplificada)
+function addLoadMoreButton() {
+    const container = document.getElementById('selectedCategoryProducts');
+    if (!container) return;
+    
+    // Remover botões existentes
+    const existingBtn = document.getElementById('loadMoreBtn');
+    const existingContainer = document.getElementById('loadMoreContainer');
+    if (existingBtn) existingBtn.remove();
+    if (existingContainer) existingContainer.remove();
+    
+    // Adicionar botão apenas se houver mais produtos
+    if (STATE.pagination.hasMore && STATE.products.length > 0) {
+        const loadMoreHTML = `
+            <div class="load-more-container" id="loadMoreContainer" style="grid-column: 1 / -1; text-align: center; margin: 40px 0;">
+                <button id="loadMoreBtn" class="load-more-btn" onclick="loadMoreProducts()">
+                    <i class="fas fa-sync-alt"></i>
+                    Carregar mais produtos
+                </button>
+                <div class="pagination-info" style="margin-top: 10px; color: #666; font-size: 12px;">
+                    Mostrando ${STATE.products.length} produtos
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', loadMoreHTML);
+        updateLoadMoreButton();
+    }
+}
 
-// Inicializar quando DOM carregar
-document.addEventListener('DOMContentLoaded', initFloatingDiamond);
-
-// Inicialização alternativa para SPAs
-if (typeof STATE !== 'undefined') {
-    setTimeout(initFloatingDiamond, 1000);
+// Função para exibir produtos com paginação
+function displayProductsWithPagination(products) {
+    const container = document.getElementById('selectedCategoryProducts');
+    if (!container) return;
+    
+    // Limpar apenas na primeira página
+    if (STATE.pagination.currentPage === 1) {
+        container.innerHTML = '';
+    }
+    
+    // Se não há produtos, mostrar mensagem
+    if (!products || products.length === 0) {
+        if (STATE.pagination.currentPage === 1) {
+            container.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+                    <i class="fas fa-box-open" style="font-size: 48px; color: #ccc; margin-bottom: 20px;"></i>
+                    <h3 style="color: #666; margin-bottom: 10px;">Nenhum produto encontrado</h3>
+                    <p style="color: #999;">Tente outra categoria ou volte mais tarde</p>
+                </div>
+            `;
+        }
+        return;
+    }
+    
+    // Gerar HTML dos produtos
+    const productsHTML = products.map(product => {
+        const category = STATE.categories.find(cat => cat.id === product.categoryId);
+        const isOutOfStock = product.stock <= 0;
+        
+        return `
+            <div class="product-card" data-product-id="${product.id}">
+                <img src="${product.imageURL || 'https://via.placeholder.com/300x300?text=Produto'}" 
+                     alt="${product.name}" 
+                     class="product-image"
+                     onerror="this.src='https://via.placeholder.com/300x300?text=Imagem+Não+Encontrada'"
+                     onclick="showProductDetails('${product.id}')">
+                
+                <div class="product-info">
+                    <h3 class="product-title">${product.name}</h3>
+                    <div class="product-price">R$ ${formatPrice(product.price)}</div>
+                    
+                    ${product.description ? `
+                        <p class="product-description">${product.description.substring(0, 100)}...</p>
+                    ` : ''}
+                    
+                    <div class="product-meta">
+                        <span class="product-category">${category?.name || 'Geral'}</span>
+                        ${product.subcategory ? `<span class="product-subcategory">${product.subcategory}</span>` : ''}
+                        <span class="product-stock ${isOutOfStock ? 'out-of-stock' : 'in-stock'}">
+                            ${isOutOfStock ? 'Esgotado' : `${product.stock} em estoque`}
+                        </span>
+                    </div>
+                    
+                    <div class="product-actions">
+                        <button class="btn-secondary" onclick="showProductDetails('${product.id}')">
+                            <i class="fas fa-eye"></i> Detalhes
+                        </button>
+                        <button class="btn-primary" 
+                                onclick="addToCart('${product.id}')" 
+                                ${isOutOfStock ? 'disabled' : ''}>
+                            <i class="fas fa-shopping-bag"></i> 
+                            ${isOutOfStock ? 'Esgotado' : 'Comprar'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Adicionar produtos ao container
+    container.insertAdjacentHTML('beforeend', productsHTML);
+    
+    // Adicionar botão "Carregar mais"
+    addLoadMoreButton();
 }

@@ -2522,95 +2522,94 @@ p { margin-bottom: var(--space-md); }
         font-size: 1.2rem;
     }
 }
+/* ===== BOTÃO DIAMANTE SUSPENSO - PERFEITAMENTE ALINHADO ===== */
 
-
-
-/* ===== BOTÃO DIAMANTE SUSPENSO ===== */
-.floating-diamond-btn {
+/* Container principal - SEMPRE no canto inferior ESQUERDO */
+.diamond-top-btn {
     position: fixed;
     bottom: 40px;
-    right: 100;
-    width: 80px;
-    height: 120px; /* Mais alto para incluir a corrente */
+    left: 40px;
+    width: 70px;
+    height: 110px;
     background: transparent;
     border: none;
     cursor: pointer;
     z-index: 9999;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
     overflow: visible;
 }
 
-.floating-diamond-btn.visible {
+/* Visível quando mostra */
+.diamond-top-btn.visible {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
 }
 
-.floating-diamond-btn:hover {
-    transform: translateY(-5px);
-}
-
-.floating-diamond-btn:active {
-    transform: translateY(2px);
-    transition: transform 0.1s;
-}
-
-/* Container do diamante */
-.diamond-wrapper {
+/* Container interno */
+.diamond-container {
     position: relative;
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-end;
 }
 
-/* Corrente de suspensão */
-.diamond-chain {
+/* Pêndulo completo (corrente + diamante) */
+.diamond-pendant {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* CORRENTE - Alinhada centralmente */
+.pendant-chain {
     position: absolute;
     top: 0;
     width: 2px;
     height: 60px;
     background: linear-gradient(to bottom,
-        rgba(255, 255, 255, 0.8) 0%,
-        rgba(200, 200, 200, 0.6) 30%,
-        rgba(150, 150, 150, 0.4) 70%,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(220, 220, 220, 0.7) 30%,
+        rgba(180, 180, 180, 0.5) 70%,
         transparent 100%
     );
     z-index: 1;
 }
 
-.chain-link {
+/* Segmentos da corrente - centralizados */
+.chain-segment {
     position: absolute;
+    left: -3px;
     width: 8px;
     height: 8px;
-    background: #c0c0c0;
+    background: linear-gradient(135deg, #e0e0e0, #c0c0c0);
     border-radius: 50%;
     box-shadow: 
-        0 0 5px rgba(255, 255, 255, 0.5),
-        inset 0 1px 2px rgba(0, 0, 0, 0.3);
+        0 1px 3px rgba(0, 0, 0, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
-.chain-link:nth-child(1) {
-    top: 15px;
-    left: -3px;
-}
+.chain-segment:nth-child(1) { top: 10px; }
+.chain-segment:nth-child(2) { top: 30px; }
+.chain-segment:nth-child(3) { top: 50px; }
 
-.chain-link:nth-child(2) {
-    top: 30px;
-    left: -3px;
-}
-
-.chain-link:nth-child(3) {
-    top: 45px;
-    left: -3px;
-}
-
-/* Diamante principal */
-.diamond-main {
+/* DIAMANTE - Centralizado e perfeitamente alinhado */
+.diamond-gem {
     position: absolute;
     bottom: 0;
     width: 60px;
@@ -2618,87 +2617,72 @@ p { margin-bottom: var(--space-md); }
     transform: rotate(45deg);
     background: linear-gradient(135deg,
         rgba(255, 255, 255, 0.95) 0%,
-        rgba(230, 230, 255, 0.9) 25%,
-        rgba(200, 220, 255, 0.85) 50%,
-        rgba(180, 210, 255, 0.8) 75%,
-        rgba(160, 200, 255, 0.75) 100%
+        rgba(240, 240, 255, 0.85) 25%,
+        rgba(220, 230, 255, 0.75) 50%,
+        rgba(200, 220, 255, 0.65) 75%,
+        rgba(180, 210, 255, 0.55) 100%
     );
+    border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow: 
-        0 10px 30px rgba(0, 100, 255, 0.3),
-        0 5px 15px rgba(255, 255, 255, 0.5) inset,
-        0 0 0 1px rgba(255, 255, 255, 0.8);
+        0 5px 20px rgba(0, 100, 255, 0.3),
+        inset 0 0 20px rgba(255, 255, 255, 0.6),
+        0 0 30px rgba(100, 150, 255, 0.2);
     z-index: 2;
-    transition: all 0.5s ease;
-    overflow: hidden;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s ease;
 }
 
-.floating-diamond-btn:hover .diamond-main {
-    transform: rotate(45deg) scale(1.1);
-    box-shadow: 
-        0 15px 40px rgba(0, 100, 255, 0.5),
-        0 8px 20px rgba(255, 255, 255, 0.7) inset,
-        0 0 0 2px rgba(255, 255, 255, 0.9);
-    animation: diamond-spin 3s linear infinite;
-}
-
-/* Facetas do diamante */
+/* Facetas do diamante - centralizadas */
 .diamond-facet {
     position: absolute;
     background: rgba(255, 255, 255, 0.6);
     clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
 }
 
-.facet-1 {
-    top: 10%;
-    left: 10%;
-    width: 30px;
-    height: 30px;
-    animation: facet-shine-1 4s linear infinite;
-}
-
-.facet-2 {
-    top: 10%;
-    right: 10%;
+.df-1 {
     width: 25px;
     height: 25px;
-    animation: facet-shine-2 5s linear infinite;
+    animation: facet-shine-1 4s ease-in-out infinite;
 }
 
-.facet-3 {
-    bottom: 10%;
-    left: 10%;
+.df-2 {
     width: 20px;
     height: 20px;
-    animation: facet-shine-3 6s linear infinite;
+    animation: facet-shine-2 5s ease-in-out infinite 0.5s;
 }
 
-.facet-4 {
-    bottom: 10%;
-    right: 10%;
+.df-3 {
     width: 15px;
     height: 15px;
-    animation: facet-shine-4 7s linear infinite;
+    animation: facet-shine-3 6s ease-in-out infinite 1s;
+}
+
+.df-4 {
+    width: 10px;
+    height: 10px;
+    animation: facet-shine-4 7s ease-in-out infinite 1.5s;
 }
 
 /* Centro do diamante */
-.diamond-center {
+.diamond-core {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 15px;
-    height: 15px;
+    width: 12px;
+    height: 12px;
     background: radial-gradient(circle,
         rgba(255, 255, 255, 1) 0%,
         rgba(200, 220, 255, 0.8) 50%,
-        transparent 70%
+        transparent 100%
     );
     border-radius: 50%;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+    z-index: 3;
 }
 
-/* Brilhos do diamante */
-.diamond-sparkle {
+/* Brilhos flutuantes */
+.sparkle {
     position: absolute;
     background: rgba(255, 255, 255, 0.9);
     border-radius: 50%;
@@ -2706,257 +2690,353 @@ p { margin-bottom: var(--space-md); }
     z-index: 3;
 }
 
-.sparkle-1 {
-    width: 6px;
-    height: 6px;
-    top: 15px;
-    right: 10px;
+.s1 {
+    width: 5px;
+    height: 5px;
+    top: 20px;
+    right: 15px;
     animation: sparkle-float-1 3s ease-in-out infinite;
 }
 
-.sparkle-2 {
+.s2 {
     width: 4px;
     height: 4px;
-    bottom: 25px;
-    left: 15px;
+    top: 40px;
+    left: 10px;
     animation: sparkle-float-2 4s ease-in-out infinite 0.5s;
 }
 
-.sparkle-3 {
-    width: 5px;
-    height: 5px;
-    top: 40px;
-    right: 20px;
+.s3 {
+    width: 6px;
+    height: 6px;
+    top: 60px;
+    right: 5px;
     animation: sparkle-float-3 5s ease-in-out infinite 1s;
 }
 
-/* Sombra do diamante */
-.diamond-shadow {
+/* Sombra do pêndulo */
+.pendant-shadow {
     position: absolute;
-    bottom: -10px;
-    width: 70px;
-    height: 20px;
+    bottom: -8px;
+    width: 65px;
+    height: 15px;
     background: radial-gradient(ellipse at center,
-        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.25) 0%,
         rgba(0, 0, 0, 0.1) 50%,
         transparent 70%
     );
-    filter: blur(5px);
+    filter: blur(4px);
     z-index: 1;
+    opacity: 0.7;
     transition: all 0.3s ease;
 }
 
-.floating-diamond-btn:hover .diamond-shadow {
-    width: 80px;
-    height: 25px;
-    filter: blur(8px);
-    opacity: 0.4;
+/* ===== EFEITOS DE HOVER ===== */
+.diamond-top-btn:hover {
+    transform: translateY(-5px);
 }
 
-/* Reflexo na parede */
-.wall-reflection {
-    position: absolute;
-    top: 0;
-    right: -15px;
-    width: 30px;
-    height: 100%;
-    background: linear-gradient(to right,
-        rgba(255, 255, 255, 0.05) 0%,
-        rgba(255, 255, 255, 0.02) 50%,
-        transparent 100%
-    );
-    transform: skewX(-10deg);
-    z-index: 0;
+.diamond-top-btn:hover .diamond-gem {
+    transform: rotate(45deg) scale(1.1);
+    box-shadow: 
+        0 10px 30px rgba(0, 100, 255, 0.5),
+        inset 0 0 30px rgba(255, 255, 255, 0.8),
+        0 0 40px rgba(100, 150, 255, 0.4);
 }
 
-/* Animações */
-@keyframes diamond-spin {
-    0% {
-        transform: rotate(45deg) scale(1.1);
-    }
-    100% {
-        transform: rotate(405deg) scale(1.1);
-    }
+.diamond-top-btn:hover .pendant-shadow {
+    width: 75px;
+    height: 20px;
+    opacity: 0.9;
+    filter: blur(6px);
 }
 
+/* ===== ANIMAÇÕES ===== */
+
+/* Brilho das facetas */
 @keyframes facet-shine-1 {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
-}
-
-@keyframes facet-shine-2 {
     0%, 100% { opacity: 0.5; }
     50% { opacity: 0.9; }
 }
 
-@keyframes facet-shine-3 {
+@keyframes facet-shine-2 {
     0%, 100% { opacity: 0.4; }
     50% { opacity: 0.8; }
 }
 
-@keyframes facet-shine-4 {
+@keyframes facet-shine-3 {
     0%, 100% { opacity: 0.3; }
     50% { opacity: 0.7; }
 }
 
+@keyframes facet-shine-4 {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.6; }
+}
+
+/* Brilhos flutuantes */
 @keyframes sparkle-float-1 {
-    0%, 100% {
-        transform: translate(0, 0);
-        opacity: 0;
-    }
-    25% {
-        transform: translate(-5px, -5px);
-        opacity: 1;
-    }
-    50% {
-        transform: translate(5px, -10px);
-        opacity: 0.5;
-    }
-    75% {
-        transform: translate(-5px, -5px);
-        opacity: 0.8;
-    }
+    0%, 100% { transform: translate(0, 0); opacity: 0; }
+    50% { transform: translate(-3px, -5px); opacity: 1; }
 }
 
 @keyframes sparkle-float-2 {
-    0%, 100% {
-        transform: translate(0, 0);
-        opacity: 0;
-    }
-    25% {
-        transform: translate(3px, -8px);
-        opacity: 0.7;
-    }
-    50% {
-        transform: translate(-3px, -12px);
-        opacity: 0.3;
-    }
-    75% {
-        transform: translate(3px, -8px);
-        opacity: 0.6;
-    }
+    0%, 100% { transform: translate(0, 0); opacity: 0; }
+    50% { transform: translate(4px, -8px); opacity: 0.8; }
 }
 
 @keyframes sparkle-float-3 {
-    0%, 100% {
-        transform: translate(0, 0);
-        opacity: 0;
-    }
-    25% {
-        transform: translate(-8px, 3px);
-        opacity: 0.8;
-    }
-    50% {
-        transform: translate(8px, 6px);
-        opacity: 0.4;
-    }
-    75% {
-        transform: translate(-8px, 3px);
-        opacity: 0.9;
-    }
+    0%, 100% { transform: translate(0, 0); opacity: 0; }
+    50% { transform: translate(-5px, -10px); opacity: 0.9; }
 }
 
-/* Efeito de balanço suave */
+/* Balanço suave */
 @keyframes gentle-swing {
-    0%, 100% {
-        transform: translateY(0) rotate(0);
-    }
-    25% {
-        transform: translateY(-2px) rotate(1deg);
-    }
-    75% {
-        transform: translateY(2px) rotate(-1deg);
-    }
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(3px); }
 }
 
-.floating-diamond-btn.visible .diamond-main {
-    animation: gentle-swing 6s ease-in-out infinite;
+.diamond-top-btn.visible .diamond-gem {
+    animation: gentle-swing 8s ease-in-out infinite;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-    .floating-diamond-btn {
-        bottom: 30px;
-        right: 30px;
-        width: 60px;
+/* ===== RESPONSIVIDADE - SEMPRE LADO ESQUERDO ===== */
+
+/* Tablets */
+@media (max-width: 1024px) {
+    .diamond-top-btn {
+        bottom: 35px;
+        left: 35px;
+        width: 65px;
         height: 100px;
     }
     
-    .diamond-main {
+    .diamond-gem {
+        width: 55px;
+        height: 55px;
+    }
+    
+    .pendant-chain {
+        height: 55px;
+    }
+    
+    .chain-segment:nth-child(3) { top: 45px; }
+}
+
+/* Tablets pequenos */
+@media (max-width: 768px) {
+    .diamond-top-btn {
+        bottom: 30px;
+        left: 30px;
+        width: 60px;
+        height: 95px;
+    }
+    
+    .diamond-gem {
         width: 50px;
         height: 50px;
     }
     
-    .facet-1 { width: 25px; height: 25px; }
-    .facet-2 { width: 20px; height: 20px; }
-    .facet-3 { width: 15px; height: 15px; }
-    .facet-4 { width: 12px; height: 12px; }
+    .df-1 { width: 22px; height: 22px; }
+    .df-2 { width: 18px; height: 18px; }
+    .df-3 { width: 14px; height: 14px; }
+    .df-4 { width: 10px; height: 10px; }
     
-    .diamond-chain {
+    .pendant-chain {
         height: 50px;
+    }
+    
+    .chain-segment:nth-child(2) { top: 25px; }
+    .chain-segment:nth-child(3) { top: 40px; }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .diamond-top-btn {
+        bottom: 25px;
+        left: 25px;
+        width: 55px;
+        height: 85px;
+    }
+    
+    .diamond-gem {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .df-1 { width: 20px; height: 20px; }
+    .df-2 { width: 16px; height: 16px; }
+    .df-3 { width: 12px; height: 12px; }
+    .df-4 { width: 8px; height: 8px; }
+    
+    .pendant-chain {
+        height: 45px;
+    }
+    
+    .chain-segment {
+        width: 7px;
+        height: 7px;
+        left: -2.5px;
+    }
+    
+    .chain-segment:nth-child(1) { top: 8px; }
+    .chain-segment:nth-child(2) { top: 23px; }
+    .chain-segment:nth-child(3) { top: 38px; }
+    
+    .pendant-shadow {
+        width: 50px;
+        height: 12px;
     }
 }
 
-@media (max-width: 480px) {
-    .floating-diamond-btn {
+/* Mobile muito pequeno */
+@media (max-width: 360px) {
+    .diamond-top-btn {
         bottom: 20px;
-        right: 20px;
+        left: 20px;
         width: 50px;
         height: 80px;
     }
     
-    .diamond-main {
+    .diamond-gem {
         width: 40px;
         height: 40px;
     }
     
-    .facet-1 { width: 20px; height: 20px; }
-    .facet-2 { width: 15px; height: 15px; }
-    .facet-3 { width: 12px; height: 12px; }
-    .facet-4 { width: 10px; height: 10px; }
-    
-    .diamond-chain {
+    .pendant-chain {
         height: 40px;
     }
+    
+    .chain-segment:nth-child(3) { top: 35px; }
 }
 
-/* Modo escuro */
-@media (prefers-color-scheme: dark) {
-    .diamond-main {
-        background: linear-gradient(135deg,
-            rgba(255, 255, 255, 0.9) 0%,
-            rgba(180, 200, 255, 0.8) 25%,
-            rgba(150, 180, 255, 0.7) 50%,
-            rgba(120, 160, 255, 0.6) 75%,
-            rgba(100, 140, 255, 0.5) 100%
-        );
-        box-shadow: 
-            0 10px 30px rgba(0, 80, 255, 0.4),
-            0 5px 15px rgba(255, 255, 255, 0.3) inset,
-            0 0 0 1px rgba(255, 255, 255, 0.6);
+/* ===== ESTILOS PARA DEBUG (REMOVER DEPOIS) ===== */
+.diamond-top-btn.debug {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+    border: 2px dashed red !important;
+    background: rgba(255, 0, 0, 0.1) !important;
+}
+
+.diamond-top-btn.debug .diamond-gem {
+    border: 2px solid blue !important;
+}
+
+.diamond-top-btn.debug .pendant-chain {
+    background: green !important;
+}
+
+
+/* ===== ESTILOS DE PAGINAÇÃO ===== */
+.load-more-container {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin: 40px 0;
+    padding: 20px;
+    border-top: 1px solid #eee;
+}
+
+.load-more-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.load-more-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.load-more-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.load-more-btn .fa-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.pagination-info {
+    margin-top: 10px;
+    color: #666;
+    font-size: 14px;
+}
+
+.pagination-end {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px;
+    color: #28a745;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.pagination-end i {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.pagination-total {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Loading skeleton para os produtos */
+.product-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 8px;
+    height: 300px;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Grid responsivo para produtos */
+#selectedCategoryProducts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    padding: 20px 0;
+}
+
+@media (max-width: 768px) {
+    #selectedCategoryProducts {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    #selectedCategoryProducts {
+        grid-template-columns: 1fr;
+        gap: 15px;
     }
     
-    .diamond-chain {
-        background: linear-gradient(to bottom,
-            rgba(255, 255, 255, 0.6) 0%,
-            rgba(180, 180, 180, 0.4) 30%,
-            rgba(120, 120, 120, 0.2) 70%,
-            transparent 100%
-        );
+    .load-more-btn {
+        padding: 12px 24px;
+        font-size: 14px;
+        width: 100%;
     }
-    
-    .chain-link {
-        background: #a0a0a0;
-    }
-}
-
-/* Efeito de clique */
-.floating-diamond-btn.clicked .diamond-main {
-    animation: diamond-click 0.6s ease;
-}
-
-@keyframes diamond-click {
-    0% { transform: rotate(45deg) scale(1); }
-    50% { transform: rotate(45deg) scale(0.9); }
-    100% { transform: rotate(45deg) scale(1); }
 }
