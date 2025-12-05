@@ -1579,7 +1579,7 @@ p { margin-bottom: var(--space-md); }
 /* ===== WHATSAPP FLOAT ===== */
 .whatsapp-float {
   position: fixed;
-  bottom: var(--space-xl);
+  bottom: 50px;
   right: var(--space-xl);
   z-index: 100;
 }
@@ -1662,7 +1662,7 @@ p { margin-bottom: var(--space-md); }
   }
   
   .whatsapp-float {
-    bottom: var(--space-lg);
+      bottom: 50px;
     right: var(--space-lg);
   }
 }
@@ -2246,7 +2246,7 @@ p { margin-bottom: var(--space-md); }
 }
 
 .search-results {
-    position: absolute;
+    position: relative;
     top: 100%;
     left: 0;
     right: 0;
@@ -2521,4 +2521,442 @@ p { margin-bottom: var(--space-md); }
     .product-description-section h4 {
         font-size: 1.2rem;
     }
+}
+
+
+
+/* ===== BOTÃO DIAMANTE SUSPENSO ===== */
+.floating-diamond-btn {
+    position: fixed;
+    bottom: 40px;
+    right: 100;
+    width: 80px;
+    height: 120px; /* Mais alto para incluir a corrente */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: visible;
+}
+
+.floating-diamond-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.floating-diamond-btn:hover {
+    transform: translateY(-5px);
+}
+
+.floating-diamond-btn:active {
+    transform: translateY(2px);
+    transition: transform 0.1s;
+}
+
+/* Container do diamante */
+.diamond-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Corrente de suspensão */
+.diamond-chain {
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 60px;
+    background: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.8) 0%,
+        rgba(200, 200, 200, 0.6) 30%,
+        rgba(150, 150, 150, 0.4) 70%,
+        transparent 100%
+    );
+    z-index: 1;
+}
+
+.chain-link {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #c0c0c0;
+    border-radius: 50%;
+    box-shadow: 
+        0 0 5px rgba(255, 255, 255, 0.5),
+        inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.chain-link:nth-child(1) {
+    top: 15px;
+    left: -3px;
+}
+
+.chain-link:nth-child(2) {
+    top: 30px;
+    left: -3px;
+}
+
+.chain-link:nth-child(3) {
+    top: 45px;
+    left: -3px;
+}
+
+/* Diamante principal */
+.diamond-main {
+    position: absolute;
+    bottom: 0;
+    width: 60px;
+    height: 60px;
+    transform: rotate(45deg);
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(230, 230, 255, 0.9) 25%,
+        rgba(200, 220, 255, 0.85) 50%,
+        rgba(180, 210, 255, 0.8) 75%,
+        rgba(160, 200, 255, 0.75) 100%
+    );
+    box-shadow: 
+        0 10px 30px rgba(0, 100, 255, 0.3),
+        0 5px 15px rgba(255, 255, 255, 0.5) inset,
+        0 0 0 1px rgba(255, 255, 255, 0.8);
+    z-index: 2;
+    transition: all 0.5s ease;
+    overflow: hidden;
+}
+
+.floating-diamond-btn:hover .diamond-main {
+    transform: rotate(45deg) scale(1.1);
+    box-shadow: 
+        0 15px 40px rgba(0, 100, 255, 0.5),
+        0 8px 20px rgba(255, 255, 255, 0.7) inset,
+        0 0 0 2px rgba(255, 255, 255, 0.9);
+    animation: diamond-spin 3s linear infinite;
+}
+
+/* Facetas do diamante */
+.diamond-facet {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.6);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+.facet-1 {
+    top: 10%;
+    left: 10%;
+    width: 30px;
+    height: 30px;
+    animation: facet-shine-1 4s linear infinite;
+}
+
+.facet-2 {
+    top: 10%;
+    right: 10%;
+    width: 25px;
+    height: 25px;
+    animation: facet-shine-2 5s linear infinite;
+}
+
+.facet-3 {
+    bottom: 10%;
+    left: 10%;
+    width: 20px;
+    height: 20px;
+    animation: facet-shine-3 6s linear infinite;
+}
+
+.facet-4 {
+    bottom: 10%;
+    right: 10%;
+    width: 15px;
+    height: 15px;
+    animation: facet-shine-4 7s linear infinite;
+}
+
+/* Centro do diamante */
+.diamond-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 15px;
+    height: 15px;
+    background: radial-gradient(circle,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(200, 220, 255, 0.8) 50%,
+        transparent 70%
+    );
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+}
+
+/* Brilhos do diamante */
+.diamond-sparkle {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    filter: blur(1px);
+    z-index: 3;
+}
+
+.sparkle-1 {
+    width: 6px;
+    height: 6px;
+    top: 15px;
+    right: 10px;
+    animation: sparkle-float-1 3s ease-in-out infinite;
+}
+
+.sparkle-2 {
+    width: 4px;
+    height: 4px;
+    bottom: 25px;
+    left: 15px;
+    animation: sparkle-float-2 4s ease-in-out infinite 0.5s;
+}
+
+.sparkle-3 {
+    width: 5px;
+    height: 5px;
+    top: 40px;
+    right: 20px;
+    animation: sparkle-float-3 5s ease-in-out infinite 1s;
+}
+
+/* Sombra do diamante */
+.diamond-shadow {
+    position: absolute;
+    bottom: -10px;
+    width: 70px;
+    height: 20px;
+    background: radial-gradient(ellipse at center,
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.1) 50%,
+        transparent 70%
+    );
+    filter: blur(5px);
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.floating-diamond-btn:hover .diamond-shadow {
+    width: 80px;
+    height: 25px;
+    filter: blur(8px);
+    opacity: 0.4;
+}
+
+/* Reflexo na parede */
+.wall-reflection {
+    position: absolute;
+    top: 0;
+    right: -15px;
+    width: 30px;
+    height: 100%;
+    background: linear-gradient(to right,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(255, 255, 255, 0.02) 50%,
+        transparent 100%
+    );
+    transform: skewX(-10deg);
+    z-index: 0;
+}
+
+/* Animações */
+@keyframes diamond-spin {
+    0% {
+        transform: rotate(45deg) scale(1.1);
+    }
+    100% {
+        transform: rotate(405deg) scale(1.1);
+    }
+}
+
+@keyframes facet-shine-1 {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+@keyframes facet-shine-2 {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.9; }
+}
+
+@keyframes facet-shine-3 {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+}
+
+@keyframes facet-shine-4 {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes sparkle-float-1 {
+    0%, 100% {
+        transform: translate(0, 0);
+        opacity: 0;
+    }
+    25% {
+        transform: translate(-5px, -5px);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(5px, -10px);
+        opacity: 0.5;
+    }
+    75% {
+        transform: translate(-5px, -5px);
+        opacity: 0.8;
+    }
+}
+
+@keyframes sparkle-float-2 {
+    0%, 100% {
+        transform: translate(0, 0);
+        opacity: 0;
+    }
+    25% {
+        transform: translate(3px, -8px);
+        opacity: 0.7;
+    }
+    50% {
+        transform: translate(-3px, -12px);
+        opacity: 0.3;
+    }
+    75% {
+        transform: translate(3px, -8px);
+        opacity: 0.6;
+    }
+}
+
+@keyframes sparkle-float-3 {
+    0%, 100% {
+        transform: translate(0, 0);
+        opacity: 0;
+    }
+    25% {
+        transform: translate(-8px, 3px);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translate(8px, 6px);
+        opacity: 0.4;
+    }
+    75% {
+        transform: translate(-8px, 3px);
+        opacity: 0.9;
+    }
+}
+
+/* Efeito de balanço suave */
+@keyframes gentle-swing {
+    0%, 100% {
+        transform: translateY(0) rotate(0);
+    }
+    25% {
+        transform: translateY(-2px) rotate(1deg);
+    }
+    75% {
+        transform: translateY(2px) rotate(-1deg);
+    }
+}
+
+.floating-diamond-btn.visible .diamond-main {
+    animation: gentle-swing 6s ease-in-out infinite;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .floating-diamond-btn {
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 100px;
+    }
+    
+    .diamond-main {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .facet-1 { width: 25px; height: 25px; }
+    .facet-2 { width: 20px; height: 20px; }
+    .facet-3 { width: 15px; height: 15px; }
+    .facet-4 { width: 12px; height: 12px; }
+    
+    .diamond-chain {
+        height: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .floating-diamond-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 80px;
+    }
+    
+    .diamond-main {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .facet-1 { width: 20px; height: 20px; }
+    .facet-2 { width: 15px; height: 15px; }
+    .facet-3 { width: 12px; height: 12px; }
+    .facet-4 { width: 10px; height: 10px; }
+    
+    .diamond-chain {
+        height: 40px;
+    }
+}
+
+/* Modo escuro */
+@media (prefers-color-scheme: dark) {
+    .diamond-main {
+        background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.9) 0%,
+            rgba(180, 200, 255, 0.8) 25%,
+            rgba(150, 180, 255, 0.7) 50%,
+            rgba(120, 160, 255, 0.6) 75%,
+            rgba(100, 140, 255, 0.5) 100%
+        );
+        box-shadow: 
+            0 10px 30px rgba(0, 80, 255, 0.4),
+            0 5px 15px rgba(255, 255, 255, 0.3) inset,
+            0 0 0 1px rgba(255, 255, 255, 0.6);
+    }
+    
+    .diamond-chain {
+        background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.6) 0%,
+            rgba(180, 180, 180, 0.4) 30%,
+            rgba(120, 120, 120, 0.2) 70%,
+            transparent 100%
+        );
+    }
+    
+    .chain-link {
+        background: #a0a0a0;
+    }
+}
+
+/* Efeito de clique */
+.floating-diamond-btn.clicked .diamond-main {
+    animation: diamond-click 0.6s ease;
+}
+
+@keyframes diamond-click {
+    0% { transform: rotate(45deg) scale(1); }
+    50% { transform: rotate(45deg) scale(0.9); }
+    100% { transform: rotate(45deg) scale(1); }
 }

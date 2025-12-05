@@ -453,6 +453,8 @@ function displayProducts() {
     displayProductsList(STATE.products);
 }
 
+
+
 function displayProductsList(products) {
     const container = document.getElementById('selectedCategoryProducts');
     if (!container) return;
@@ -489,11 +491,12 @@ function displayProductsList(products) {
                         <button class="btn-secondary" onclick="showProductDetails('${product.id}')">
                             <i class="fas fa-eye"></i> Detalhes
                         </button>
-                        <button class="btn-primary" onclick="addToCart('${product.id}')" 
-                                ${isOutOfStock ? 'disabled' : ''}>
-                            <i class="fas fa-shopping-bag"></i> 
-                            ${isOutOfStock ? 'Esgotado' : 'Comprar'}
-                        </button>
+                       <button class="btn-primary" 
+        onclick="addToCartWithTracking('${product.id}')" 
+        ${isOutOfStock ? 'disabled' : ''}>
+    <i class="fas fa-shopping-bag"></i> 
+    ${isOutOfStock ? 'Esgotado' : 'Comprar'}
+</button>
                     </div>
                 </div>
             </div>
@@ -1152,38 +1155,57 @@ function decreaseDetailQuantity() {
         STATE.detailQuantity = newValue;
     }
 }
-
+// ===== ADICIONAR AO CARRINHO DO MODAL DE DETALHES COM TRACKING =====
 function addToCartFromDetail(productId) {
+    console.log('🛒 Adicionando ao carrinho do modal:', productId);
+    
+    // Obter quantidade do input
     const quantityInput = document.getElementById('detailQuantity');
     const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
     
-    console.log('🛒 Adicionando do detalhe:', productId, 'Quantidade:', quantity);
+    if (isNaN(quantity) || quantity < 1) {
+        showMessage('Quantidade inválida!', 'error');
+        return;
+    }
     
     const product = STATE.products.find(p => p.id === productId);
     
     if (!product) {
+        console.error('❌ Produto não encontrado:', productId);
         showMessage('Produto não encontrado.', 'error');
         return;
     }
 
+    // Verificar se o produto está em estoque
     if (product.stock <= 0) {
+        console.log('⚠️ Produto fora de estoque:', product.name);
         showMessage('Produto fora de estoque.', 'warning');
         return;
     }
 
     // Verificar se a quantidade solicitada está disponível
-    const existingItem = STATE.cart.find(item => item.id === productId);
-    const totalInCart = existingItem ? existingItem.quantity : 0;
-    
-    if (totalInCart + quantity > product.stock) {
-        showMessage(`Quantidade indisponível. Disponível: ${product.stock - totalInCart} unidades.`, 'warning');
+    if (quantity > product.stock) {
+        console.log('📦 Quantidade excede estoque:', product.name);
+        showMessage(`Apenas ${product.stock} unidades disponíveis.`, 'warning');
         return;
     }
 
-    // Adicionar ao carrinho
+    // Verificar se o produto já está no carrinho
+    const existingItem = STATE.cart.find(item => item.id === productId);
+    
     if (existingItem) {
+        // Verificar se não excede o estoque com a nova quantidade
+        if (existingItem.quantity + quantity > product.stock) {
+            const available = product.stock - existingItem.quantity;
+            console.log('📦 Quantidade máxima em estoque atingida:', product.name);
+            showMessage(`Você pode adicionar no máximo ${available} unidades.`, 'warning');
+            return;
+        }
+        // Incrementar quantidade
         existingItem.quantity += quantity;
+        console.log('➕ Quantidade incrementada:', product.name, 'Nova quantidade:', existingItem.quantity);
     } else {
+        // Adicionar novo item ao carrinho
         STATE.cart.push({
             id: product.id,
             name: product.name,
@@ -1193,16 +1215,36 @@ function addToCartFromDetail(productId) {
             quantity: quantity,
             cartId: generateId()
         });
+        console.log('🆕 Novo produto adicionado ao carrinho:', product.name);
     }
 
+    // Atualizar estoque localmente (opcional, se quiser refletir imediatamente)
+    // product.stock -= quantity;
+    
+    // Registrar múltiplos cliques de tracking (um para cada unidade)
+    for (let i = 0; i < quantity; i++) {
+        trackPurchaseClick(productId).catch(error => {
+            console.warn('Aviso: Tracking falhou:', error);
+        });
+    }
+
+    // Atualizar interface do carrinho
     updateCartUI();
-    showMessage(`✅ ${quantity}x ${product.name} adicionado ao carrinho!`, 'success');
+    
+    // Mostrar mensagem de sucesso
+    if (quantity === 1) {
+        showMessage('✅ ' + product.name + ' adicionado ao carrinho!', 'success');
+    } else {
+        showMessage(`✅ ${quantity} unidades de ${product.name} adicionadas ao carrinho!`, 'success');
+    }
+    
+    // Salvar carrinho no localStorage
     cacheData('shoppingCart', STATE.cart);
     
-    // Fechar modal após adicionar (opcional)
-    setTimeout(() => {
-        closeProductModal();
-    }, 1500);
+    // Fechar o modal após adicionar (opcional)
+    // setTimeout(() => {
+    //     closeProductModal();
+    // }, 1500);
 }
 
 // Função auxiliar para obter o ID do produto atual no modal
@@ -1567,10 +1609,19 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+// ===== CARRINHO DE COMPRAS COM TRACKING INTEGRADO =====
+let lastClickTime = 0;
+const CLICK_DELAY = 500; // 500ms entre cliques
 
-
-// ===== CARRINHO DE COMPRAS =====
 function addToCart(productId) {
+    // Prevenir cliques rápidos duplicados
+    const now = Date.now();
+    if (now - lastClickTime < CLICK_DELAY) {
+        console.log('⏳ Aguarde antes de clicar novamente');
+        return;
+    }
+    lastClickTime = now;
+    
     console.log('🛒 Tentando adicionar produto ao carrinho:', productId);
     
     // Encontrar o produto na lista de produtos
@@ -1616,6 +1667,11 @@ function addToCart(productId) {
         console.log('🆕 Novo produto adicionado ao carrinho:', product.name);
     }
 
+    // Registrar o clique para estatísticas (não-bloqueante)
+    trackPurchaseClick(productId).catch(error => {
+        console.warn('Aviso: Tracking falhou:', error);
+    });
+
     // Atualizar interface do carrinho
     updateCartUI();
     
@@ -1624,11 +1680,157 @@ function addToCart(productId) {
     
     // Salvar carrinho no localStorage
     cacheData('shoppingCart', STATE.cart);
+}
+
+// Remova a função addToCartWithTracking se não for mais necessária
+// ou mantenha-a apenas como um wrapper:
+function addToCartWithTracking(productId) {
+    addToCart(productId);
+}
+
+
+// ===== FUNÇÃO DE TRACKING DE CLICKS NO BOTÃO COMPRAR =====
+async function trackPurchaseClick(productId) {
+    try {
+        // Verificar se o produto existe no STATE
+        const product = STATE.products.find(p => p.id === productId);
+        if (!product) return false;
+        
+        // Dados do clique
+        const clickData = {
+            productId: productId,
+            productName: product.name,
+            price: product.price,
+            category: STATE.categories.find(cat => cat.id === product.categoryId)?.name || 'Geral',
+            timestamp: new Date().toISOString(),
+            sessionId: getSessionId(),
+            userAgent: navigator.userAgent.substring(0, 200), // Limitar tamanho
+            screenSize: `${window.innerWidth}x${window.innerHeight}`,
+            referrer: document.referrer || 'direct'
+        };
+        
+        console.log('📊 Registrando clique no produto:', product.name);
+        
+        // Opção 1: Salvar no LocalStorage (para fallback)
+        saveClickToLocalStorage(clickData);
+        
+        // Opção 2: Enviar para API/Firebase (se configurado)
+        if (window.firebaseConfig) {
+            await sendClickToFirebase(clickData);
+        } else {
+            // Enviar para um endpoint simples
+            await sendClickToAPI(clickData);
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('❌ Erro no tracking:', error);
+        // Não interromper o fluxo de compra em caso de erro no tracking
+        return false;
+    }
+}
+
+// ===== FUNÇÕES AUXILIARES PARA TRACKING =====
+
+// Gerar/obter session ID
+function getSessionId() {
+    let sessionId = localStorage.getItem('userSessionId');
+    if (!sessionId) {
+        sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('userSessionId', sessionId);
+    }
+    return sessionId;
+}
+
+// Salvar no LocalStorage (fallback)
+function saveClickToLocalStorage(clickData) {
+    try {
+        // Obter cliques existentes
+        const clicks = JSON.parse(localStorage.getItem('productClicks') || '[]');
+        
+        // Adicionar novo clique
+        clicks.push({
+            ...clickData,
+            localTimestamp: new Date().getTime()
+        });
+        
+        // Manter apenas os últimos 1000 cliques para não sobrecarregar
+        if (clicks.length > 1000) {
+            clicks.splice(0, clicks.length - 1000);
+        }
+        
+        // Salvar de volta
+        localStorage.setItem('productClicks', JSON.stringify(clicks));
+        
+        // Também salvar contagem por produto
+        updateProductClickCount(clickData.productId, clickData.productName);
+        
+        console.log('📝 Clique salvo localmente:', clickData.productName);
+    } catch (error) {
+        console.error('Erro ao salvar no localStorage:', error);
+    }
+}
+
+// Atualizar contagem por produto no LocalStorage
+function updateProductClickCount(productId, productName) {
+    try {
+        const productStats = JSON.parse(localStorage.getItem('productStats') || '{}');
+        
+        if (!productStats[productId]) {
+            productStats[productId] = {
+                productName: productName,
+                clickCount: 0,
+                firstClick: new Date().toISOString(),
+                lastClick: new Date().toISOString()
+            };
+        }
+        
+        productStats[productId].clickCount++;
+        productStats[productId].lastClick = new Date().toISOString();
+        
+        localStorage.setItem('productStats', JSON.stringify(productStats));
+    } catch (error) {
+        console.error('Erro ao atualizar estatísticas:', error);
+    }
+}
+
+// Enviar para Firebase (se configurado)
+async function sendClickToFirebase(clickData) {
+    // Implementação do Firebase
+    // Descomente se tiver Firebase configurado
+    /*
+    if (!window.firebaseApp) return;
     
-    // Abrir carrinho automaticamente (opcional)
-    // if (!STATE.isCartOpen) {
-    //     toggleCart();
-    // }
+    const db = getFirestore();
+    const clickRef = doc(collection(db, 'productClicks'));
+    
+    await setDoc(clickRef, {
+        ...clickData,
+        serverTimestamp: serverTimestamp()
+    });
+    */
+}
+
+// Enviar para API endpoint
+async function sendClickToAPI(clickData) {
+    try {
+        // Usar Beacon API para envio confiável (não bloqueia navegação)
+        const blob = new Blob([JSON.stringify(clickData)], {type: 'application/json'});
+        
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon('/api/track-click', blob);
+        } else {
+            // Fallback para fetch
+            fetch('/api/track-click', {
+                method: 'POST',
+                body: JSON.stringify(clickData),
+                headers: { 'Content-Type': 'application/json' },
+                keepalive: true // Mantém a requisição mesmo após sair da página
+            });
+        }
+    } catch (error) {
+        console.error('Erro ao enviar para API:', error);
+    }
 }
 
 
@@ -3717,4 +3919,186 @@ function checkAdminSession() {
 function adminLogout() {
     localStorage.removeItem("adminSession");
     window.location.href = "login.html";
+}
+
+
+
+
+
+
+
+// ===== BOTÃO DIAMANTE SUSPENSO =====
+
+// Inicializar botão diamante
+function initFloatingDiamond() {
+    const diamondBtn = document.getElementById('floatingDiamondBtn');
+    
+    if (!diamondBtn) {
+        console.error('Botão diamante não encontrado');
+        return;
+    }
+    
+    // Mostrar/ocultar baseado no scroll
+    window.addEventListener('scroll', function() {
+        toggleFloatingDiamond();
+    });
+    
+    // Adicionar clique suave
+    diamondBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        scrollToTopWithDiamondEffect();
+    });
+    
+    // Verificar estado inicial
+    toggleFloatingDiamond();
+    
+    // Adicionar efeito de clique
+    diamondBtn.addEventListener('mousedown', function() {
+        this.classList.add('clicked');
+    });
+    
+    diamondBtn.addEventListener('mouseup', function() {
+        setTimeout(() => {
+            this.classList.remove('clicked');
+        }, 600);
+    });
+    
+    diamondBtn.addEventListener('mouseleave', function() {
+        this.classList.remove('clicked');
+    });
+}
+
+// Mostrar/ocultar diamante
+function toggleFloatingDiamond() {
+    const diamondBtn = document.getElementById('floatingDiamondBtn');
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    if (scrollTop > 500) {
+        diamondBtn.classList.add('visible');
+    } else {
+        diamondBtn.classList.remove('visible');
+    }
+}
+
+// Scroll com efeito especial
+function scrollToTopWithDiamondEffect() {
+    const diamondBtn = document.getElementById('floatingDiamondBtn');
+    
+    // Efeito visual de clique
+    diamondBtn.classList.add('clicked');
+    
+    // Efeito de partículas (opcional)
+    createDiamondParticles();
+    
+    // Scroll suave para o topo
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+    
+    // Remover classe após animação
+    setTimeout(() => {
+        diamondBtn.classList.remove('clicked');
+    }, 600);
+    
+    // Efeito sonoro opcional
+    playCrystalSound();
+}
+
+// Criar partículas de brilho (efeito opcional)
+function createDiamondParticles() {
+    const diamondBtn = document.getElementById('floatingDiamondBtn');
+    if (!diamondBtn) return;
+    
+    const rect = diamondBtn.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // Criar 10 partículas
+    for (let i = 0; i < 10; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'diamond-particle';
+        
+        // Posição inicial
+        particle.style.left = centerX + 'px';
+        particle.style.top = centerY + 'px';
+        
+        // Tamanho aleatório
+        const size = Math.random() * 6 + 3;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        
+        // Cor e efeitos
+        particle.style.background = 'rgba(255, 255, 255, 0.9)';
+        particle.style.borderRadius = '50%';
+        particle.style.position = 'fixed';
+        particle.style.pointerEvents = 'none';
+        particle.style.zIndex = '9998';
+        particle.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.8)';
+        
+        // Adicionar ao body
+        document.body.appendChild(particle);
+        
+        // Animação
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.random() * 100 + 50;
+        const duration = Math.random() * 800 + 400;
+        
+        particle.animate([
+            {
+                transform: `translate(0, 0) scale(1)`,
+                opacity: 1
+            },
+            {
+                transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`,
+                opacity: 0
+            }
+        ], {
+            duration: duration,
+            easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)'
+        });
+        
+        // Remover após animação
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
+        }, duration);
+    }
+}
+
+// Efeito sonoro de cristal (opcional)
+function playCrystalSound() {
+    try {
+        // Criar áudio sintetizado para efeito de cristal
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // Configurar som de cristal
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(1567.98, audioContext.currentTime); // Sol#6
+        oscillator.frequency.exponentialRampToValueAtTime(2093.00, audioContext.currentTime + 0.2); // Dó7
+        
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+        
+    } catch (error) {
+        console.log('Efeito sonoro não disponível');
+    }
+}
+
+
+// Inicializar quando DOM carregar
+document.addEventListener('DOMContentLoaded', initFloatingDiamond);
+
+// Inicialização alternativa para SPAs
+if (typeof STATE !== 'undefined') {
+    setTimeout(initFloatingDiamond, 1000);
 }
