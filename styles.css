@@ -3040,3 +3040,154 @@ p { margin-bottom: var(--space-md); }
         width: 100%;
     }
 }
+
+/* Links de Categorias */
+.category-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--white);
+    border: 2px solid var(--gray-300);
+    border-radius: 25px;
+    color: var(--gray-700);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    white-space: nowrap;
+    margin: 0 5px 10px 0;
+}
+
+.category-link:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+/* Hero Section */
+.hero-section {
+    padding: 60px 0;
+    text-align: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.hero-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: var(--gray-800);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    color: var(--gray-600);
+    margin-bottom: 30px;
+}
+
+.hero-categories {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 40px;
+}
+
+/* Página de Categoria */
+.category-page {
+    padding: 40px 0;
+}
+
+.breadcrumb {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: var(--gray-600);
+}
+
+.breadcrumb a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.category-header {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.category-header h1 {
+    font-size: 2.2rem;
+    color: var(--gray-800);
+    margin-bottom: 10px;
+}
+
+.category-description {
+    color: var(--gray-600);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.category-filters {
+    background: var(--gray-50);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+
+/* Estilos para a seção de produtos da categoria */
+.category-products {
+    margin: 40px 0;
+    animation: fadeIn 0.5s ease;
+}
+
+.category-products .section-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.category-products .section-header h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.category-products .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .category-products .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+    }
+    
+    .category-products .section-header h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .category-products .products-grid {
+        grid-template-columns: 1fr;
+    }
+}

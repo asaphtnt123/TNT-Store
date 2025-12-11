@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- Mesmo head da index.html -->
+    <title id="pageTitle">Categoria - Quero'Luxo</title>
+    <!-- Copie todo o head da index.html -->
+</head>
+<body>
+    <!-- Header igual ao da index.html -->
+    <header class="main-header">
+        <!-- Mesmo header -->
+    </header>
+
+    <!-- Conteúdo específico da categoria -->
+    <main class="category-page">
+        <div class="container">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="index.html">Home</a>
+                <span>/</span>
+                <span id="currentCategoryName">Categoria</span>
+            </nav>
+
+            <!-- Título da categoria -->
+            <div class="category-header">
+                <h1 id="categoryPageTitle">Categoria</h1>
+                <p id="categoryDescription">Produtos desta categoria</p>
+            </div>
+
+            <!-- Filtros e ordenação -->
+            <div class="category-filters">
+                <!-- Adicione filtros se necessário -->
+            </div>
+
+            <!-- Produtos -->
+            <div class="products-container">
+                <div id="categoryProducts" class="products-grid">
+                    <!-- Produtos carregados via JavaScript -->
+                </div>
+                
+                <!-- Paginação -->
+                <div id="pagination" class="pagination">
+                    <!-- Paginação será gerada aqui -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer igual -->
+    <footer class="main-footer">
+        <!-- Mesmo footer -->
+    </footer>
+
+    <!-- Mesmos scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="../scripts.js"></script>
+    <script>
+        // Script específico para página de categoria
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategoryPage();
+        });
+    </script>
+</body>
+</html>
