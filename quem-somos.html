@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Quem Somos | Quero'Luxo Joias – Luxo Acessível com Qualidade Excepcional</title>
+  <meta name="description" content="Conheça a Quero'Luxo Joias: Semijoias importadas premium. Luxo acessível com materiais de qualidade excepcional - Hipoalergênicos, PVD, Prata 925. Nada de bijuterias baratas.">
+
+  <!-- Fontes & Ícones -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --gold: #c5a45b;
+      --gold-light: #e6d4a8;
+      --ivory: #f9f7f3;
+      --cream: #f5f1ea;
+      --taupe: #e8e4dd;
+      --gray-light: #a0a0a0;
+      --gray-medium: #7a7a7a;
+      --gray-dark: #555555;
+      --charcoal: #2a2a2a;
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 2rem;
+      --spacing-lg: 4rem;
+      --spacing-xl: 6rem;
+      --border-radius: 12px;
+      --shadow-subtle: 0 5px 15px rgba(0, 0, 0, 0.05);
+      --shadow-elevated: 0 15px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--ivory);
+      color: var(--charcoal);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-md);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      padding: var(--spacing-xl) var(--spacing-md);
+      background: linear-gradient(135deg, var(--cream) 0%, var(--ivory) 100%);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23c5a45b' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+      opacity: 0.4;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .logo-circle {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--spacing-md);
+      box-shadow: var(--shadow-elevated);
+    }
+
+    .logo-circle i {
+      font-size: 2.2rem;
+      color: var(--ivory);
+    }
+
+    .hero-content h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.2rem;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: var(--spacing-sm);
+      letter-spacing: -0.5px;
+    }
+
+    .hero-content .highlight {
+      color: var(--gold);
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-content .highlight::after {
+      content: "";
+      position: absolute;
+      bottom: 5px;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background-color: rgba(197, 164, 91, 0.2);
+      z-index: -1;
+    }
+
+    .hero-content p {
+      font-size: 1.15rem;
+      color: var(--gray-dark);
+      margin-bottom: var(--spacing-md);
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Quality Badge */
+    .quality-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 500;
+      margin: var(--spacing-sm) 0;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    /* Cards Section */
+    .cards-section {
+      padding: var(--spacing-xl) 0;
+    }
+
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .card {
+      background-color: white;
+      border-radius: var(--border-radius);
+      padding: var(--spacing-lg);
+      box-shadow: var(--shadow-subtle);
+      transition: all 0.4s ease;
+      border: 1px solid var(--taupe);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--gold), var(--gold-light));
+      transform: scaleY(0);
+      transition: transform 0.4s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-elevated);
+    }
+
+    .card:hover::before {
+      transform: scaleY(1);
+    }
+
+    .card-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--cream) 0%, var(--taupe) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--spacing-md);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover .card-icon {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    }
+
+    .card-icon i {
+      font-size: 1.6rem;
+      color: var(--charcoal);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover .card-icon i {
+      color: var(--ivory);
+    }
+
+    .card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+      color: var(--charcoal);
+    }
+
+    .card p {
+      color: var(--gray-medium);
+      font-size: 0.95rem;
+    }
+
+    /* Materiais Section */
+    .materials-section {
+      padding: var(--spacing-xl) 0;
+      background-color: var(--cream);
+    }
+
+    .materials-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: var(--spacing-md);
+      text-align: center;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background-color: var(--gold);
+    }
+
+    .materials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-lg);
+    }
+
+    .material-item {
+      background: white;
+      padding: var(--spacing-md);
+      border-radius: var(--border-radius);
+      text-align: center;
+      border: 1px solid var(--taupe);
+      transition: all 0.3s ease;
+    }
+
+    .material-item:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-elevated);
+      border-color: var(--gold-light);
+    }
+
+    .material-icon {
+      font-size: 2rem;
+      color: var(--gold);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .material-name {
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .material-desc {
+      font-size: 0.85rem;
+      color: var(--gray-medium);
+      line-height: 1.5;
+    }
+
+    /* Warning Box */
+    .warning-box {
+      background: linear-gradient(135deg, #fff8f8 0%, #ffefef 100%);
+      border-left: 4px solid #ff6b6b;
+      padding: var(--spacing-md);
+      border-radius: var(--border-radius);
+      margin: var(--spacing-lg) 0;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .warning-box h3 {
+      color: #d63031;
+      margin-bottom: var(--spacing-xs);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    /* Stats Section */
+    .stats-section {
+      padding: var(--spacing-lg) 0;
+    }
+
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md);
+      text-align: center;
+    }
+
+    .stat-item {
+      padding: var(--spacing-md);
+    }
+
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .stat-text {
+      font-size: 0.9rem;
+      color: var(--gray-medium);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Manifesto Section */
+    .manifesto-section {
+      padding: var(--spacing-xl) 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .manifesto-container {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .manifesto-text {
+      font-size: 1.1rem;
+      color: var(--gray-dark);
+      line-height: 1.8;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .quote {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      color: var(--charcoal);
+      padding: var(--spacing-md);
+      border-left: 3px solid var(--gold);
+      background-color: rgba(255, 255, 255, 0.7);
+      border-radius: 0 var(--border-radius) var(--border-radius) 0;
+      margin-top: var(--spacing-lg);
+      text-align: left;
+    }
+
+    /* Footer */
+    footer {
+      padding: var(--spacing-lg) var(--spacing-md);
+      text-align: center;
+      border-top: 1px solid var(--taupe);
+      background-color: var(--cream);
+    }
+
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .footer-logo span {
+      color: var(--gold);
+    }
+
+    footer p {
+      font-size: 0.9rem;
+      color: var(--gray-medium);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: var(--spacing-md);
+      margin: var(--spacing-md) 0;
+    }
+
+    .social-link {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--taupe);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--charcoal);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .social-link:hover {
+      background-color: var(--gold);
+      color: var(--ivory);
+      transform: translateY(-3px);
+    }
+
+    /* Responsividade */
+    @media (max-width: 992px) {
+      :root {
+        --spacing-lg: 3rem;
+        --spacing-xl: 4rem;
+      }
+      
+      .hero-content h1 {
+        font-size: 2.8rem;
+      }
+      
+      .section-title {
+        font-size: 2.2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-content h1 {
+        font-size: 2.4rem;
+      }
+      
+      .cards-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .section-title {
+        font-size: 2rem;
+      }
+      
+      .stat-number {
+        font-size: 2rem;
+      }
+      
+      .materials-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 576px) {
+      :root {
+        --spacing-md: 1.5rem;
+        --spacing-lg: 2.5rem;
+      }
+      
+      .hero-content h1 {
+        font-size: 2rem;
+      }
+      
+      .hero-content p {
+        font-size: 1rem;
+      }
+      
+      .card {
+        padding: var(--spacing-md);
+      }
+      
+      .quote {
+        font-size: 1.2rem;
+        padding: var(--spacing-sm);
+      }
+    }
+  </style>
+   <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TJD5YRHVJB"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TJD5YRHVJB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-TJD5YRHVJB');
+</script>
+
+
+</head>
+
+<body>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container hero-content">
+      <div class="logo-circle">
+        <i class="fas fa-gem"></i>
+      </div>
+      <h1>Quem <span class="highlight">Somos</span></h1>
+      <div class="quality-badge">
+        <i class="fas fa-award"></i>
+        Luxo Acessível • Qualidade Excepcional
+      </div>
+      <p>
+        A <strong>Quero'Luxo Joias</strong> nasceu da paixão por oferecer <strong>semijoias importadas premium</strong> com qualidade excepcional. Somos a alternativa sofisticada para quem busca elegância duradoura, sem abrir mão da acessibilidade.
+      </p>
+      <p>
+        <strong>Nossa missão:</strong> Trabalhar exclusivamente com materiais premium que garantem durabilidade, brilho e segurança. Não utilizamos bijuterias baratas de baixa qualidade - nosso compromisso é com a excelência em cada detalhe.
+      </p>
+    </div>
+  </section>
+
+  <!-- Cards Section -->
+  <section class="cards-section">
+    <div class="container">
+      <div class="cards-container">
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-crown"></i>
+          </div>
+          <h2>Luxo Democratizado</h2>
+          <p>
+            Democratizamos o acesso ao luxo através de <strong>semijoias importadas premium</strong>. Oferecemos sofisticação a preços justos, sem comprometer a qualidade. Cada peça é cuidadosamente selecionada para entregar experiência de luxo acessível.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h2>Qualidade Superior</h2>
+          <p>
+            Trabalhamos apenas com materiais <strong>hipoalergênicos e de alta durabilidade</strong>. Nada de cobre, zinco ou aço alloy de baixa qualidade. Cada peça passa por rigoroso controle de qualidade para garantir segurança, conforto e longevidade.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-star"></i>
+          </div>
+          <h2>Materiais Premium</h2>
+          <p>
+            Utilizamos exclusivamente <strong>aço inox 304/316, PVD de alta qualidade, prata 925 e banhos em ouro 18k</strong>. Nossa seleção de materiais é pensada para quem busca durabilidade e brilho que permanecem, não bijuterias descartáveis.
+          </p>
+        </div>
+      </div>
+
+      <!-- Materiais Premium Section -->
+      <div class="materials-section">
+        <h2 class="section-title">Materiais Premium</h2>
+        <p style="text-align: center; color: var(--gray-dark); max-width: 800px; margin: 0 auto var(--spacing-md);">
+          Trabalhamos apenas com os melhores materiais do mercado. Cada escolha é baseada em durabilidade, segurança e beleza duradoura.
+        </p>
+        
+        <div class="materials-grid">
+          <div class="material-item">
+            <div class="material-icon">
+              <i class="fas fa-shield-virus"></i>
+            </div>
+            <div class="material-name">Hipoalergênicos</div>
+            <div class="material-desc">Materiais seguros para peles sensíveis, sem riscos de alergias ou irritações</div>
+          </div>
+          
+          <div class="material-item">
+            <div class="material-icon">
+              <i class="fas fa-sun"></i>
+            </div>
+            <div class="material-name">PVD Quality</div>
+            <div class="material-desc">Revestimento de altíssima qualidade que não descasca com o tempo</div>
+          </div>
+          
+          <div class="material-item">
+            <div class="material-icon">
+              <i class="fas fa-gem"></i>
+            </div>
+            <div class="material-name">Prata 925</div>
+            <div class="material-desc">Prata sterling autêntica para peças de excelência e durabilidade</div>
+          </div>
+          
+          <div class="material-item">
+            <div class="material-icon">
+              <i class="fas fa-crown"></i>
+            </div>
+            <div class="material-name">Ouro 18k</div>
+            <div class="material-desc">Banhos em ouro 18k para brilho intenso e resistência superior</div>
+          </div>
+        </div>
+        
+        <!-- Warning Box -->
+        <div class="warning-box">
+          <h3><i class="fas fa-exclamation-triangle"></i> O que NÃO trabalhamos:</h3>
+          <p style="color: var(--gray-dark); margin-bottom: 0;">
+            <strong>Não utilizamos bijuterias baratas</strong> feitas de cobre, zinco, aço alloy ou outros materiais de baixa qualidade que oxidam, escurecem ou causam alergias. Nosso compromisso é com materiais premium que garantem durabilidade e segurança.
+          </p>
+        </div>
+      </div>
+
+      <!-- Stats Section -->
+      <div class="stats-section">
+        <div class="stats-container">
+          <div class="stat-item">
+            <div class="stat-number">100%</div>
+            <div class="stat-text">Materiais Premium</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">0%</div>
+            <div class="stat-text">Bijuterias Baratas</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">99+</div>
+            <div class="stat-text">Clientes Satisfeitos</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">100+</div>
+            <div class="stat-text">Peças Importadas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Manifesto Section -->
+  <section class="manifesto-section">
+    <div class="container manifesto-container">
+      <h2 class="section-title">Mais que Semijoias, Uma Filosofia</h2>
+      <p class="manifesto-text">
+        Na Quero'Luxo, acreditamos que a verdadeira elegância está na qualidade, não apenas na aparência. Criamos coleções que unem <strong>design sofisticado com materiais premium</strong>, oferecendo uma experiência de luxo acessível que dura.
+      </p>
+      <div class="quote">
+        "Porque luxo de verdade não está na etiqueta, mas na durabilidade do brilho, na segurança do material e na confiança de usar uma peça que permanece bela. Oferecemos semijoias importadas que são investimento, não apenas acessório."
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-logo">Quero'<span>Luxo</span> Joias</div>
+      <p>Semijoias Importadas • Luxo Acessível • Qualidade Premium</p>
+      
+      <div class="social-links">
+        <a href="https://www.instagram.com/queroluxo_joias/" class="social-link" aria-label="Instagram" target="_blank">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61578272981380" class="social-link" aria-label="Facebook" target="_blank">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://wa.me/5519996249702?text=Ola%2C%20Gostaria%20de%20falar%20com%20um%20%20atentende!" class="social-link" aria-label="WhatsApp" target="_blank">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </div>
+      
+      <p>© 2025 Quero'Luxo Joias. Todos os direitos reservados.</p>
+      <p>Com materiais premium - Nada de bijuterias baratas</p>
+    </div>
+  </footer>
+
+</body>
+</html>

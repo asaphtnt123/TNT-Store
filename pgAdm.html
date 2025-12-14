@@ -935,6 +935,20 @@
 }
 
     </style>
+
+     <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TJD5YRHVJB"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TJD5YRHVJB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-TJD5YRHVJB');
+</script>
+
+
 </head>
 <body>
     <div class="admin-container">
@@ -2069,10 +2083,8 @@ async function toggleProductFeature(productId, field, value) {
         showMessage('Erro ao atualizar produto', 'error');
     }
 }
-
-// Atualize a função addProduct para lidar com a subcategoria selecionada
+// ===== ADICIONAR PRODUTO (COM SUPORTE A REVIEWS + SEO) =====
 async function addProduct() {
-    // Obter elementos de forma segura
     const categorySelect = document.getElementById('productCategory');
     const nameInput = document.getElementById('productName');
     const priceInput = document.getElementById('productPrice');
@@ -2084,8 +2096,7 @@ async function addProduct() {
     const featuredCheckbox = document.getElementById('productFeatured');
     const exclusiveCheckbox = document.getElementById('productExclusive');
 
-    // Verificar se os elementos existem
-    if (!categorySelect || !nameInput || !priceInput || !stockInput || !featuredCheckbox || !exclusiveCheckbox) {
+    if (!categorySelect || !nameInput || !priceInput || !stockInput) {
         showMessage('Erro: Elementos do formulário não encontrados.', 'error');
         return;
     }
@@ -2094,21 +2105,20 @@ async function addProduct() {
     const name = nameInput.value.trim();
     const price = parseFloat(priceInput.value);
     const stock = parseInt(stockInput.value);
-    
-    // Obter subcategoria (do select ou do input manual)
+
     let subcategory = '';
-    if (subcategorySelect && subcategorySelect.value) {
+    if (subcategorySelect?.value) {
         subcategory = subcategorySelect.value;
-    } else if (manualSubcategoryInput && manualSubcategoryInput.value.trim()) {
+    } else if (manualSubcategoryInput?.value.trim()) {
         subcategory = manualSubcategoryInput.value.trim();
     }
-    
-    const description = descriptionInput ? descriptionInput.value.trim() : '';
-    const imageURL = imageInput ? imageInput.value.trim() : '';
-    const featured = featuredCheckbox ? featuredCheckbox.checked : false;
-    const exclusive = exclusiveCheckbox ? exclusiveCheckbox.checked : false;
 
-    // Validações
+    const description = descriptionInput?.value.trim() || '';
+    const imageURL = imageInput?.value.trim() || '';
+    const featured = featuredCheckbox?.checked || false;
+    const exclusive = exclusiveCheckbox?.checked || false;
+
+    // ===== VALIDAÇÕES =====
     if (!categoryId) {
         showMessage('Selecione uma categoria', 'error');
         return;
@@ -2130,27 +2140,37 @@ async function addProduct() {
     }
 
     try {
-        // Preparar dados do produto
+        // ===== DADOS DO PRODUTO (SEO + REVIEWS READY) =====
         const productData = {
-            categoryId: categoryId,
-            name: name,
-            price: price,
-            stock: stock || 0,
-            description: description,
-            imageURL: imageURL,
-            featured: featured,
-            exclusive: exclusive,
+            categoryId,
+            name,
+            price,
+            stock,
+            description,
+            imageURL,
+            featured,
+            exclusive,
+
+            // 🔥 CAMPOS PARA AVALIAÇÕES
+            rating: {
+                average: 0,
+                count: 0
+            },
+
+            // 🔥 CAMPOS SEO OPCIONAIS (RECOMENDADO)
+            brand: "Quero'Luxo Joias",
+            sku: `QL-${Date.now()}`,
+
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
-        // Adicionar subcategoria se fornecida
         if (subcategory) {
             productData.subcategory = subcategory;
         }
 
         await db.collection('products').add(productData);
 
-        // Limpar formulário
+        // ===== RESET FORM =====
         nameInput.value = '';
         priceInput.value = '';
         stockInput.value = '1';
@@ -2164,14 +2184,15 @@ async function addProduct() {
         if (featuredCheckbox) featuredCheckbox.checked = false;
         if (exclusiveCheckbox) exclusiveCheckbox.checked = false;
 
-        showMessage('Produto adicionado com sucesso!', 'success');
+        showMessage('✅ Produto adicionado com sucesso!', 'success');
         await loadProducts();
-        
+
     } catch (error) {
-        console.error('Erro ao adicionar produto:', error);
+        console.error('❌ Erro ao adicionar produto:', error);
         showMessage('Erro ao adicionar produto: ' + error.message, 'error');
     }
 }
+
 
         async function deleteProduct(productId) {
             if (!confirm('Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita.')) return;

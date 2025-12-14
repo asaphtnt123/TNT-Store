@@ -46,14 +46,24 @@
   "@context": "https://schema.org",
   "@type": "JewelryStore",
   "name": "Quero'Luxo Joias",
-  "priceRange": "R$25 - R$200",
+  "image": "https://www.queroluxo.com.br/assets/images/logo.png",
+  "url": "https://www.queroluxo.com.br",
+  "telephone": "+5519996249702",
+  "priceRange": "$$",
   "address": {
     "@type": "PostalAddress",
+    "addressLocality": "Itapira",
+    "addressRegion": "SP",
     "addressCountry": "BR"
   },
-  "url": "https://queroluxo.com.br"
+  "openingHours": "Mo-Fr 09:00-18:00",
+  "sameAs": [
+    "https://www.instagram.com/queroluxo_joias",
+    "https://wa.me/5519996249702"
+  ]
 }
 </script>
+
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,6 +72,19 @@
 
 <link rel="stylesheet" href="styles.css">
 <link rel="icon" href="/favicon.ico">
+
+ <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TJD5YRHVJB"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TJD5YRHVJB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-TJD5YRHVJB');
+</script>
+
 </head>
 
 
@@ -171,300 +194,231 @@
 
 </header>
 
+<!-- ================= CONTEÚDO PRINCIPAL ================= -->
+<main class="main-content" itemscope itemtype="https://schema.org/WebPage">
 
-    <!-- Conteúdo Principal -->
-    <main class="main-content">
+<!-- SEO LOCAL -->
+<section class="local-info-banner" aria-label="Joalheria em Itapira SP">
+  <p>
+    <strong>Joias femininas em Itapira – SP</strong> 🚚
+    Frete grátis para Itapira e região •
+    Retirada presencial •
+    Atendimento Seg–Sex das 9h às 18h
+  </p>
+</section>
+
+<!-- CATEGORIA PRINCIPAL -->
+  <section class="category-products" id="categoryProductsSection" aria-labelledby="categoryTitle">
         <div class="container">
-            <div class="local-info-banner" style="background: #f8f9fa; padding: 8px; text-align: center; border-bottom: 1px solid #dee2e6;">
-    <small>
-        🚚 <strong>Frete Grátis</strong> para toda Itapira.SP | 
-        📍 <strong>Retirada na Loja</strong> | 
-        ⏰ <strong>Horário:</strong> Seg-Sex 9h-18h
-    </small>
-</div>
+            <header class="section-header">
+                <h2 id="categoryTitle" itemprop="name">
+                    Joias e Semijoias por Categoria
+                </h2>
+                <p>
+                    Descubra anéis, brincos, colares e pulseiras com qualidade premium
+                </p>
+            </header>
 
-
-<!-- Seção de Produtos da Categoria (ADICIONE ESTA SEÇÃO) -->
-<section class="category-products" id="categoryProductsSection">
-    <div class="container">
-        <div class="section-header">
-            <h2 id="categoryTitle">Produtos</h2>
-        </div>
-        <div id="selectedCategoryProducts" class="products-grid">
-            <!-- Produtos serão carregados aqui -->
-        </div>
-    </div>
-</section>
-            <!-- Banner Hero -->
-           <section class="exclusive-products">
-    <div class="container">
-        <div class="section-header">
-            <h2>🎯 Produtos Exclusivos</h2>
-            <p>Itens especiais selecionados para você</p>
-        </div>
-        <!-- Adicione este banner no header -->
-
-        <div id="exclusiveProducts" class="products-grid">
-            <!-- Produtos exclusivos carregados via JavaScript -->
-        </div>
-    </div>
-</section>
-
-            <!-- Produtos em Destaque -->
-            <section class="featured-products">
-    <div class="container">
-        <div class="section-header">
-            <h2>⭐ Em Destaque</h2>
-            <p>Nossos produtos mais populares</p>
-        </div>
-        <div id="featuredProducts" class="products-grid">
-            <!-- Produtos em destaque carregados via JavaScript -->
-        </div>
-    </div>
-</section>
-
-          
-
-    </main>
-
-    <!-- Carrinho de Compras -->
-    <div id="cartSidebar" class="cart-sidebar">
-        <div class="cart-header">
-            <h3>Seu Carrinho</h3>
-            <button class="close-cart" onclick="toggleCart()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        
-        <div class="cart-content">
-            <div id="cartItems" class="cart-items">
-                <!-- Itens do carrinho -->
-            </div>
-            
-            <div class="cart-summary">
-                <div class="cart-totals">
-                    <div class="total-line">
-                        <span>Subtotal:</span>
-                        <span id="cartSubtotal">R$ 0,00</span>
-                    </div>
-                    <div class="total-line">
-                        <span>Entrega:</span>
-                        <span id="cartDeliveryFee">R$ 2,00</span>
-                    </div>
-                    <div class="total-line final">
-                        <span>Total:</span>
-                        <span id="cartTotal">R$ 2,00</span>
-                    </div>
-                </div>
-                
-                <button class="checkout-btn" onclick="openCheckoutModal()" id="finalizarButton" disabled>
-                    Finalizar Compra <i class="fas fa-arrow-right"></i>
-                </button>
+            <div id="selectedCategoryProducts"
+                 class="products-grid"
+                 itemprop="makesOffer">
+                <!-- Produtos carregados via JavaScript -->
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Modal de Finalização -->
-    <div id="checkoutModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Finalizar Pedido</h3>
-                <button class="close-modal" onclick="closeCheckoutModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <form id="checkoutForm">
-                    <div class="form-group">
-                        <label for="name">Nome Completo</label>
-                        <input type="text" id="name" class="form-input" placeholder="Seu nome completo" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="deliveryOption">Tipo de Entrega</label>
-                        <select id="deliveryOption" class="form-select" onchange="handleDeliveryOptionChange()">
-                            <option value="none">Selecione...</option>
-                            <option value="delivery">Entrega</option>
-                            <option value="pickup">Retirada no Local</option>
-                        </select>
-                    </div>
-                    
-                    <div id="addressFields" class="form-group" style="display: none;">
-                        <label for="address">Endereço de Entrega</label>
-                        <input type="text" id="address" class="form-input" placeholder="Rua, número, bairro">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="paymentMethod">Forma de Pagamento</label>
-                        <select id="paymentMethod" class="form-select" onchange="showTrocoField()">
-                            <option value="Cartao">Cartão</option>
-                            <option value="Dinheiro">Dinheiro</option>
-                            <option value="Pix">PIX</option>
-                        </select>
-                    </div>
-                    
-                    <div id="trocoContainer" class="form-group" style="display: none;">
-                        <label for="troco">Troco para quanto?</label>
-                        <input type="number" id="troco" class="form-input" placeholder="R$ 0,00" min="0">
-                    </div>
-                    
-                    <div class="order-summary">
-                        <h4>Resumo do Pedido</h4>
-                        <div id="orderSummary"></div>
-                        <div class="order-total">
-                            <strong id="totalWithDelivery">Total: R$ 0,00</strong>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeCheckoutModal()">Cancelar</button>
-                <button class="btn-primary" onclick="confirmPurchase()">
-                    <i class="fas fa-whatsapp"></i> Enviar para WhatsApp
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modais Auxiliares -->
-    <div id="productModal" class="modal">
-        <div class="modal-content product-modal">
-            <!-- Conteúdo do produto será injetado via JavaScript -->
-        </div>
-    </div>
-
-    <div id="outOfStockDialog" class="modal">
-        <div class="modal-content">
-            <h3>Produto Indisponível</h3>
-            <p>Este produto está fora de estoque no momento.</p>
-            <button class="btn-primary" onclick="closeOutOfStockDialog()">Entendi</button>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="main-footer">
+<!-- PRODUTOS EXCLUSIVOS -->
+<section class="exclusive-products" aria-labelledby="exclusiveTitle">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Quero'Luxo</h4>
-                    <p>Melhores preços em joias, Alta Qualidade com Garantia</p>
-                    <div class="contact-info">
-                        <p><i class="fas fa-phone"></i> (19) 99624-9702</p>
-                    </div>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Links Rápidos</h4>
-                    <div class="footer-links">
-                        <a href="#">Quem Somos</a>
-                        <a href="#">Políticas</a>
-                        <a href="#">Frete e Reembolso</a>
-                        <a href="#">Contato</a>
-                    </div>
-                </div>
-                
-               
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2026 TNT-Design. Todos os direitos reservados.</p>
-                <p>>>>>>>>>> "DEUS É FIEL" <<<<<<<<< </p>
+            <header class="section-header">
+                <h2 id="exclusiveTitle">
+                    Produtos Exclusivos Quero'Luxo
+                </h2>
+                <p>
+                    Joias selecionadas com design sofisticado e acabamento de alto padrão
+                </p>
+            </header>
+
+            <div id="exclusiveProducts" class="products-grid">
+                <!-- Produtos exclusivos -->
             </div>
         </div>
-    </footer>
+    </section>
 
-<!-- Botão Diamante Voltar ao Topo - Coloque antes do </body> -->
-<button id="diamondTopBtn" class="diamond-top-btn" aria-label="Voltar ao topo" title="Clique para voltar ao topo">
-    <div class="diamond-container">
-        <div class="diamond-pendant">
-            <!-- Corrente -->
-            <div class="pendant-chain">
-                <div class="chain-segment"></div>
-                <div class="chain-segment"></div>
-                <div class="chain-segment"></div>
-            </div>
-            
-            <!-- Diamante -->
-            <div class="diamond-gem">
-                <div class="diamond-facet df-1"></div>
-                <div class="diamond-facet df-2"></div>
-                <div class="diamond-facet df-3"></div>
-                <div class="diamond-facet df-4"></div>
-                <div class="diamond-core"></div>
-            </div>
-            
-            <!-- Brilhos -->
-            <div class="sparkle s1"></div>
-            <div class="sparkle s2"></div>
-            <div class="sparkle s3"></div>
+<!-- PRODUTOS EM DESTAQUE -->
+<section class="featured-products">
+  <div class="container">
+    <header class="section-header">
+      <h2>Joias Femininas Mais Vendidas</h2>
+      <p>
+        As joias mais desejadas da Quero'Luxo,
+        ideais para presentear ou elevar seu estilo.
+      </p>
+    </header>
+
+    <div id="featuredProducts" class="products-grid"></div>
+  </div>
+</section>
+
+<!-- TEXTO SEO INSTITUCIONAL -->
+<section class="seo-text">
+  <div class="container">
+    <h2>Quero'Luxo Joias – Loja Online de Joias Femininas</h2>
+    <p>
+      A Quero'Luxo Joias é especializada em joias femininas
+      importadas de alta qualidade. Trabalhamos com Prata 925,
+      zircônias premium e semi joias banhadas a Ouro 18K,
+      oferecendo elegância, sofisticação e entrega rápida
+      para todo o Brasil.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= CARRINHO ================= -->
+<div id="cartSidebar" class="cart-sidebar" aria-label="Carrinho de compras">
+  <div class="cart-header">
+    <h3>Seu Carrinho</h3>
+    <button class="close-cart" onclick="toggleCart()" aria-label="Fechar carrinho">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <div class="cart-content">
+    <div id="cartItems" class="cart-items"></div>
+
+    <div class="cart-summary">
+      <div class="cart-totals">
+        <div class="total-line"><span>Subtotal:</span><span id="cartSubtotal">R$ 0,00</span></div>
+        <div class="total-line"><span>Entrega:</span><span id="cartDeliveryFee">R$ 2,00</span></div>
+        <div class="total-line final"><span>Total:</span><span id="cartTotal">R$ 2,00</span></div>
+      </div>
+
+      <button class="checkout-btn" onclick="openCheckoutModal()" id="finalizarButton" disabled>
+        Finalizar Compra <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+<!-- ================= MODAL FINALIZAÇÃO ================= -->
+<div id="checkoutModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <div class="modal-decoration"></div>
+    <div class="corner-accent"></div>
+    <div class="corner-accent"></div>
+    
+    <div class="modal-header">
+      <h3 class="modal-title">Finalizar Pedido</h3>
+      <button class="close-modal" onclick="closeCheckoutModal()" aria-label="Fechar">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form id="checkoutForm">
+        <div class="form-group">
+          <label for="name">Nome Completo</label>
+          <input type="text" id="name" required class="luxury-input">
         </div>
-        
-        <!-- Sombra -->
-        <div class="pendant-shadow"></div>
+
+        <div class="form-group">
+          <label for="deliveryOption">Tipo de Entrega</label>
+          <select id="deliveryOption" onchange="handleDeliveryOptionChange()" class="luxury-select">
+            <option value="">Selecione</option>
+            <option value="delivery">Entrega</option>
+            <option value="pickup">Retirada no Local</option>
+          </select>
+        </div>
+
+        <div id="addressFields" class="form-group" style="display:none;">
+          <label for="address">Endereço</label>
+          <input type="text" id="address" class="luxury-input">
+        </div>
+
+        <div class="form-group">
+          <label for="paymentMethod">Forma de Pagamento</label>
+          <select id="paymentMethod" onchange="showTrocoField()" class="luxury-select">
+            <option value="Cartao">Cartão</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Pix">PIX</option>
+          </select>
+        </div>
+
+        <div id="trocoContainer" class="form-group" style="display:none;">
+          <label for="troco">Troco para quanto?</label>
+          <input type="number" id="troco" class="luxury-input">
+        </div>
+
+        <div class="order-summary luxury-summary">
+          <h4 class="summary-title">Resumo do Pedido</h4>
+          <div id="orderSummary" class="summary-content"></div>
+          <strong id="totalWithDelivery" class="total-amount">Total: R$ 0,00</strong>
+        </div>
+      </form>
     </div>
-</button>
 
-
-    <!-- WhatsApp Float -->
-    <div class="whatsapp-float">
-        <a href="https://wa.me/5519999999999" target="_blank" class="whatsapp-btn">
-            <i class="fab fa-whatsapp"></i>
-        </a>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeCheckoutModal()">Cancelar</button>
+      <button class="btn-primary" onclick="confirmPurchase()">
+        <i class="fab fa-whatsapp"></i> Enviar para WhatsApp
+      </button>
     </div>
+  </div>
+</div>
+<!-- Modal de Detalhes do Produto -->
+<div id="productModal" class="product-modal" aria-hidden="true">
 
+    <section class="review-form">
+  <h3>💬 Avaliar este produto</h3>
 
-    <div id="visitor-counter" style="position: fixed; bottom: 10px; right: 10px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 8px 15px; border-radius: 20px; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999;">
-    <i class="fas fa-users me-1"></i>
-    <span id="counter">0</span> visitantes
+  <label>Avaliação</label>
+  <select id="reviewRating">
+    <option value="5">⭐⭐⭐⭐⭐ (Excelente)</option>
+    <option value="4">⭐⭐⭐⭐ (Muito bom)</option>
+    <option value="3">⭐⭐⭐ (Bom)</option>
+    <option value="2">⭐⭐ (Regular)</option>
+    <option value="1">⭐ (Ruim)</option>
+  </select>
+
+  <label>Comentário</label>
+  <textarea id="reviewComment"
+    placeholder="Conte sua experiência com esta joia"></textarea>
+
+  <button onclick="submitReview('${product.id}')">
+    Enviar Avaliação
+  </button>
+</section>
+
 </div>
 
-<!-- Adicione este código no final do <body> do seu site -->
-<div id="adminLoginModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 99999; justify-content: center; align-items: center;">
-    <div style="background: white; padding: 40px; border-radius: 20px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <i class="fas fa-lock fa-3x mb-3" style="color: #667eea;"></i>
-            <h3 style="margin: 0; color: #2d3748;">Acesso Administrativo</h3>
-            <small style="color: #718096;">Digite suas credenciais de administrador</small>
-        </div>
-        
-        <div id="loginMessage" style="display: none; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;"></div>
-        
-        <form id="adminLoginForm" onsubmit="event.preventDefault(); adminLogin();">
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 600;">Usuário</label>
-                <input type="text" id="adminUsername" 
-                       style="width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; transition: all 0.3s; box-sizing: border-box;"
-                       placeholder="Digite seu usuário"
-                       required>
-            </div>
-            
-            <div style="margin-bottom: 25px;">
-                <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 600;">Senha</label>
-                <input type="password" id="adminPassword" 
-                       style="width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; transition: all 0.3s; box-sizing: border-box;"
-                       placeholder="Digite sua senha"
-                       required>
-            </div>
-            
-            <button type="submit" 
-                    style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                <i class="fas fa-sign-in-alt me-2"></i>Entrar
-            </button>
-        </form>
-        
-        <div style="text-align: center; margin-top: 20px;">
-            <button onclick="closeLoginModal()" style="background: none; border: none; color: #718096; cursor: pointer; font-size: 14px;">
-                <i class="fas fa-times me-2"></i>Cancelar
-            </button>
-        </div>
-    </div>
-</div>
+<!-- ================= FOOTER SEO ================= -->
+<footer class="main-footer" itemscope itemtype="https://schema.org/Organization">
+  <div class="container">
+    <section class="footer-section">
+      <h4 itemprop="name">Quero'Luxo Joias</h4>
+      <p itemprop="description">
+        Loja online especializada em joias femininas,
+        Prata 925 e semi joias banhadas a Ouro 18K.
+      </p>
+      <p><strong>Contato:</strong> <span itemprop="telephone">(19) 99624-9702</span></p>
+    </section>
 
-<!-- Páginação -->
-<div id="pageInfo" class="pagination-info"></div>
-<div id="paginationContainer" class="pagination-container"></div>
+    <section class="footer-section">
+      <h4>Institucional</h4>
+      <nav class="footer-links">
+        <a href="/quem-somos">Quem Somos</a>
+        <a href="/politicas">Políticas</a>
+        <a href="/frete-e-reembolso">Frete e Reembolso</a>
+      </nav>
+    </section>
+
+    <div class="footer-bottom">
+      <p>© 2026 Quero'Luxo Joias – Todos os direitos reservados.</p>
+      <p>“Deus é fiel”</p>
+    </div>
+  </div>
+</footer>
 
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>

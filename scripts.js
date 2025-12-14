@@ -935,46 +935,95 @@ function displayFilteredProducts(products, subcategory) {
     products.forEach(product => {
         const category = STATE.categories.find(cat => cat.id === product.categoryId);
         const isOutOfStock = product.stock <= 0;
-        
+injectProductSchema(product, category?.name);
+
         const productHTML = `
-            <div class="product-card" data-product-id="${product.id}">
-                <img src="${product.imageURL || 'https://via.placeholder.com/300x300?text=Produto'}" 
-                     alt="${product.name}" 
-                     class="product-image"
-                     onerror="this.src='https://via.placeholder.com/300x300?text=Imagem+Não+Encontrada'"
-                     onclick="showProductDetails('${product.id}')">
-                
-                <div class="product-info">
-                    <h3 class="product-title">${product.name}</h3>
-                    <div class="product-price">R$ ${formatPrice(product.price)}</div>
-                    
-                    ${product.description ? `
-                        <p class="product-description">${product.description.substring(0, 100)}...</p>
-                    ` : ''}
-                    
-                    <div class="product-meta">
-                        <span class="product-category">${category?.name || 'Geral'}</span>
-                        ${product.subcategory ? `<span class="product-subcategory">${product.subcategory}</span>` : ''}
-                        <span class="product-stock ${isOutOfStock ? 'out-of-stock' : 'in-stock'}">
-                            ${isOutOfStock ? 'Esgotado' : `${product.stock} em estoque`}
-                        </span>
-                    </div>
-                    
-                    <div class="product-actions">
-                        <button class="btn-secondary" onclick="showProductDetails('${product.id}')">
-                            <i class="fas fa-eye"></i> Detalhes
-                        </button>
-                        <button class="btn-primary" 
-                                onclick="addToCart('${product.id}')" 
-                                ${isOutOfStock ? 'disabled' : ''}>
-                            <i class="fas fa-shopping-bag"></i> 
-                            ${isOutOfStock ? 'Esgotado' : 'Comprar'}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
+<article class="product-card"
+         data-product-id="${product.id}"
+         itemscope
+         itemtype="https://schema.org/Product">
+
+    <!-- Imagem -->
+    <img src="${product.imageURL || 'https://via.placeholder.com/300x300?text=Produto'}"
+         alt="Joia feminina ${product.name} em ${category?.name || 'Prata 925 ou Ouro 18K'}"
+         class="product-image"
+         itemprop="image"
+         loading="lazy"
+         onerror="this.src='https://via.placeholder.com/300x300?text=Imagem+Indisponível'"
+         onclick="showProductDetails('${product.id}')">
+
+    <div class="product-info">
+
+        <!-- Nome -->
+        <h3 class="product-title" itemprop="name">
+            ${product.name}
+        </h3>
+
+        <!-- Marca -->
+        <meta itemprop="brand" content="Quero'Luxo Joias">
+
+        <!-- Categoria -->
+        <meta itemprop="category" content="${category?.name || 'Joias Femininas'}">
+
+        <!-- Preço -->
+        <div class="product-price"
+             itemprop="offers"
+             itemscope
+             itemtype="https://schema.org/Offer">
+
+            <meta itemprop="priceCurrency" content="BRL">
+            <meta itemprop="price" content="${product.price}">
+            <link itemprop="availability"
+                  href="https://schema.org/${isOutOfStock ? 'OutOfStock' : 'InStock'}">
+
+            <strong>R$ ${formatPrice(product.price)}</strong>
+        </div>
+
+        <!-- Descrição -->
+        ${product.description ? `
+            <p class="product-description" itemprop="description">
+                ${product.description.substring(0, 120)}...
+            </p>
+        ` : ''}
+
+        <!-- Informações extras -->
+        <div class="product-meta">
+            <span class="product-category">
+                ${category?.name || 'Joias Femininas'}
+            </span>
+
+            ${product.subcategory ? `
+                <span class="product-subcategory">
+                    ${product.subcategory}
+                </span>
+            ` : ''}
+
+            <span class="product-stock ${isOutOfStock ? 'out-of-stock' : 'in-stock'}">
+                ${isOutOfStock ? 'Produto esgotado' : `${product.stock} disponíveis`}
+            </span>
+        </div>
+
+        <!-- Ações -->
+        <div class="product-actions">
+            <button class="btn-secondary"
+                    onclick="showProductDetails('${product.id}')"
+                    aria-label="Ver detalhes do produto ${product.name}">
+                <i class="fas fa-eye"></i> Detalhes
+            </button>
+
+            <button class="btn-primary"
+                    onclick="addToCart('${product.id}')"
+                    ${isOutOfStock ? 'disabled' : ''}
+                    aria-label="Adicionar ${product.name} ao carrinho">
+                <i class="fas fa-shopping-bag"></i>
+                ${isOutOfStock ? 'Esgotado' : 'Comprar'}
+            </button>
+        </div>
+
+    </div>
+</article>
+`;
+
         container.insertAdjacentHTML('beforeend', productHTML);
     });
     
@@ -1092,48 +1141,100 @@ function displayProductsList(products) {
     
     // Gerar HTML dos produtos
     const productsHTML = products.map(product => {
-        const category = STATE.categories.find(cat => cat.id === product.categoryId);
-        const isOutOfStock = product.stock <= 0;
-        
-        return `
-            <div class="product-card" data-product-id="${product.id}">
-                <img src="${product.imageURL || 'https://via.placeholder.com/300x300?text=Produto'}" 
-                     alt="${product.name}" 
-                     class="product-image"
-                     onerror="this.src='https://via.placeholder.com/300x300?text=Imagem+Não+Encontrada'"
-                     onclick="showProductDetails('${product.id}')">
-                
-                <div class="product-info">
-                    <h3 class="product-title">${product.name}</h3>
-                    <div class="product-price">R$ ${formatPrice(product.price)}</div>
-                    
-                    ${product.description ? `
-                        <p class="product-description">${product.description.substring(0, 100)}...</p>
-                    ` : ''}
-                    
-                    <div class="product-meta">
-                        <span class="product-category">${category?.name || 'Geral'}</span>
-                        ${product.subcategory ? `<span class="product-subcategory">${product.subcategory}</span>` : ''}
-                        <span class="product-stock ${isOutOfStock ? 'out-of-stock' : 'in-stock'}">
-                            ${isOutOfStock ? 'Esgotado' : `${product.stock} em estoque`}
-                        </span>
-                    </div>
-                    
-                    <div class="product-actions">
-                        <button class="btn-secondary" onclick="showProductDetails('${product.id}')">
-                            <i class="fas fa-eye"></i> Detalhes
-                        </button>
-                        <button class="btn-primary" 
-                                onclick="addToCart('${product.id}')" 
-                                ${isOutOfStock ? 'disabled' : ''}>
-                            <i class="fas fa-shopping-bag"></i> 
-                            ${isOutOfStock ? 'Esgotado' : 'Comprar'}
-                        </button>
-                    </div>
-                </div>
+    const category = STATE.categories.find(cat => cat.id === product.categoryId);
+    const isOutOfStock = product.stock <= 0;
+    injectProductSchema(product, category?.name);
+    
+
+
+    return `
+    <article class="product-card"
+             data-product-id="${product.id}"
+             itemscope
+             itemtype="https://schema.org/Product">
+
+        <!-- Imagem do Produto -->
+        <img src="${product.imageURL || 'https://via.placeholder.com/300x300?text=Produto'}"
+             alt="Joia feminina ${product.name} em ${category?.name || 'Prata 925 ou Ouro 18K'}"
+             class="product-image"
+             itemprop="image"
+             loading="lazy"
+             onerror="this.src='https://via.placeholder.com/300x300?text=Imagem+Indisponível'"
+             onclick="showProductDetails('${product.id}')">
+
+        <div class="product-info">
+
+            <!-- Nome -->
+            <h3 class="product-title" itemprop="name">
+                ${product.name}
+            </h3>
+
+            <!-- Marca -->
+            <meta itemprop="brand" content="Quero'Luxo Joias">
+
+            <!-- Categoria -->
+            <meta itemprop="category" content="${category?.name || 'Joias Femininas'}">
+
+            <!-- Oferta / Preço -->
+            <div class="product-price"
+                 itemprop="offers"
+                 itemscope
+                 itemtype="https://schema.org/Offer">
+
+                <meta itemprop="priceCurrency" content="BRL">
+                <meta itemprop="price" content="${product.price}">
+                <link itemprop="availability"
+                      href="https://schema.org/${isOutOfStock ? 'OutOfStock' : 'InStock'}">
+
+                <strong>R$ ${formatPrice(product.price)}</strong>
             </div>
-        `;
-    }).join('');
+
+            <!-- Descrição -->
+            ${product.description ? `
+                <p class="product-description" itemprop="description">
+                    ${product.description.substring(0, 120)}...
+                </p>
+            ` : ''}
+
+            <!-- Meta informações -->
+            <div class="product-meta">
+                <span class="product-category">
+                    ${category?.name || 'Joias Femininas'}
+                </span>
+
+                ${product.subcategory ? `
+                    <span class="product-subcategory">
+                        ${product.subcategory}
+                    </span>
+                ` : ''}
+
+                <span class="product-stock ${isOutOfStock ? 'out-of-stock' : 'in-stock'}">
+                    ${isOutOfStock ? 'Produto esgotado' : `${product.stock} disponíveis`}
+                </span>
+            </div>
+
+            <!-- Ações -->
+            <div class="product-actions">
+                <button class="btn-secondary"
+                        onclick="showProductDetails('${product.id}')"
+                        aria-label="Ver detalhes do produto ${product.name}">
+                    <i class="fas fa-eye"></i> Detalhes
+                </button>
+
+                <button class="btn-primary"
+                        onclick="addToCart('${product.id}')"
+                        ${isOutOfStock ? 'disabled' : ''}
+                        aria-label="Adicionar ${product.name} ao carrinho">
+                    <i class="fas fa-shopping-bag"></i>
+                    ${isOutOfStock ? 'Esgotado' : 'Comprar'}
+                </button>
+            </div>
+
+        </div>
+    </article>
+    `;
+}).join('');
+
     
     // Adicionar produtos ao container
     container.insertAdjacentHTML('beforeend', productsHTML);
@@ -1265,42 +1366,86 @@ function displayExclusiveProducts(products) {
         return;
     }
 
-    container.innerHTML = products.map(product => {
-        const isOutOfStock = product.stock <= 0;
-        return `
-            <div class="product-card exclusive-card ${isOutOfStock ? 'out-of-stock-card' : ''}">
-                <div class="exclusive-badge">🎯 Exclusivo</div>
-                ${isOutOfStock ? '<div class="out-of-stock-overlay">Esgotado</div>' : ''}
-                <img src="${product.imageURL || 'https://via.placeholder.com/300x300?text=Produto'}" 
-                     alt="${product.name}" 
-                     class="product-image ${isOutOfStock ? 'grayscale' : ''}"
-                     onerror="this.src='https://via.placeholder.com/300x300?text=Imagem+Não+Encontrada'"
-                     onclick="${isOutOfStock ? '' : `showProductDetails('${product.id}')`}">
-                
-                <div class="product-info">
-                    <h3 class="product-title">${product.name}</h3>
-                    <div class="product-price">R$ ${formatPrice(product.price)}</div>
-                    
-                    <div class="product-meta">
-                        <span class="product-stock ${isOutOfStock ? 'out-of-stock' : 'in-stock'}">
-                            ${isOutOfStock ? 'Esgotado' : `${product.stock} em estoque`}
-                        </span>
-                    </div>
-                    
-                    <div class="product-actions">
-                        <button class="btn-secondary" onclick="showProductDetails('${product.id}')">
-                            <i class="fas fa-eye"></i> Detalhes
-                        </button>
-                        <button class="btn-primary" onclick="addToCart('${product.id}')" 
-                                ${isOutOfStock ? 'disabled' : ''}>
-                            <i class="fas fa-shopping-bag"></i> 
-                            ${isOutOfStock ? 'Esgotado' : 'Comprar'}
-                        </button>
-                    </div>
-                </div>
+   container.innerHTML = products.map(product => {
+    const isOutOfStock = product.stock <= 0;
+
+    return `
+    <article class="product-card exclusive-card ${isOutOfStock ? 'out-of-stock-card' : ''}"
+             itemscope
+             itemtype="https://schema.org/Product"
+             data-product-id="${product.id}">
+
+        <!-- Badge Exclusivo -->
+        <div class="exclusive-badge">🎯 Exclusivo</div>
+
+        <!-- Overlay Esgotado -->
+        ${isOutOfStock ? '<div class="out-of-stock-overlay">Esgotado</div>' : ''}
+
+        <!-- Imagem -->
+        <img src="${product.imageURL || 'https://via.placeholder.com/300x300?text=Produto'}"
+             alt="Joia exclusiva feminina ${product.name}"
+             class="product-image ${isOutOfStock ? 'grayscale' : ''}"
+             itemprop="image"
+             loading="lazy"
+             onerror="this.src='https://via.placeholder.com/300x300?text=Imagem+Indisponível'"
+             onclick="${isOutOfStock ? '' : `showProductDetails('${product.id}')`}">
+
+        <div class="product-info">
+
+            <!-- Nome -->
+            <h3 class="product-title" itemprop="name">
+                ${product.name}
+            </h3>
+
+            <!-- Marca -->
+            <meta itemprop="brand" content="Quero'Luxo Joias">
+
+            <!-- Categoria -->
+            <meta itemprop="category" content="Joias Exclusivas Femininas">
+
+            <!-- Preço / Oferta -->
+            <div class="product-price"
+                 itemprop="offers"
+                 itemscope
+                 itemtype="https://schema.org/Offer">
+
+                <meta itemprop="priceCurrency" content="BRL">
+                <meta itemprop="price" content="${product.price}">
+                <link itemprop="availability"
+                      href="https://schema.org/${isOutOfStock ? 'OutOfStock' : 'InStock'}">
+
+                <strong>R$ ${formatPrice(product.price)}</strong>
             </div>
-        `;
-    }).join('');
+
+            <!-- Estoque -->
+            <div class="product-meta">
+                <span class="product-stock ${isOutOfStock ? 'out-of-stock' : 'in-stock'}">
+                    ${isOutOfStock ? 'Produto esgotado' : `${product.stock} disponíveis`}
+                </span>
+            </div>
+
+            <!-- Ações -->
+            <div class="product-actions">
+                <button class="btn-secondary"
+                        onclick="showProductDetails('${product.id}')"
+                        aria-label="Ver detalhes do produto exclusivo ${product.name}">
+                    <i class="fas fa-eye"></i> Detalhes
+                </button>
+
+                <button class="btn-primary"
+                        onclick="addToCart('${product.id}')"
+                        ${isOutOfStock ? 'disabled' : ''}
+                        aria-label="Adicionar ${product.name} ao carrinho">
+                    <i class="fas fa-shopping-bag"></i>
+                    ${isOutOfStock ? 'Esgotado' : 'Comprar'}
+                </button>
+            </div>
+
+        </div>
+    </article>
+    `;
+}).join('');
+
 }
 
 function displayFeaturedProducts(products) {
@@ -1475,17 +1620,15 @@ function closeAllModals() {
     console.log('✅ Todos os modais fechados');
 }
 
-// ===== FINALIZAÇÃO DE PEDIDO =====
 function confirmPurchase() {
     console.log('🛍️ Confirmando compra');
-    
+
     const name = document.getElementById('name')?.value.trim();
     const address = document.getElementById('address')?.value.trim();
     const paymentMethod = document.getElementById('paymentMethod')?.value;
     const deliveryOption = document.getElementById('deliveryOption')?.value;
     const troco = document.getElementById('troco')?.value;
 
-    // Validações
     if (!name) {
         showMessage('Digite seu nome', 'warning');
         return;
@@ -1508,20 +1651,163 @@ function confirmPurchase() {
 
         const whatsappNumber = STATE.storeConfig.whatsapp || CONFIG.defaultStoreConfig.whatsapp;
         const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-        
-        console.log('📤 Abrindo WhatsApp com pedido');
+
+        // 🔐 SALVAR PEDIDO CONCLUÍDO
+        localStorage.setItem('lastOrderCompleted', JSON.stringify({
+            date: Date.now(),
+            products: STATE.cart.map(item => ({
+                productId: item.id,
+                name: item.name
+            }))
+        }));
+
+       // 📊 Google Analytics – Purchase (WhatsApp)
+if (typeof gtag === 'function') {
+    gtag('event', 'purchase', {
+        transaction_id: 'whatsapp_' + Date.now(),
+        value: getCartTotal(),
+        currency: 'BRL',
+        method: 'whatsapp',
+        items: STATE.cart.map(item => ({
+            item_id: item.id,
+            item_name: item.name,
+            price: item.price,
+            quantity: item.quantity
+        }))
+    });
+}
+
+
+
         window.open(whatsappUrl, '_blank');
-        
+
         closeCheckoutModal();
         clearCart();
-        
+
         showMessage('✅ Pedido enviado com sucesso!', 'success');
-        
+
     } catch (error) {
         console.error('❌ Erro ao finalizar pedido:', error);
         showMessage('Erro ao enviar pedido. Tente novamente.', 'error');
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkPendingReview();
+});
+function checkPendingReview() {
+    const orderData = localStorage.getItem('lastOrderCompleted');
+
+    if (!orderData) return;
+
+    if (localStorage.getItem('reviewModalShown')) return;
+
+    const parsed = JSON.parse(orderData);
+
+    const elapsed = Date.now() - parsed.date;
+    const MAX_TIME = 1000 * 60 * 60 * 24; // 24h
+
+    if (elapsed > MAX_TIME) {
+        localStorage.removeItem('lastOrderCompleted');
+        localStorage.removeItem('reviewModalShown');
+        return;
+    }
+
+    localStorage.setItem('reviewModalShown', 'true');
+
+    openPostPurchaseReviewModal(parsed.products);
+}
+
+
+function openPostPurchaseReviewModal(products) {
+    const modal = document.getElementById('reviewAfterPurchaseModal');
+
+    if (!modal) return;
+
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>⭐ Avalie sua experiência</h3>
+            <p>Sua opinião é muito importante para nós.</p>
+
+            ${products.map(p => `
+                <div class="review-product-item">
+                    <strong>${p.name}</strong>
+
+                    <select id="rating-${p.productId}">
+                        <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+                        <option value="4">⭐⭐⭐⭐ Muito bom</option>
+                        <option value="3">⭐⭐⭐ Bom</option>
+                        <option value="2">⭐⭐ Regular</option>
+                        <option value="1">⭐ Ruim</option>
+                    </select>
+
+                    <textarea id="comment-${p.productId}"
+                        placeholder="Conte sua experiência"></textarea>
+
+                    <button onclick="submitPostPurchaseReview('${p.productId}')">
+                        Enviar Avaliação
+                    </button>
+                </div>
+            `).join('')}
+
+            <button class="close-modal" onclick="closePostPurchaseReviewModal()">
+                Agora não
+            </button>
+        </div>
+    `;
+
+    modal.classList.add('open');
+    createOverlay();
+}
+
+
+async function submitPostPurchaseReview(productId) {
+    const rating = parseInt(document.getElementById(`rating-${productId}`).value);
+    const comment = document.getElementById(`comment-${productId}`).value.trim();
+
+    if (!rating || !comment) {
+        showMessage('Preencha a avaliação', 'warning');
+        return;
+    }
+
+    try {
+        await db.collection('productReviews').add({
+            productId: productId,
+            rating: rating,
+            comment: comment,
+            verifiedPurchase: true,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        showMessage('⭐ Obrigado pela avaliação!', 'success');
+
+        // Atualizar média
+        await recalculateProductRating(productId);
+
+        // Marcar como avaliado
+        localStorage.removeItem('lastOrderCompleted');
+        closePostPurchaseReviewModal();
+
+    } catch (error) {
+        console.error('Erro ao enviar avaliação:', error);
+        showMessage('Erro ao enviar avaliação', 'error');
+    }
+}
+function closePostPurchaseReviewModal() {
+    const modal = document.getElementById('reviewAfterPurchaseModal');
+    modal?.classList.remove('open');
+    removeOverlay();
+}
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        checkPendingReview();
+    }
+});
+
+window.addEventListener('focus', () => {
+    checkPendingReview();
+});
+
 
 function generateWhatsAppMessage(formData) {
     const { name, address, paymentMethod, deliveryOption, troco } = formData;
@@ -1607,12 +1893,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// ===== DETALHES DO PRODUTO =====
+// ===== DETALHES DO PRODUTO (MODAL + SEO + REVIEWS) =====
 function showProductDetails(productId) {
     console.log('🔍 Mostrando detalhes do produto:', productId);
-    
+
     const product = STATE.products.find(p => p.id === productId);
-    
+
     if (!product) {
         console.error('❌ Produto não encontrado:', productId);
         showMessage('Produto não encontrado.', 'error');
@@ -1621,57 +1907,85 @@ function showProductDetails(productId) {
 
     const category = STATE.categories.find(cat => cat.id === product.categoryId);
     const modal = document.getElementById('productModal');
-    
+
     if (!modal) {
         console.error('❌ Modal de detalhes não encontrado');
         showMessage('Erro ao carregar detalhes do produto.', 'error');
         return;
     }
 
-    // Criar conteúdo do modal
+    // 🔥 SEO – Schema.org Product dinâmico
+    injectProductSchema(product, category?.name);
+if (typeof gtag === 'function') {
+    gtag('event', 'view_item', {
+        currency: 'BRL',
+        value: Number(product.price) || 0,
+        items: [{
+            item_id: product.id,
+            item_name: product.name,
+            price: Number(product.price) || 0,
+            item_category: category?.name || 'Geral'
+        }]
+    });
+}
     modal.innerHTML = `
-        <div class="modal-content product-modal-content">
+        <div class="modal-content product-modal-content" itemscope itemtype="https://schema.org/Product">
+
             <div class="modal-header">
-                <h3>Detalhes do Produto</h3>
+                <h3 itemprop="name">${product.name}</h3>
                 <button class="close-modal" onclick="closeProductModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+
             <div class="modal-body">
                 <div class="product-detail-container">
+
+                    <!-- IMAGEM -->
                     <div class="product-detail-image-section">
-                        <img src="${product.imageURL || 'https://via.placeholder.com/400x400?text=Produto'}" 
-                             alt="${product.name}" 
+                        <img src="${product.imageURL || 'https://via.placeholder.com/400x400?text=Produto'}"
+                             alt="${product.name}"
                              class="product-detail-image"
+                             itemprop="image"
                              onerror="this.src='https://via.placeholder.com/400x400?text=Imagem+Não+Encontrada'">
-                        
-                        <!-- Badges -->
+
                         <div class="product-detail-badges">
                             ${product.featured ? '<span class="badge featured-badge">⭐ Destaque</span>' : ''}
                             ${product.exclusive ? '<span class="badge exclusive-badge">🎯 Exclusivo</span>' : ''}
                             ${product.stock <= 0 ? '<span class="badge out-of-stock-badge">Esgotado</span>' : ''}
                         </div>
                     </div>
-                    
+
+                    <!-- INFO -->
                     <div class="product-detail-info">
-                        <h2 class="product-detail-title">${product.name}</h2>
-                        
-                        <div class="product-detail-price">R$ ${formatPrice(product.price)}</div>
-                        
+
+                        <h2 class="product-detail-title" itemprop="name">
+                            ${product.name}
+                        </h2>
+
+                        <div class="product-detail-price"
+                             itemprop="offers"
+                             itemscope
+                             itemtype="https://schema.org/Offer">
+                            <meta itemprop="priceCurrency" content="BRL">
+                            <span itemprop="price">R$ ${formatPrice(product.price)}</span>
+                            <link itemprop="availability"
+                                  href="https://schema.org/${product.stock > 0 ? 'InStock' : 'OutOfStock'}">
+                        </div>
+
+                        <!-- META -->
                         <div class="product-detail-meta">
                             <div class="meta-item">
                                 <strong>Categoria:</strong>
-                                <span>${category?.name || 'Geral'}</span>
+                                <span itemprop="category">${category?.name || 'Geral'}</span>
                             </div>
-                            
+
                             ${product.subcategory ? `
-                                <div class="meta-item">
-                                    <strong>Subcategoria:</strong>
-                                    <span>${product.subcategory}</span>
-                                </div>
-                            ` : ''}
-                            
+                            <div class="meta-item">
+                                <strong>Subcategoria:</strong>
+                                <span>${product.subcategory}</span>
+                            </div>` : ''}
+
                             <div class="meta-item">
                                 <strong>Estoque:</strong>
                                 <span class="${product.stock <= 0 ? 'out-of-stock' : 'in-stock'}">
@@ -1679,56 +1993,114 @@ function showProductDetails(productId) {
                                 </span>
                             </div>
                         </div>
-                        
-                       ${product.description ? `
-    <div class="product-description-section">
-        <h4><i class="fas fa-gem"></i> Detalhes da Joia</h4>
-        <div class="product-description-text jewelry-description">
-            ${formatJewelryDescription(product.description)}
-        </div>
-    </div>
-` : '<p class="no-description">Este produto não possui descrição.</p>'}
 
+                        <!-- DESCRIÇÃO -->
+                        ${product.description ? `
+                        <div class="product-description-section" itemprop="description">
+                            <h4><i class="fas fa-gem"></i> Detalhes da Joia</h4>
+                            <div class="product-description-text jewelry-description">
+                                ${formatJewelryDescription(product.description)}
+                            </div>
+                        </div>` : ''}
+
+                        <!-- ⭐ AVALIAÇÕES -->
+                        <div class="product-reviews-section">
+                            <h4><i class="fas fa-star"></i> Avaliações dos Clientes</h4>
+
+                            <div class="review-summary" itemprop="aggregateRating"
+                                 itemscope itemtype="https://schema.org/AggregateRating">
+                                <span class="review-average">
+                                    ⭐ <span itemprop="ratingValue">
+                                        ${product.rating?.average || '0.0'}
+                                    </span>
+                                </span>
+                                <span class="review-count">
+                                    (<span itemprop="reviewCount">
+                                        ${product.rating?.count || 0}
+                                    </span> avaliações)
+                                </span>
+                            </div>
+
+                            <div id="productReviews"></div>
+
+                            <div class="review-form">
+                                <h5>💬 Deixe sua avaliação</h5>
+                                <select id="reviewRating">
+                                    <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+                                    <option value="4">⭐⭐⭐⭐ Muito bom</option>
+                                    <option value="3">⭐⭐⭐ Bom</option>
+                                    <option value="2">⭐⭐ Regular</option>
+                                    <option value="1">⭐ Ruim</option>
+                                </select>
+
+                                <textarea id="reviewComment"
+                                    placeholder="Conte sua experiência com esta joia"></textarea>
+
+                                <button class="btn-secondary"
+                                    onclick="submitReview('${product.id}')">
+                                    Enviar Avaliação
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- AÇÕES -->
                         <div class="product-detail-actions">
+
                             <div class="quantity-selector">
                                 <label for="detailQuantity">Quantidade:</label>
                                 <div class="quantity-controls">
                                     <button class="quantity-btn" onclick="decreaseDetailQuantity()">
                                         <i class="fas fa-minus"></i>
                                     </button>
-                                    <input type="number" 
-                                           id="detailQuantity" 
-                                           class="quantity-input" 
-                                           value="1" 
-                                           min="1" 
+
+                                    <input type="number"
+                                           id="detailQuantity"
+                                           class="quantity-input"
+                                           value="1"
+                                           min="1"
                                            max="${product.stock}">
+
                                     <button class="quantity-btn" onclick="increaseDetailQuantity()">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
                             </div>
-                            
-                            <button class="btn-primary large-btn" 
-                                    onclick="addToCartFromDetail('${product.id}')" 
+
+                            <button class="btn-primary large-btn"
+                                    onclick="addToCartFromDetail('${product.id}')"
                                     ${product.stock <= 0 ? 'disabled' : ''}>
                                 <i class="fas fa-shopping-bag"></i>
                                 ${product.stock <= 0 ? 'Produto Esgotado' : 'Adicionar ao Carrinho'}
                             </button>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     `;
-    
-    // Resetar quantidade para 1
+
+    // Resetar quantidade
     STATE.detailQuantity = 1;
-    
+
+    // 🔥 Carregar avaliações reais
+    loadProductReviews(product.id);
+
     modal.classList.add('open');
     createOverlay();
+
     console.log('✅ Modal de detalhes aberto');
 }
 
+
+function closeProductModal() {
+    const modal = document.getElementById('productModal');
+    if (modal) {
+        modal.classList.remove('open');
+        modal.innerHTML = '';
+        removeOverlay?.();
+    }
+}
 
 // Adicione emojis automáticos baseados em palavras-chave
 function addJewelryEmojis(text) {
@@ -1755,64 +2127,83 @@ function addJewelryEmojis(text) {
     });
     
     return result;
-}
-// ===== FORMATADOR DE DESCRIÇÃO PARA JOIAS =====
+}// ===== FORMATADOR SEO AVANÇADO PARA DESCRIÇÃO DE JOIAS =====
 function formatJewelryDescription(description) {
     if (!description) return '';
-    
-    let formatted = description;
-    
-    // 1. Substituir quebras de linha por <br> ou <p>
-    formatted = formatted.replace(/\n/g, '<br>');
-    
-    // 2. Detectar e formatar listas
-    // Para listas com marcadores como *, -, •, ✓
-    formatted = formatted.replace(/(\*|\-|\•|\✓)\s+(.+?)(?=\n|$)/g, 
-        '<li><span class="jewelry-list-icon">•</span>$2</li>');
-    
-    // 3. Envolver parágrafos em <p>
-    const paragraphs = formatted.split('<br><br>');
-    formatted = paragraphs.map(p => {
-        if (p.trim()) {
-            // Se parece com uma lista, manter como está
-            if (p.includes('<li>')) {
-                return `<ul class="jewelry-features-list">${p}</ul>`;
-            }
-            return `<p class="jewelry-paragraph">${p}</p>`;
+
+    let formatted = description.trim();
+
+    /* 1. Normalizar quebras de linha */
+    formatted = formatted.replace(/\r\n|\r/g, '\n');
+
+    /* 2. Detectar listas ( *, -, •, ✓ ) */
+    formatted = formatted.replace(
+        /(?:^|\n)([\*\-\•\✓])\s+(.+)/g,
+        '<li itemprop="additionalProperty">$2</li>'
+    );
+
+    /* 3. Separar blocos */
+    const blocks = formatted.split(/\n{2,}/);
+
+    formatted = blocks.map(block => {
+
+        /* Se for lista */
+        if (block.includes('<li')) {
+            return `
+                <ul class="jewelry-features-list" role="list">
+                    ${block}
+                </ul>
+            `;
         }
-        return '';
+
+        /* Se for título [Ex: [Detalhes]] */
+        if (block.match(/^\[.*?\]$/)) {
+            const title = block.replace(/[\[\]]/g, '');
+            return `<h4 class="jewelry-subtitle">${title}</h4>`;
+        }
+
+        /* Parágrafo padrão */
+        return `
+            <p class="jewelry-paragraph" itemprop="description">
+                ${block}
+            </p>
+        `;
     }).join('');
-    
-    // 4. Formatar títulos dentro da descrição
-    formatted = formatted.replace(/\[(.*?)\]/g, 
-        '<h4 class="jewelry-subtitle">$1</h4>');
-    
-    // 5. Destacar especificações técnicas
-    const techTerms = ['ouro', 'prata', 'quilate', 'ct', 'gramas', 'g', 'cm', 'mm', 'diamante', 'rubi', 'esmeralda', 'safira', 'pérola'];
+
+    /* 4. Destaque técnico (SEO semântico) */
+    const techTerms = [
+        'ouro 18k', 'ouro', 'prata 925', 'prata',
+        'quilate', 'ct', 'gramas', 'g', 'cm', 'mm',
+        'zircônia', 'diamante', 'pérola',
+        'aço 316l', 'pvd', 'banho de ouro'
+    ];
+
     techTerms.forEach(term => {
-        const regex = new RegExp(`\\b(${term}s?|${term.toUpperCase()}S?)\\b`, 'gi');
-        formatted = formatted.replace(regex, '<strong class="tech-term">$1</strong>');
+        const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+        formatted = formatted.replace(
+            regex,
+            `<strong class="tech-term">$1</strong>`
+        );
     });
-    
-    // 6. Adicionar emojis para características especiais
+
+    /* 5. Emojis leves e estratégicos (UX + CTR) */
     const emojiMap = {
-        'brilhante|brilho|brilha': '✨',
+        'brilho|brilhante': '✨',
         'luxo|luxuoso|sofisticado': '👑',
-        'presente|presentear|presenteável': '🎁',
-        'exclusivo|exclusividade|limitado': '⭐',
-        'garantia|certificado|autenticidade': '🏅',
-        'entrega grátis|frete grátis': '🚚',
-        'promoção|ofertas|desconto': '💎'
+        'presente|presentear': '🎁',
+        'exclusivo|limitado': '⭐',
+        'garantia|certificado': '🏅',
+        'frete grátis|entrega grátis': '🚚'
     };
-    
-    Object.keys(emojiMap).forEach(pattern => {
+
+    Object.entries(emojiMap).forEach(([pattern, emoji]) => {
         const regex = new RegExp(`\\b(${pattern})\\b`, 'gi');
-        formatted = formatted.replace(regex, 
-            (match, p1) => `${emojiMap[pattern]} ${match} ${emojiMap[pattern]}`);
+        formatted = formatted.replace(regex, `${emoji} $1`);
     });
-    
+
     return formatted;
 }
+
 function closeProductModal() {
     console.log('❌ Fechando modal de detalhes');
     const modal = document.getElementById('productModal');
@@ -1853,92 +2244,69 @@ function decreaseDetailQuantity() {
     }
 }
 
-// ===== ADICIONAR AO CARRINHO DO MODAL (SEM SUBTRAIR ESTOQUE) =====
+
+// ===== ADICIONAR AO CARRINHO (MODAL) – SEO & UX FRIENDLY =====
 function addToCartFromDetail(productId) {
-    console.log('🛒 Adicionando ao carrinho do modal:', productId);
-    
-    // Obter quantidade do input
+
     const quantityInput = document.getElementById('detailQuantity');
-    const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
-    
-    if (isNaN(quantity) || quantity < 1) {
-        showMessage('Quantidade inválida!', 'error');
+    const quantity = quantityInput ? Number(quantityInput.value) : 1;
+
+    if (!Number.isInteger(quantity) || quantity < 1) {
+        showMessage('Quantidade inválida.', 'error');
         return;
     }
-    
+
     const product = STATE.products.find(p => p.id === productId);
-    
     if (!product) {
-        console.error('❌ Produto não encontrado:', productId);
         showMessage('Produto não encontrado.', 'error');
         return;
     }
 
-    // Verificar se o produto está em estoque
     if (product.stock <= 0) {
-        console.log('⚠️ Produto fora de estoque:', product.name);
-        showMessage('Produto fora de estoque.', 'warning');
+        showMessage('Produto esgotado.', 'warning');
         return;
     }
 
-    // Verificar se a quantidade solicitada está disponível
     if (quantity > product.stock) {
-        console.log('📦 Quantidade excede estoque:', product.name);
         showMessage(`Apenas ${product.stock} unidades disponíveis.`, 'warning');
         return;
     }
 
-    // Verificar se o produto já está no carrinho
-    const existingItem = STATE.cart.find(item => item.id === productId);
-    
-    if (existingItem) {
-        // Verificar se não excede o estoque com a nova quantidade
-        if (existingItem.quantity + quantity > product.stock) {
-            const available = product.stock - existingItem.quantity;
-            console.log('📦 Quantidade máxima em estoque atingida:', product.name);
-            showMessage(`Você pode adicionar no máximo ${available} unidades.`, 'warning');
+    const item = STATE.cart.find(i => i.id === productId);
+
+    if (item) {
+        const newQty = item.quantity + quantity;
+        if (newQty > product.stock) {
+            showMessage(`Você pode adicionar no máximo ${product.stock - item.quantity} unidades.`, 'warning');
             return;
         }
-        // Incrementar quantidade NO CARRINHO apenas
-        existingItem.quantity += quantity;
-        console.log('➕ Quantidade incrementada no carrinho:', product.name, 
-                   'Nova quantidade no carrinho:', existingItem.quantity);
+        item.quantity = newQty;
     } else {
-        // Adicionar novo item ao carrinho
         STATE.cart.push({
             id: product.id,
             name: product.name,
             price: product.price,
             imageURL: product.imageURL,
-            stock: product.stock, // Armazena o estoque atual
-            quantity: quantity,
+            quantity,
+            stock: product.stock,
             cartId: generateId()
         });
-        console.log('🆕 Novo produto adicionado ao carrinho:', product.name, 
-                   'Quantidade:', quantity, 'Estoque disponível:', product.stock);
     }
 
-    // NÃO subtrair do estoque local
-    // O estoque só será atualizado na finalização da compra
-    
-    // Atualizar interface do carrinho
     updateCartUI();
-    
-    // Mostrar mensagem de sucesso
-    if (quantity === 1) {
-        showMessage('✅ ' + product.name + ' adicionado ao carrinho!', 'success');
-    } else {
-        showMessage(`✅ ${quantity} unidades de ${product.name} adicionadas ao carrinho!`, 'success');
-    }
-    
-    // Salvar carrinho no localStorage
     cacheData('shoppingCart', STATE.cart);
-    
-    // Fechar o modal após adicionar (opcional)
-     setTimeout(() => {
-         closeProductModal();
-     }, 1500);
+
+    showMessage(`✅ ${quantity > 1 ? quantity + 'x ' : ''}${product.name} adicionado ao carrinho!`, 'success');
+    gtag('event', 'add_to_cart', { currency: 'BRL', value: product.price, items: [{ item_name: product.name, item_id: product.id }] });
+
+    // Evento SEO / Analytics (opcional)
+    document.dispatchEvent(new CustomEvent('product:addToCart', {
+        detail: { productId, quantity }
+    }));
+
+    setTimeout(closeProductModal, 1200);
 }
+
 
 // Função auxiliar para obter o ID do produto atual no modal
 function getCurrentDetailProductId() {
@@ -2409,6 +2777,21 @@ function addToCart(productId) {
     // Mostrar mensagem de sucesso
     showMessage('✅ ' + product.name + ' adicionado ao carrinho!', 'success');
     
+
+    // 📊 Google Analytics – Add to Cart
+if (typeof gtag === 'function') {
+    gtag('event', 'add_to_cart', {
+        currency: 'BRL',
+        value: Number(product.price) || 0,
+        items: [{
+            item_id: product.id,
+            item_name: product.name,
+            price: Number(product.price) || 0,
+            quantity: 1
+        }]
+    });
+}
+
     // Salvar carrinho no localStorage
     cacheData('shoppingCart', STATE.cart);
     
@@ -2828,7 +3211,8 @@ function displaySearchResults(products, searchTerm) {
             ${products.map(product => {
                 const category = STATE.categories.find(cat => cat.id === product.categoryId);
                 const isOutOfStock = product.stock <= 0;
-                
+                injectProductSchema(product, category?.name);
+
                 return `
                     <div class="search-result-card" onclick="openProductFromSearch('${product.id}')">
                         <img src="${product.imageURL || 'https://via.placeholder.com/200x120?text=Produto'}" 
@@ -2950,7 +3334,8 @@ function displaySearchResultsInMain(products, searchTerm) {
             ${products.map(product => {
                 const category = STATE.categories.find(cat => cat.id === product.categoryId);
                 const isOutOfStock = product.stock <= 0;
-                
+                injectProductSchema(product, category?.name);
+
                 return `
                     <div class="product-card" data-product-id="${product.id}">
                         <img src="${product.imageURL || 'https://via.placeholder.com/300x300?text=Produto'}" 
@@ -4512,3 +4897,184 @@ function testCategorySystem() {
 
 // Execute após a inicialização
 // setTimeout(testCategorySystem, 2000);
+// ===== SCHEMA.ORG PRODUCT + REVIEWS =====
+function injectProductSchema(product) {
+  if (!product) return;
+
+  const reviews = Array.isArray(product.reviews) ? product.reviews : [];
+
+  const aggregateRating = reviews.length
+    ? {
+        "@type": "AggregateRating",
+        "ratingValue": (
+          reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+        ).toFixed(1),
+        "reviewCount": reviews.length
+      }
+    : null;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.imageURL,
+    "description": product.description,
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "BRL",
+      "price": product.price,
+      "availability": product.stock > 0
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock"
+    }
+  };
+
+  if (aggregateRating) {
+    schema.aggregateRating = aggregateRating;
+  }
+
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.textContent = JSON.stringify(schema);
+
+  document.head.appendChild(script);
+}
+
+async function loadProductReviews(productId) {
+    console.log('⭐ Carregando avaliações do produto:', productId);
+
+    const reviewsContainer = document.getElementById('productReviews');
+
+    if (!reviewsContainer) {
+        console.error('❌ Container de reviews não encontrado');
+        return;
+    }
+
+    reviewsContainer.innerHTML = '<p>Carregando avaliações...</p>';
+
+    try {
+        const snapshot = await db
+            .collection('productReviews')
+            .where('productId', '==', productId)
+            .orderBy('createdAt', 'desc')
+            .get();
+
+        if (snapshot.empty) {
+            reviewsContainer.innerHTML = '<p>Este produto ainda não possui avaliações.</p>';
+            return;
+        }
+
+        const reviews = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        renderProductReviews(reviews);
+
+    } catch (error) {
+        console.error('❌ Erro ao carregar avaliações:', error);
+        reviewsContainer.innerHTML = '<p>Erro ao carregar avaliações.</p>';
+    }
+}
+
+
+function renderProductReviews(reviews) {
+    const container = document.getElementById('productReviews');
+
+    container.innerHTML = reviews.map(review => `
+        <div class="review-item" itemprop="review" itemscope itemtype="https://schema.org/Review">
+            <meta itemprop="datePublished" content="${review.createdAt?.toDate()?.toISOString() || ''}">
+            
+            <div class="review-stars" itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
+                <meta itemprop="ratingValue" content="${review.rating}">
+                ${'⭐'.repeat(review.rating)}
+            </div>
+
+            <p class="review-comment" itemprop="reviewBody">
+                ${review.comment}
+            </p>
+        </div>
+    `).join('');
+}
+
+
+function updateAggregateRating(productId, average, count) {
+    const ratingValueEl = document.querySelector('[itemprop="ratingValue"]');
+    const reviewCountEl = document.querySelector('[itemprop="reviewCount"]');
+
+    if (ratingValueEl) ratingValueEl.textContent = average;
+    if (reviewCountEl) reviewCountEl.textContent = count;
+
+    // Atualizar estado local
+    const product = STATE.products.find(p => p.id === productId);
+    if (product) {
+        product.rating = {
+            average: parseFloat(average),
+            count: count
+        };
+    }
+}
+async function submitReview(productId) {
+    const ratingEl = document.getElementById('reviewRating');
+    const commentEl = document.getElementById('reviewComment');
+
+    const rating = parseInt(ratingEl.value);
+    const comment = commentEl.value.trim();
+
+    if (!rating || rating < 1 || rating > 5) {
+        showMessage('Selecione uma nota válida', 'error');
+        return;
+    }
+
+    if (!comment || comment.length < 5) {
+        showMessage('Digite um comentário com pelo menos 5 caracteres', 'error');
+        return;
+    }
+
+    try {
+        await db.collection('productReviews').add({
+            productId: productId,
+            rating: rating,
+            comment: comment,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        showMessage('⭐ Avaliação enviada com sucesso!', 'success');
+
+        commentEl.value = '';
+        ratingEl.value = '5';
+
+        // Recarregar avaliações
+        loadProductReviews(productId);
+
+        // Atualizar média no produto
+        await recalculateProductRating(productId);
+
+    } catch (error) {
+        console.error('❌ Erro ao enviar avaliação:', error);
+        showMessage('Erro ao enviar avaliação', 'error');
+    }
+}
+
+async function recalculateProductRating(productId) {
+    const snapshot = await db
+        .collection('productReviews')
+        .where('productId', '==', productId)
+        .get();
+
+    if (snapshot.empty) return;
+
+    let total = 0;
+    snapshot.forEach(doc => {
+        total += doc.data().rating;
+    });
+
+    const average = (total / snapshot.size).toFixed(1);
+
+    await db.collection('products').doc(productId).update({
+        rating: {
+            average: Number(average),
+            count: snapshot.size
+        }
+    });
+}

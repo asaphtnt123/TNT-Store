@@ -1413,41 +1413,144 @@ p { margin-bottom: var(--space-md); }
   cursor: not-allowed;
   transform: none;
 }
-
-/* ===== MODALS ===== */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
+/* Estilos para os elementos do formulário do modal */
+.luxury-input {
+  background: rgba(20, 20, 20, 0.7);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: #f5f5f5;
+  font-size: 1rem;
   width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 2000;
-  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.modal.open {
+.luxury-input:focus {
+  outline: none;
+  border-color: #ffd700;
+  box-shadow: 
+    0 0 0 3px rgba(255, 215, 0, 0.1),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  background: rgba(30, 30, 30, 0.8);
+}
+
+.luxury-select {
+  background: rgba(20, 20, 20, 0.7);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: #f5f5f5;
+  font-size: 1rem;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23ffd700' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+}
+
+.luxury-select:focus {
+  outline: none;
+  border-color: #ffd700;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+  background-color: rgba(30, 30, 30, 0.8);
+}
+
+.luxury-select option {
+  background: #1a1a1a;
+  color: #f5f5f5;
+  padding: 12px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #d4d4d4;
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+/* Estilo para o resumo do pedido */
+.luxury-summary {
+  background: rgba(20, 20, 20, 0.6);
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 24px;
+}
+
+.summary-title {
+  color: #ffd700;
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
-.modal-content {
-  background: var(--white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
-  max-width: 500px;
-  width: 90%;
-  max-height: 90vh;
+.summary-title::before {
+  content: '📋';
+  margin-right: 10px;
+  font-size: 1rem;
+}
+
+.summary-content {
+  color: #e5e5e5;
+  max-height: 200px;
   overflow-y: auto;
-  animation: modalSlideIn 0.3s ease;
+  padding-right: 8px;
+  margin-bottom: 16px;
 }
 
-@keyframes modalSlideIn {
+.summary-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.summary-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #ffd700, #b8860b);
+  border-radius: 3px;
+}
+
+.total-amount {
+  display: block;
+  text-align: right;
+  color: #ffd700;
+  font-size: 1.4rem;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Estilos para os ícones */
+.fa-times, .fab fa-whatsapp {
+  transition: transform 0.3s ease;
+}
+
+.close-modal:hover .fa-times {
+  transform: rotate(90deg);
+}
+
+.btn-primary:hover .fa-whatsapp {
+  transform: scale(1.1);
+}
+
+/* Animação para itens do resumo */
+@keyframes fadeInItem {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-5px);
   }
   to {
     opacity: 1;
@@ -1455,29 +1558,57 @@ p { margin-bottom: var(--space-md); }
   }
 }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-xl);
-  border-bottom: 1px solid var(--gray-200);
+.summary-content > div {
+  animation: fadeInItem 0.3s ease forwards;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.modal-body {
-  padding: var(--space-xl);
+.summary-content > div:last-child {
+  border-bottom: none;
 }
 
-.modal-footer {
-  display: flex;
-  gap: var(--space-md);
-  padding: var(--space-xl);
-  border-top: 1px solid var(--gray-200);
-  background: var(--gray-50);
+/* Efeito de foco nos campos */
+.form-group:focus-within label {
+  color: #ffd700;
 }
 
-.modal-footer .btn-primary,
-.modal-footer .btn-secondary {
-  flex: 1;
+/* Placeholder estilizado */
+.luxury-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    margin: 10px;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+  }
+  
+  .modal-footer .btn-primary,
+  .modal-footer .btn-secondary {
+    width: 100%;
+  }
+  
+  .luxury-summary {
+    padding: 16px;
+  }
+}
+
+/* Efeito de brilho nos botões quando ativos */
+.btn-primary:active,
+.btn-secondary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Indicador de campo obrigatório */
+.luxury-input:required + label::after {
+  content: ' *';
+  color: #ffd700;
 }
 
 /* ===== FORMS ===== */
@@ -3191,3 +3322,20 @@ p { margin-bottom: var(--space-md); }
         grid-template-columns: 1fr;
     }
 }
+
+
+
+.product-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.product-modal.open {
+    display: flex;
+}
+
