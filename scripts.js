@@ -1692,6 +1692,18 @@ if (typeof gtag === 'function') {
     }
 }
 
+
+// 🧮 Total do carrinho
+function getCartTotal() {
+    if (!STATE.cart || STATE.cart.length === 0) return 0;
+
+    return STATE.cart.reduce((total, item) => {
+        return total + (item.price * item.quantity);
+    }, 0);
+}
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
     checkPendingReview();
 });
