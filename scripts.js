@@ -10,9 +10,9 @@ const CONFIG = {
         appId: "1:357149829474:web:324b2005d82eabbce5e43b"
     },
     defaultStoreConfig: {
-        name: "Atacadão dos Revendedores",
+        name: "Quero'Luxo Joias & Semijoias Importadas",
         description: "Melhores preços em joias e acessórios",
-        whatsapp: "5519999999999",
+        whatsapp: "5519996249702",
         deliveryFee: 2.00
     }
 };
