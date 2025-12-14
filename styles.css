@@ -421,10 +421,43 @@ p { margin-bottom: var(--space-md); }
 
         
         /* Seção da Logo */
-        .logo-section {
-            display: flex;
-            align-items: center;
-        }
+       .logo-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.logo-large {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.logo-large img {
+    width: auto;
+    object-fit: contain;
+}
+
+.brand-name {
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .logo-large img {
+    
+    }
+}
+
         
         .logo {
             display: flex;
@@ -433,7 +466,7 @@ p { margin-bottom: var(--space-md); }
         }
         
         .logo img {
-            height: 50px;
+            height: 260px;
             width: auto;
             border-radius: 8px;
         }
