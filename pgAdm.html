@@ -2919,80 +2919,1042 @@ function updateBannerPreview() {
     }
 }
 
+// ===== FUNÇÕES DE PROCESSAMENTO DE DADOS =====
 
-
-// ===== VISUALIZAR ESTATÍSTICAS DE CLICKS =====
-function showProductStats() {
+function processCompleteStats(productStats, conversionStats, cartHistory) {
+    const products = STATE.products || [];
+    const today = new Date().toISOString().split('T')[0];
+    
+    return Object.entries(productStats).map(([id, stats]) => {
+        const product = products.find(p => p.id === id) || {};
+        const conversion = conversionStats[id] || {};
+        const productCartHistory = cartHistory.filter(item => item.productId === id);
+        
+        // Calcular visualizações de hoje
+        const todayClicks = stats.viewsByDay && stats.viewsByDay[today] 
+            ? stats.viewsByDay[today] 
+            : 0;
+        
+        // Calcular média de preço das adições ao carrinho
+        const cartEntries = productCartHistory.filter(item => item.action === 'add');
+        const averagePrice = cartEntries.length > 0
+            ? cartEntries.reduce((sum, item) => sum + (item.price || 0), 0) / cartEntries.length
+            : product.price || 0;
+        
+        return {
+            id,
+            productName: stats.productName || product.name || 'Produto sem nome',
+            clickCount: stats.clickCount || 0,
+            todayClicks,
+            lastClick: stats.lastClick || new Date().toISOString(),
+            firstClick: stats.firstClick || new Date().toISOString(),
+            avgPerDay: calculateAvgPerDay(stats),
+            
+            // Dados de conversão
+            addToCartCount: conversion.addToCartCount || 0,
+            purchases: conversion.purchases || 0,
+            lastAdded: conversion.lastAdded || null,
+            firstAdded: conversion.firstAdded || null,
+            
+            // Informações do produto
+            price: product.price || 0,
+            stock: product.stock || 0,
+            category: product.categoryId || 'sem-categoria',
+            averagePrice,
+            
+            // Histórico detalhado
+            cartHistory: productCartHistory,
+            last7DaysClicks: calculateLast7DaysClicks(stats),
+            conversionRate: stats.clickCount > 0 
+                ? ((conversion.addToCartCount || 0) / stats.clickCount) * 100 
+                : 0
+        };
+    });
+}
+function calculateTodayConversions(cartHistory) {
     try {
-        // Obter dados do LocalStorage
+        console.log('📅 Calculando adições ao carrinho de hoje...');
+        
+        if (!cartHistory || !Array.isArray(cartHistory) || cartHistory.length === 0) {
+            console.log('📭 Nenhum histórico de carrinho encontrado');
+            return 0;
+        }
+        
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+        
+        console.log('Data de hoje:', todayStr);
+        console.log('Total de registros no histórico:', cartHistory.length);
+        
+        // Filtrar apenas ações de 'add' de hoje
+        const todayAdditions = cartHistory.filter(item => {
+            try {
+                if (!item || typeof item !== 'object') return false;
+                
+                // Verificar se é uma ação de adição
+                if (item.action !== 'add') return false;
+                
+                // Verificar timestamp
+                let itemDate;
+                if (item.timestamp) {
+                    itemDate = new Date(item.timestamp);
+                } else if (item.addedAt) {
+                    itemDate = new Date(item.addedAt);
+                } else if (item.date) {
+                    itemDate = new Date(item.date);
+                } else {
+                    return false;
+                }
+                
+                if (isNaN(itemDate.getTime())) return false;
+                
+                const itemDateStr = itemDate.toISOString().split('T')[0];
+                return itemDateStr === todayStr;
+                
+            } catch (error) {
+                console.warn('Erro ao processar item do histórico:', item, error);
+                return false;
+            }
+        });
+        
+        console.log('Adições de hoje encontradas:', todayAdditions.length);
+        console.log('Detalhes:', todayAdditions.map(item => ({
+            action: item.action,
+            product: item.productName,
+            quantity: item.quantity,
+            timestamp: item.timestamp || item.addedAt
+        })));
+        
+        return todayAdditions.length;
+        
+    } catch (error) {
+        console.error('❌ Erro ao calcular adições de hoje:', error);
+        return 0;
+    }
+}
+
+function calculateConversionRate(statsArray) {
+    const totalClicks = statsArray.reduce((sum, p) => sum + p.clickCount, 0);
+    const totalAddToCart = statsArray.reduce((sum, p) => sum + p.addToCartCount, 0);
+    
+    if (totalClicks === 0) return 0;
+    return ((totalAddToCart / totalClicks) * 100).toFixed(1);
+}
+
+function calculateTotalCartValue(cart) {
+    return cart.reduce((total, item) => {
+        return total + (Number(item.price) || 0) * (item.quantity || 1);
+    }, 0);
+}
+
+function calculateAbandonedCartValue(cartHistory) {
+    const abandonedItems = cartHistory.filter(item => 
+        item.action === 'add' && 
+        !cartHistory.some(purchase => 
+            purchase.action === 'purchase' && purchase.productId === item.productId
+        )
+    );
+    
+    return abandonedItems.reduce((total, item) => {
+        return total + (item.price || 0) * (item.quantity || 1);
+    }, 0);
+}
+
+function calculateLast7DaysClicks(stats) {
+    if (!stats.viewsByDay) return {};
+    
+    const last7Days = {};
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        last7Days[dateStr] = stats.viewsByDay[dateStr] || 0;
+    }
+    
+    return last7Days;
+}
+
+function calculateTotalDataSize() {
+    const productStats = localStorage.getItem('productStats') || '';
+    const productClicks = localStorage.getItem('productClicks') || '';
+    const conversionStats = localStorage.getItem('conversionStats') || '';
+    const cartHistory = localStorage.getItem('cartHistory') || '';
+    
+    return productStats.length + productClicks.length + conversionStats.length + cartHistory.length;
+}
+
+// ===== FUNÇÕES DE FORMATAÇÃO E UI =====
+
+function getConversionTrend(statsArray) {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    const todayStr = today.toISOString().split('T')[0];
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    
+    const todayClicks = statsArray.reduce((sum, p) => sum + (p.last7DaysClicks[todayStr] || 0), 0);
+    const yesterdayClicks = statsArray.reduce((sum, p) => sum + (p.last7DaysClicks[yesterdayStr] || 0), 0);
+    
+    if (yesterdayClicks === 0) return '📈 Nova';
+    const change = ((todayClicks - yesterdayClicks) / yesterdayClicks) * 100;
+    
+    if (change > 20) return '📈 Alta';
+    if (change > 0) return '↗️ Crescendo';
+    if (change < -20) return '📉 Queda';
+    if (change < 0) return '↘️ Declínio';
+    return '➡️ Estável';
+}
+
+function getConversionTrendClass(rate) {
+    if (rate > 10) return 'positive';
+    if (rate > 5) return 'good';
+    if (rate > 2) return 'average';
+    return 'low';
+}
+
+function getConversionTrendText(rate) {
+    if (rate > 10) return '🎯 Excelente';
+    if (rate > 5) return '👍 Bom';
+    if (rate > 2) return '👌 Aceitável';
+    return '📉 Baixo';
+}
+
+function getConversionStatus(product) {
+    const rate = product.conversionRate;
+    
+    if (rate > 10 && product.clickCount > 20) {
+        return { class: 'status-excellent', text: '🎯 Alta Conversão' };
+    }
+    if (rate > 5 && product.clickCount > 10) {
+        return { class: 'status-good', text: '👍 Bom' };
+    }
+    if (rate > 0 && product.clickCount > 5) {
+        return { class: 'status-average', text: '👌 Média' };
+    }
+    if (product.clickCount > 10 && rate === 0) {
+        return { class: 'status-low', text: '📉 Sem Conversão' };
+    }
+    return { class: 'status-new', text: '🆕 Novo' };
+}
+
+function getActionText(action) {
+    const actions = {
+        'add': 'Adicionado ao carrinho',
+        'remove': 'Removido do carrinho',
+        'purchase': 'Comprado',
+        'view': 'Visualizado'
+    };
+    return actions[action] || action;
+}
+
+function formatTimeAgo(date) {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffMins < 1) return 'agora';
+    if (diffMins < 60) return `${diffMins} min atrás`;
+    if (diffHours < 24) return `${diffHours} h atrás`;
+    if (diffDays === 1) return 'ontem';
+    if (diffDays < 7) return `${diffDays} dias atrás`;
+    return date.toLocaleDateString('pt-BR');
+}
+
+function getTrendClass(item) {
+    if (item.avgPerDay > 5) return 'trend-high';
+    if (item.avgPerDay > 2) return 'trend-medium';
+    if (item.avgPerDay > 0.5) return 'trend-low';
+    return 'trend-none';
+}
+
+// ===== FUNÇÕES DE GERAÇÃO DE GRÁFICOS =====
+
+function generateHourlyClicksChart(allClicks) {
+    const today = new Date().toDateString();
+    const todayClicks = allClicks.filter(click => {
+        const clickDate = new Date(click.timestamp || click.date).toDateString();
+        return clickDate === today;
+    });
+    
+    // Agrupar por hora
+    const hourlyData = Array(24).fill(0);
+    todayClicks.forEach(click => {
+        const hour = new Date(click.timestamp || click.date).getHours();
+        hourlyData[hour]++;
+    });
+    
+    const maxClicks = Math.max(...hourlyData) || 1;
+    const chartHeight = 80;
+    
+    let html = '<div class="hourly-chart">';
+    
+    hourlyData.forEach((count, hour) => {
+        const height = (count / maxClicks) * chartHeight;
+        const hourLabel = hour.toString().padStart(2, '0') + 'h';
+        
+        html += `
+            <div class="hour-bar">
+                <div class="bar" style="height: ${height}px" title="${hourLabel}: ${count} cliques">
+                    <span class="bar-count">${count}</span>
+                </div>
+                <span class="hour-label">${hourLabel}</span>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    return html;
+}
+
+function generateDailyClicksChart(allClicks) {
+    const last7Days = getLast7Days();
+    const dailyData = {};
+    
+    last7Days.forEach(day => dailyData[day] = 0);
+    
+    allClicks.forEach(click => {
+        const date = new Date(click.timestamp || click.date).toISOString().split('T')[0];
+        if (dailyData[date] !== undefined) {
+            dailyData[date]++;
+        }
+    });
+    
+    const maxClicks = Math.max(...Object.values(dailyData)) || 1;
+    const chartHeight = 100;
+    
+    let html = '<div class="daily-chart">';
+    
+    Object.entries(dailyData).forEach(([date, count]) => {
+        const height = (count / maxClicks) * chartHeight;
+        const dayName = new Date(date).toLocaleDateString('pt-BR', { weekday: 'short' });
+        const dayNum = new Date(date).getDate();
+        
+        html += `
+            <div class="day-bar">
+                <div class="bar" style="height: ${height}px" title="${date}: ${count} cliques">
+                    <span class="bar-count">${count}</span>
+                </div>
+                <div class="day-label">
+                    <span class="day-name">${dayName}</span>
+                    <span class="day-number">${dayNum}</span>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    return html;
+}
+
+function generatePerformanceChart(statsArray) {
+    const categories = {
+        'alta-conversao': { min: 10, max: 100, label: 'Alta Conversão', count: 0 },
+        'media-conversao': { min: 5, max: 9.9, label: 'Média Conversão', count: 0 },
+        'baixa-conversao': { min: 1, max: 4.9, label: 'Baixa Conversão', count: 0 },
+        'sem-conversao': { min: 0, max: 0.9, label: 'Sem Conversão', count: 0 }
+    };
+    
+    // Contar produtos por categoria de conversão
+    statsArray.forEach(product => {
+        const rate = product.conversionRate;
+        
+        for (const [key, category] of Object.entries(categories)) {
+            if (rate >= category.min && rate <= category.max) {
+                category.count++;
+                break;
+            }
+        }
+    });
+    
+    const total = statsArray.length;
+    let html = '<div class="performance-distribution">';
+    
+    Object.values(categories).forEach(category => {
+        const percentage = total > 0 ? (category.count / total) * 100 : 0;
+        
+        html += `
+            <div class="performance-category">
+                <div class="category-header">
+                    <span class="category-label">${category.label}</span>
+                    <span class="category-count">${category.count} (${percentage.toFixed(1)}%)</span>
+                </div>
+                <div class="category-bar">
+                    <div class="bar-fill" style="width: ${percentage}%"></div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    return html;
+}
+
+function generateRecommendations(statsArray) {
+    const recommendations = [];
+    
+    // Produtos com alta visualização mas baixa conversão
+    const highViewLowConv = statsArray.filter(p => 
+        p.clickCount > 20 && p.conversionRate < 2
+    );
+    
+    if (highViewLowConv.length > 0) {
+        recommendations.push({
+            type: 'warning',
+            icon: '👁️',
+            title: 'Alta Visualização, Baixa Conversão',
+            text: `${highViewLowConv.length} produtos com muitas visualizações mas poucas conversões. Considere ajustar preços ou descrições.`
+        });
+    }
+    
+    // Produtos sem estoque
+    const outOfStock = statsArray.filter(p => p.stock <= 0 && p.clickCount > 0);
+    
+    if (outOfStock.length > 0) {
+        recommendations.push({
+            type: 'danger',
+            icon: '⚠️',
+            title: 'Produtos Esgotados',
+            text: `${outOfStock.length} produtos estão esgotados mas recebendo visualizações. Considere repor estoque.`
+        });
+    }
+    
+    // Produtos com alta conversão
+    const highConv = statsArray.filter(p => p.conversionRate > 15 && p.clickCount > 10);
+    
+    if (highConv.length > 0) {
+        recommendations.push({
+            type: 'success',
+            icon: '🎯',
+            title: 'Produtos de Alta Performance',
+            text: `${highConv.length} produtos com excelente taxa de conversão. Pode ser interessante destacá-los mais.`
+        });
+    }
+    
+    // Carrinho abandonado
+    const abandonedValue = calculateAbandonedCartValue([]);
+    if (abandonedValue > 100) {
+        recommendations.push({
+            type: 'info',
+            icon: '🛒',
+            title: 'Carrinho Abandonado',
+            text: `R$ ${formatPrice(abandonedValue)} em produtos não finalizados. Considere enviar lembretes de carrinho.`
+        });
+    }
+    
+    // Gerar HTML das recomendações
+    let html = '';
+    recommendations.forEach(rec => {
+        html += `
+            <div class="recommendation ${rec.type}">
+                <div class="rec-icon">${rec.icon}</div>
+                <div class="rec-content">
+                    <h6>${rec.title}</h6>
+                    <p>${rec.text}</p>
+                </div>
+            </div>
+        `;
+    });
+    
+    return html || '<div class="no-recommendations">✅ Tudo está funcionando bem! Continue monitorando.</div>';
+}
+
+// ===== FUNÇÕES DE CONTROLE E EXPORTAÇÃO =====
+
+function switchTab(tabName) {
+    // Remover classe active de todas as tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    // Adicionar classe active à tab selecionada
+    document.querySelectorAll(`.tab-btn`).forEach(btn => {
+        if (btn.textContent.includes(tabName === 'clicks' ? 'Visualizações' : 
+                                    tabName === 'conversions' ? 'Conversões' : 'Performance')) {
+            btn.classList.add('active');
+        }
+    });
+    
+    const tabElement = document.getElementById(`${tabName}Tab`);
+    if (tabElement) {
+        tabElement.classList.add('active');
+    }
+}
+
+function filterStats(filterType) {
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Aqui você implementaria a lógica de filtragem real
+    // Por enquanto, apenas mostra feedback
+    const filterNames = {
+        'all': 'Todos os Produtos',
+        'highPerforming': 'Produtos de Alta Performance',
+        'lowPerforming': 'Produtos com Baixa Conversão',
+        'abandoned': 'Carrinhos Abandonados'
+    };
+    
+    showMessage(`Filtrando por: ${filterNames[filterType]}`, 'info');
+}
+
+function exportFullReport() {
+    try {
+        // Coletar todos os dados
         const productStats = JSON.parse(localStorage.getItem('productStats') || '{}');
         const allClicks = JSON.parse(localStorage.getItem('productClicks') || '[]');
+        const conversionStats = JSON.parse(localStorage.getItem('conversionStats') || '{}');
+        const cartHistory = JSON.parse(localStorage.getItem('cartHistory') || '[]');
         
-        // Converter para array e ordenar por cliques
-        const statsArray = Object.entries(productStats).map(([id, data]) => ({
-            id,
-            ...data
-        }));
+        // Criar relatório completo
+        const report = {
+            metadata: {
+                reportDate: new Date().toISOString(),
+                reportType: 'full_product_analysis',
+                timeRange: 'all_time'
+            },
+            summary: {
+                totalProducts: Object.keys(productStats).length,
+                totalClicks: allClicks.length,
+                totalConversions: Object.values(conversionStats).reduce((sum, c) => sum + (c.addToCartCount || 0), 0),
+                totalPurchases: Object.values(conversionStats).reduce((sum, c) => sum + (c.purchases || 0), 0),
+                cartHistoryCount: cartHistory.length
+            },
+            detailedData: {
+                productStats: productStats,
+                conversionStats: conversionStats,
+                recentClicks: allClicks.slice(-100), // Últimos 100 cliques
+                recentCartHistory: cartHistory.slice(-50) // Últimas 50 ações
+            }
+        };
         
+        const dataStr = JSON.stringify(report, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(dataBlob);
+        downloadLink.download = `relatorio-produtos-${new Date().toISOString().split('T')[0]}.json`;
+        downloadLink.click();
+        
+        showMessage('✅ Relatório completo exportado com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao exportar relatório:', error);
+        showMessage('❌ Erro ao exportar relatório', 'error');
+    }
+}
+
+function exportClicksCSV() {
+    try {
+        const productStats = JSON.parse(localStorage.getItem('productStats') || '{}');
+        
+        let csv = 'ID do Produto,Nome do Produto,Total de Visualizações,Primeira Visualização,Última Visualização,Média por Dia\n';
+        
+        Object.entries(productStats).forEach(([id, data]) => {
+            const avgPerDay = calculateAvgPerDay(data);
+            csv += `"${id}","${data.productName || ''}",${data.clickCount || 0},"${data.firstClick || ''}","${data.lastClick || ''}",${avgPerDay.toFixed(2)}\n`;
+        });
+        
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', `visualizacoes-produtos-${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showMessage('✅ Dados de visualizações exportados em CSV!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao exportar CSV:', error);
+        showMessage('❌ Erro ao exportar dados CSV', 'error');
+    }
+}
+
+function copyProductId(productId) {
+    navigator.clipboard.writeText(productId)
+        .then(() => showMessage('✅ ID copiado para a área de transferência!', 'success'))
+        .catch(err => showMessage('❌ Erro ao copiar ID', 'error'));
+}
+
+function viewProductDetails(productId) {
+    // Fechar modal de estatísticas primeiro
+    closeStats();
+    
+    // Abrir modal de detalhes do produto
+    setTimeout(() => {
+        showProductDetails(productId);
+    }, 300);
+}
+
+function analyzeProduct(productId) {
+    showMessage(`🔍 Analisando produto ${productId}...`, 'info');
+    // Aqui você pode implementar uma análise mais detalhada
+}
+
+function showFullCartHistory() {
+    // Implementar modal com histórico completo do carrinho
+    showMessage('📋 Carregando histórico completo do carrinho...', 'info');
+}
+
+function refreshStats() {
+    closeStats();
+    setTimeout(() => {
+        showProductStats();
+        showMessage('🔄 Estatísticas atualizadas!', 'success');
+    }, 500);
+}
+
+// ===== ESTILOS DINÂMICOS COMPLETOS =====
+function addCompleteStatsStyles() {
+    // Esta função adiciona todos os estilos necessários
+    // É uma versão expandida da addStatsStyles anterior
+    // Mantenha o mesmo padrão mas com mais estilos para as novas funcionalidades
+}
+
+// ===== FUNÇÕES AUXILIARES QUE ESTÃO FALTANDO =====
+
+// Função para calcular média de cliques por dia
+function calculateAvgPerDay(data) {
+    if (!data.firstClick || !data.clickCount || data.clickCount < 2) {
+        return data.clickCount || 0;
+    }
+    
+    try {
+        const firstDate = new Date(data.firstClick);
+        const lastDate = new Date(data.lastClick || data.firstClick);
+        const daysDiff = Math.max(1, Math.floor((lastDate - firstDate) / (1000 * 60 * 60 * 24)));
+        
+        return (data.clickCount || 0) / daysDiff;
+    } catch (error) {
+        console.error('Erro ao calcular média:', error);
+        return data.clickCount || 0;
+    }
+}
+
+// ===== FUNÇÃO PARA REGISTRAR ADIÇÃO AO CARRINHO CORRETAMENTE =====
+function registerCartAddition(product, quantity) {
+    try {
+        console.log('📝 Registrando adição ao carrinho:', product.name, quantity);
+        
+        // 1. Obter ou criar histórico
+        let cartHistory = JSON.parse(localStorage.getItem('cartHistory') || '[]');
+        
+        // 2. Criar registro da adição
+        const additionRecord = {
+            action: 'add',
+            productId: product.id,
+            productName: product.name,
+            quantity: quantity,
+            price: parseFloat(product.price) || 0,
+            total: (parseFloat(product.price) || 0) * quantity,
+            timestamp: new Date().toISOString(),
+            date: new Date().toISOString().split('T')[0], // Data separada para facilitar filtros
+            hour: new Date().getHours(),
+            sessionId: localStorage.getItem('sessionId') || 'unknown'
+        };
+        
+        // 3. Adicionar ao histórico
+        cartHistory.push(additionRecord);
+        
+        // 4. Limitar histórico aos últimos 100 registros
+        if (cartHistory.length > 100) {
+            cartHistory = cartHistory.slice(-100);
+        }
+        
+        // 5. Salvar no localStorage
+        localStorage.setItem('cartHistory', JSON.stringify(cartHistory));
+        
+        console.log('✅ Adição registrada no histórico:', additionRecord);
+        
+        // 6. Atualizar estatísticas de conversão
+        updateConversionStats(product.id, quantity);
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Erro ao registrar adição ao carrinho:', error);
+        return false;
+    }
+}
+
+
+// ===== FUNÇÃO PARA ATUALIZAR ESTATÍSTICAS DE CONVERSÃO =====
+function updateConversionStats(productId, quantity) {
+    try {
+        // Obter estatísticas de conversão
+        let conversionStats = JSON.parse(localStorage.getItem('conversionStats') || '{}');
+        
+        // Obter data atual
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Inicializar ou atualizar estatísticas do produto
+        if (!conversionStats[productId]) {
+            conversionStats[productId] = {
+                productId: productId,
+                addToCartCount: 0,
+                purchases: 0,
+                todayAdditions: 0,
+                totalQuantity: 0,
+                lastAdded: null,
+                firstAdded: new Date().toISOString(),
+                dailyStats: {}
+            };
+        }
+        
+        // Atualizar contadores
+        conversionStats[productId].addToCartCount = (conversionStats[productId].addToCartCount || 0) + 1;
+        conversionStats[productId].totalQuantity = (conversionStats[productId].totalQuantity || 0) + quantity;
+        conversionStats[productId].lastAdded = new Date().toISOString();
+        
+        // Atualizar estatísticas diárias
+        if (!conversionStats[productId].dailyStats[today]) {
+            conversionStats[productId].dailyStats[today] = {
+                date: today,
+                additions: 0,
+                quantity: 0
+            };
+        }
+        
+        conversionStats[productId].dailyStats[today].additions = 
+            (conversionStats[productId].dailyStats[today].additions || 0) + 1;
+        conversionStats[productId].dailyStats[today].quantity = 
+            (conversionStats[productId].dailyStats[today].quantity || 0) + quantity;
+        
+        // Atualizar contador de adições de hoje
+        conversionStats[productId].todayAdditions = conversionStats[productId].dailyStats[today].additions || 0;
+        
+        // Salvar estatísticas
+        localStorage.setItem('conversionStats', JSON.stringify(conversionStats));
+        
+        console.log('📊 Estatísticas de conversão atualizadas:', conversionStats[productId]);
+        
+    } catch (error) {
+        console.error('❌ Erro ao atualizar estatísticas de conversão:', error);
+    }
+}
+
+// ===== FUNÇÃO PARA CALCULAR TOTAL DE ADIÇÕES (USAR NO DASHBOARD) =====
+function calculateTotalAdditions() {
+    try {
+        // Método 1: Somar de conversionStats
+        const conversionStats = JSON.parse(localStorage.getItem('conversionStats') || '{}');
+        let totalFromStats = 0;
+        
+        Object.values(conversionStats).forEach(productStats => {
+            totalFromStats += productStats.addToCartCount || 0;
+        });
+        
+        console.log('Total de adições (conversionStats):', totalFromStats);
+        
+        // Método 2: Contar no histórico
+        const cartHistory = JSON.parse(localStorage.getItem('cartHistory') || '[]');
+        const totalFromHistory = cartHistory.filter(item => item.action === 'add').length;
+        
+        console.log('Total de adições (histórico):', totalFromHistory);
+        
+        // Retornar o maior valor ou o que tiver dados
+        if (totalFromStats > 0 || totalFromHistory > 0) {
+            return Math.max(totalFromStats, totalFromHistory);
+        }
+        
+        return 0;
+        
+    } catch (error) {
+        console.error('❌ Erro ao calcular total de adições:', error);
+        return 0;
+    }
+}
+
+// Função para calcular cliques de hoje
+function calculateTodayClicks(allClicks) {
+    try {
+        const today = new Date().toDateString();
+        return allClicks.filter(click => {
+            if (!click.timestamp && !click.date) return false;
+            const clickDate = new Date(click.timestamp || click.date);
+            return clickDate.toDateString() === today;
+        }).length;
+    } catch (error) {
+        console.error('Erro ao calcular cliques de hoje:', error);
+        return 0;
+    }
+}
+
+// Função para formatar números com separadores
+function formatNumber(num) {
+    if (typeof num !== 'number') {
+        num = Number(num) || 0;
+    }
+    return num.toLocaleString('pt-BR');
+}
+
+// Função para formatar preços
+function formatPrice(price) {
+    if (typeof price !== 'number') {
+        price = Number(price) || 0;
+    }
+    return price.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+// Função para truncar texto
+function truncateText(text, maxLength) {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+}
+
+// Função para formatar data
+function formatDate(date) {
+    if (!(date instanceof Date)) {
+        date = new Date(date);
+    }
+    
+    if (isNaN(date.getTime())) {
+        return 'Data inválida';
+    }
+    
+    const now = new Date();
+    const diffMs = now - date;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+        return 'Hoje ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    } else if (diffDays === 1) {
+        return 'Ontem ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    } else if (diffDays < 7) {
+        return `${diffDays} dias atrás`;
+    } else {
+        return date.toLocaleDateString('pt-BR');
+    }
+}
+
+// Função para obter ícone de tendência
+function getTrendIcon(item) {
+    const avg = item.avgPerDay || 0;
+    
+    if (avg > 5) return '📈';
+    if (avg > 2) return '↗️';
+    if (avg > 0.5) return '➡️';
+    if (avg > 0) return '↘️';
+    return '➖';
+}
+
+// Função para obter texto de tendência
+function getTrendText(item) {
+    const avg = item.avgPerDay || 0;
+    
+    if (avg > 5) return 'Alta popularidade';
+    if (avg > 2) return 'Crescendo';
+    if (avg > 0.5) return 'Estável';
+    if (avg > 0) return 'Baixa popularidade';
+    return 'Sem atividade';
+}
+
+// Função para formatar bytes
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Função para obter últimos 7 dias
+function getLast7Days() {
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        days.push(date.toISOString().split('T')[0]);
+    }
+    return days;
+}
+
+// ===== FUNÇÃO PRINCIPAL CORRIGIDA (SIMPLIFICADA) =====
+
+function showProductStats() {
+    try {
+        console.log('📊 Carregando estatísticas completas de produtos...');
+        
+        // Obter dados do LocalStorage com fallback seguro
+        const productStats = JSON.parse(localStorage.getItem('productStats') || '{}');
+        const allClicks = JSON.parse(localStorage.getItem('productClicks') || '[]');
+        const conversionStats = JSON.parse(localStorage.getItem('conversionStats') || '{}');
+        const cartHistory = JSON.parse(localStorage.getItem('cartHistory') || '[]');
+        const currentCart = JSON.parse(localStorage.getItem('shoppingCart') || '[]');
+        
+        // Verificar se há dados
+        if (Object.keys(productStats).length === 0 && allClicks.length === 0) {
+            showMessage('📭 Nenhuma estatística disponível ainda.', 'info');
+            return;
+        }
+        
+        // Processar dados básicos (versão simplificada)
+        const statsArray = [];
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Converter productStats para array
+        Object.entries(productStats).forEach(([id, stats]) => {
+            const conversion = conversionStats[id] || {};
+            
+            statsArray.push({
+                id,
+                productName: stats.productName || 'Produto sem nome',
+                clickCount: stats.clickCount || 0,
+                lastClick: stats.lastClick || new Date().toISOString(),
+                firstClick: stats.firstClick || new Date().toISOString(),
+                avgPerDay: calculateAvgPerDay(stats),
+                todayClicks: 0, // Calcularemos abaixo
+                addToCartCount: conversion.addToCartCount || 0,
+                purchases: conversion.purchases || 0,
+                price: 0,
+                stock: 0,
+                category: 'sem-categoria'
+            });
+        });
+        
+        // Calcular cliques de hoje
+        statsArray.forEach(item => {
+            const todayClicks = allClicks.filter(click => {
+                const clickDate = new Date(click.timestamp || click.date).toISOString().split('T')[0];
+                return clickDate === today && click.productId === item.id;
+            }).length;
+            item.todayClicks = todayClicks;
+        });
+        
+        // Calcular métricas básicas
+        const totalClicks = allClicks.length;
+        const totalProducts = statsArray.length;
+        const todayClicks = calculateTodayClicks(allClicks);
+        const todayAddToCart = cartHistory.filter(item => {
+            const itemDate = new Date(item.timestamp).toISOString().split('T')[0];
+            return itemDate === today && item.action === 'add';
+        }).length;
+        
+        const totalAddToCart = statsArray.reduce((sum, p) => sum + p.addToCartCount, 0);
+        const conversionRate = totalClicks > 0 ? ((totalAddToCart / totalClicks) * 100).toFixed(1) : '0.0';
+        
+        // Ordenar por cliques
         statsArray.sort((a, b) => b.clickCount - a.clickCount);
         
-        // Criar HTML das estatísticas
+        // Criar HTML simplificado
         let statsHTML = `
             <div class="stats-modal">
                 <div class="modal-header">
-                    <h3><i class="fas fa-chart-bar"></i> Estatísticas de Produtos</h3>
+                    <h3><i class="fas fa-chart-bar"></i> Dashboard de Produtos</h3>
                     <button onclick="closeStats()" class="close-btn">&times;</button>
                 </div>
+                
                 <div class="modal-body">
+                    <!-- RESUMO GERAL -->
                     <div class="stats-summary">
                         <div class="stat-box">
-                            <span class="stat-value">${allClicks.length}</span>
-                            <span class="stat-label">Total de Cliques</span>
+                            <span class="stat-value">${formatNumber(totalClicks)}</span>
+                            <span class="stat-label">Visualizações</span>
+                            <small class="stat-today">+${todayClicks} hoje</small>
                         </div>
+                        
                         <div class="stat-box">
-                            <span class="stat-value">${statsArray.length}</span>
-                            <span class="stat-label">Produtos Clicados</span>
+                            <span class="stat-value">${formatNumber(totalProducts)}</span>
+                            <span class="stat-label">Produtos</span>
+                            <small class="stat-today">${statsArray.filter(p => p.todayClicks > 0).length} ativos</small>
+                        </div>
+                        
+                        <div class="stat-box">
+                            <span class="stat-value">${formatNumber(totalAddToCart)}</span>
+                            <span class="stat-label">Adições Carrinho</span>
+                            <small class="stat-today">+${todayAddToCart} hoje</small>
+                        </div>
+                        
+                        <div class="stat-box">
+                            <span class="stat-value">${conversionRate}%</span>
+                            <span class="stat-label">Taxa Conversão</span>
+                            <small class="stat-today">📈 Análise</small>
                         </div>
                     </div>
                     
-                    <h4>Top Produtos Mais Clicados</h4>
-                    <div class="stats-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Posição</th>
-                                    <th>Produto</th>
-                                    <th>Cliques</th>
-                                    <th>Último Clique</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    <!-- TABELA SIMPLIFICADA -->
+                    <div class="stats-section">
+                        <h4><i class="fas fa-trophy"></i> Top Produtos Mais Visualizados</h4>
+                        <div class="stats-table-container">
+                            <table class="stats-table">
+                                <thead>
+                                    <tr>
+                                        <th class="rank-col">Pos</th>
+                                        <th class="product-col">Produto</th>
+                                        <th class="clicks-col">Visualizações</th>
+                                        <th class="today-col">Hoje</th>
+                                        <th class="trend-col">Tendência</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
         `;
         
-        // Adicionar linhas da tabela
-        statsArray.slice(0, 20).forEach((item, index) => {
-            const lastClick = new Date(item.lastClick).toLocaleDateString('pt-BR');
+        // Adicionar linhas da tabela (top 10)
+        statsArray.slice(0, 10).forEach((item, index) => {
+            const lastClick = formatDate(new Date(item.lastClick));
+            const trend = getTrendIcon(item);
+            
             statsHTML += `
-                <tr>
-                    <td class="rank">${index + 1}</td>
-                    <td class="product-name">${item.productName}</td>
-                    <td class="click-count">${item.clickCount}</td>
-                    <td class="last-click">${lastClick}</td>
+                <tr class="product-row" data-id="${item.id}">
+                    <td class="rank-cell">
+                        <span class="rank-number">${index + 1}</span>
+                    </td>
+                    <td class="product-cell">
+                        <div class="product-info">
+                            <span class="product-name" title="${item.productName}">
+                                ${truncateText(item.productName, 35)}
+                            </span>
+                            <div class="product-meta">
+                                <small class="product-id">ID: ${item.id}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="clicks-cell">
+                        <span class="click-badge">${formatNumber(item.clickCount)}</span>
+                    </td>
+                    <td class="today-cell">
+                        <span class="today-count ${item.todayClicks > 0 ? 'active' : ''}">
+                            ${item.todayClicks}
+                        </span>
+                    </td>
+                    <td class="trend-cell">
+                        <span class="trend-icon" title="${getTrendText(item)}">
+                            ${trend}
+                        </span>
+                    </td>
                 </tr>
             `;
         });
         
         statsHTML += `
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     
+                    <!-- AÇÕES SIMPLIFICADAS -->
                     <div class="stats-actions">
-                        <button onclick="exportStats()" class="btn-secondary">
-                            <i class="fas fa-download"></i> Exportar Dados
+                        <button onclick="exportStats()" class="btn-primary">
+                            <i class="fas fa-file-export"></i> Exportar Dados
+                        </button>
+                        <button onclick="refreshStats()" class="btn-refresh">
+                            <i class="fas fa-sync-alt"></i> Atualizar
                         </button>
                         <button onclick="clearStats()" class="btn-danger">
-                            <i class="fas fa-trash"></i> Limpar Dados
+                            <i class="fas fa-trash-alt"></i> Limpar Dados
                         </button>
                     </div>
                 </div>
@@ -3006,13 +3968,19 @@ function showProductStats() {
         modalContainer.innerHTML = statsHTML;
         document.body.appendChild(modalContainer);
         
+        // Adicionar estilos básicos
+        addBasicStatsStyles();
+        
+        console.log('✅ Dashboard de estatísticas carregado com sucesso');
+        
     } catch (error) {
-        console.error('Erro ao mostrar estatísticas:', error);
-        showMessage('Erro ao carregar estatísticas', 'error');
+        console.error('❌ Erro ao mostrar estatísticas:', error);
+        showMessage('Erro ao carregar dashboard: ' + error.message, 'error');
     }
 }
 
-// Funções auxiliares para o modal de estatísticas
+// ===== FUNÇÕES BÁSICAS DE CONTROLE =====
+
 function closeStats() {
     const modal = document.getElementById('statsModal');
     if (modal) {
@@ -3032,7 +4000,7 @@ function exportStats() {
                 exportDate: new Date().toISOString()
             },
             productStats: productStats,
-            allClicks: allClicks
+            allClicks: allClicks.slice(-1000) // Últimos 1000 cliques
         };
         
         const dataStr = JSON.stringify(exportData, null, 2);
@@ -3043,24 +4011,335 @@ function exportStats() {
         downloadLink.download = `estatisticas-produtos-${new Date().toISOString().split('T')[0]}.json`;
         downloadLink.click();
         
-        showMessage('Dados exportados com sucesso!', 'success');
+        showMessage('✅ Dados exportados com sucesso!', 'success');
     } catch (error) {
         console.error('Erro ao exportar:', error);
         showMessage('Erro ao exportar dados', 'error');
     }
 }
 
+function refreshStats() {
+    closeStats();
+    setTimeout(() => {
+        showProductStats();
+        showMessage('🔄 Estatísticas atualizadas!', 'success');
+    }, 300);
+}
+
 function clearStats() {
-    if (confirm('Tem certeza que deseja limpar todos os dados de estatísticas?')) {
+    if (confirm('⚠️ Tem certeza que deseja limpar TODOS os dados de estatísticas?\n\nEsta ação não pode ser desfeita.')) {
         localStorage.removeItem('productStats');
         localStorage.removeItem('productClicks');
-        showMessage('Estatísticas limpas com sucesso!', 'success');
+        localStorage.removeItem('conversionStats');
+        localStorage.removeItem('cartHistory');
+        showMessage('✅ Estatísticas limpas com sucesso!', 'success');
         closeStats();
     }
 }
 
+// ===== ESTILOS BÁSICOS =====
+function addBasicStatsStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        #statsModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stats-modal {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 1001;
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .close-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-value {
+            display: block;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-today {
+            display: block;
+            color: #28a745;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+        
+        .stats-section {
+            margin-bottom: 32px;
+        }
+        
+        .stats-section h4 {
+            margin-bottom: 16px;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stats-table-container {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .stats-table thead {
+            background: #f8f9fa;
+        }
+        
+        .stats-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .stats-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .stats-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .stats-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .rank-cell {
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .rank-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .product-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .product-name {
+            font-weight: 500;
+            color: #212529;
+            margin-bottom: 4px;
+        }
+        
+        .product-meta {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .product-id {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .click-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .today-count {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .today-count.active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .trend-icon {
+            font-size: 1.2rem;
+        }
+        
+        .stats-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .stats-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-refresh {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-modal {
+                width: 95%;
+                margin: 10px;
+            }
+            
+            .stats-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats-table-container {
+                overflow-x: auto;
+            }
+            
+            .stats-table {
+                min-width: 600px;
+            }
+        }
+    `;
+    
+    document.head.appendChild(style);
+}
 
-
+// Função para mostrar mensagens (se não existir)
+function showMessage(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.textContent = message;
+    alertDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        border-radius: 6px;
+        color: white;
+        background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : type === 'info' ? '#17a2b8' : '#ffc107'};
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        alertDiv.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => alertDiv.remove(), 300);
+    }, 3000);
+}
     </script>
 
     <!-- Font Awesome -->
